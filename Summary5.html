@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>Ανεμογεννήτριες & Αιολικά Πάρκα</title>
+  <link rel="icon" href="data:," />
+
+  <style>
+    :root {
+      --bg: #F5F5F7;
+      --surface: #FFFFFF;
+      --ink: #625C5C;
+      --accent: #FF7E79;
+      --border-radius: 18px;
+      --shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html, body { margin: 0; padding: 0; height: 100%; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "San Francisco", system-ui, sans-serif;
+      background-color: transparent;
+      color: var(--ink);
+      line-height: 2.35;
+
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      overflow: hidden; /* scroll μόνο στο εσωτερικό */
+    }
+
+    /* Εξωτερικό κέλυφος ώστε να αναπνέει μέσα στο iframe */
+    .app-shell {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      padding: clamp(4px, 1.5vh, 18px);
+      background: var(--bg);
+    }
+
+    .quiz-container {
+      width: 100%;
+      max-width: 1000px;
+      background: var(--surface);
+      padding: clamp(10px, 2vh, 22px);
+      border-radius: clamp(10px, 2vh, var(--border-radius));
+      box-shadow: var(--shadow);
+
+      display: flex;
+      flex-direction: column;
+      min-height: 0; /* απαραίτητο για να δουλέψει σωστά το flex + overflow */
+    }
+
+    h1 {
+      color: var(--accent);
+      font-size: clamp(16px, 2.4vh, 24px);
+      font-weight: 800;
+      text-align: center;
+      margin: 0 0 10px;
+      letter-spacing: 0.2px;
+    }
+
+    #timer {
+      text-align: center;
+      font-size: clamp(12px, 1.9vh, 16px);
+      color: var(--ink);
+      margin-bottom: 12px;
+      font-weight: 700;
+    }
+
+    #questionContainer {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding-right: 4px;
+      margin-bottom: 10px;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 2px;
+      margin-bottom: 4px;
+    }
+
+    button {
+      padding: 8px 16px;
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: clamp(12px, 1.8vh, 15px);
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+      white-space: nowrap;
+    }
+
+    button:hover { background-color: #E66F6A; }
+    button:active { transform: scale(0.97); }
+
+    
+    #result{
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(12px, 3vh, 26px);
+      background: rgba(0,0,0,0.35);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 99999;
+    }
+
+    #result .result-panel{
+      width: min(720px, 100%);
+      max-height: min(84vh, 760px);
+      overflow: auto;
+      margin: 0;
+
+text-align: left;
+      font-size: clamp(12px, 1.8vh, 16px);
+      color: var(--ink);
+      font-weight: 650;
+      line-height: 1.45;
+      padding: clamp(10px, 1.9vh, 14px);
+      border-radius: 16px;
+      border: 1px solid rgba(210, 210, 215, 0.95);
+      background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(245,245,247,0.95));
+      box-shadow: 0 8px 22px rgba(0,0,0,0.12);
+      transform: translateY(6px);
+      opacity: 0;
+      animation: ggPop 160ms ease-out forwards;
+    }
+
+    @keyframes ggPop{
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    #result .result-title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom: 8px;
+      color: var(--accent);
+      font-weight: 900;
+      letter-spacing: 0.2px;
+    }
+
+    #result .result-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,126,121,0.30);
+      background: rgba(255,126,121,0.12);
+      color: var(--accent);
+      font-weight: 900;
+      font-size: 0.9em;
+      white-space: nowrap;
+    }
+
+    #result .result-row{
+      display:flex;
+      gap:10px;
+      flex-wrap: wrap;
+      margin: 6px 0 10px;
+    }
+
+    #result .result-box{
+      flex: 1;
+      min-width: 170px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.85);
+      border: 1px solid rgba(210,210,215,0.95);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    #result .result-label{
+      font-size: 0.86em;
+      opacity: 0.78;
+      font-weight: 800;
+    }
+
+    #result .result-value{
+      margin-top: 3px;
+      font-size: 1.18em;
+      font-weight: 950;
+      color: var(--ink);
+    }
+
+    #result .result-bar{
+      height: 10px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(98,92,92,0.14);
+      border: 1px solid rgba(210,210,215,0.65);
+    }
+
+    #result .result-bar > span{
+      display:block;
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, #FF7E79, #ffb3af);
+      border-radius: 999px;
+      transition: width 420ms ease;
+    }
+
+    #result .result-note-slot{ margin-top: 10px; }
+
+    #result .result-actions{
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    button.btn-ghost{
+      background-color: #FFFFFF;
+      color: var(--ink);
+      border: 1px solid #D2D2D7;
+    }
+    button.btn-ghost:hover{ background-color: #F5F5F7; }
+
+    .difficulty {
+      margin-top: 4px;
+      font-size: clamp(11px, 1.6vh, 13px);
+      color: var(--accent);
+      text-align: left;
+      font-weight: 800;
+    }
+
+    /* Κείμενο συμπλήρωσης */
+    .gap-instructions {
+      font-size: clamp(12px, 1.8vh, 15px);
+      margin: 0 0 8px;
+      font-weight: 800;
+    }
+
+    .gap-text {
+      font-size: clamp(12px, 1.8vh, 16px);
+      margin: 0 0 8px;
+      text-align: left;
+    }
+
+    .gap-select {
+      display: inline-block;
+      width: auto;
+      min-width: 120px;
+      margin: 0 3px;
+      padding: 4px 10px;
+      font-size: clamp(11px, 1.7vh, 14px);
+
+      border-radius: 999px;
+      border: 1px solid #D2D2D7;
+      background-color: #F5F5F7;
+      color: var(--ink);
+
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+      transition:
+        background-color 0.18s ease,
+        border-color 0.18s ease,
+        box-shadow 0.18s ease,
+        color 0.18s ease;
+    }
+
+    .gap-select.gap-correct {
+      border-color: #16a34a;
+      background: linear-gradient(135deg, #ecfdf3, #dcfce7);
+      color: #166534;
+      font-weight: 800;
+
+      box-shadow:
+        0 0 0 1px rgba(22, 163, 74, 0.35),
+        0 4px 10px rgba(22, 163, 74, 0.18);
+    }
+
+    .gap-select.gap-wrong {
+      border-color: var(--accent);
+      background: linear-gradient(135deg, #fff7f6, #ffe4e0);
+      color: #b91c1c;
+      font-weight: 800;
+
+      box-shadow:
+        0 0 0 1px rgba(255, 126, 121, 0.35),
+        0 4px 10px rgba(248, 113, 113, 0.20);
+    }
+
+    /* ΠΟΛΥ μικρά iframes: πιο σφιχτό UI */
+    @media (max-width: 380px), (max-height: 380px) {
+      .app-shell { padding: 3px; }
+
+      .quiz-container {
+        padding: 8px;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      }
+
+      .buttons { gap: 6px; }
+
+      button {
+        padding: 6px 10px;
+        border-radius: 8px;
+      }
+
+      .gap-select { min-width: 106px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-shell">
+    <div class="quiz-container">
+      <h1></h1>
+
+      <div id="timer">Χρόνος: 3:00</div>
+
+      <div id="questionContainer">
+        <p class="gap-instructions">
+        </p>
+
+        <p class="gap-text">
+          Οι ανεμογεννήτριες μετατρέπουν την
+          <select class="gap-select" data-answer="αιολική ενέργεια">
+            <option value="">Επίλεξε...</option>
+            <option value="ηλιακή ενέργεια">ηλιακή ενέργεια</option>
+            <option value="αιολική ενέργεια">αιολική ενέργεια</option>
+            <option value="χημική ενέργεια">χημική ενέργεια</option>
+          </select>
+          σε
+          <select class="gap-select" data-answer="ηλεκτρική">
+            <option value="">Επίλεξε...</option>
+            <option value="θερμική ενέργεια">θερμική ενέργεια</option>
+            <option value="πυρηνική ενέργεια">πυρηνική ενέργεια</option>
+            <option value="ηλεκτρική">ηλεκτρική</option>
+          </select>,
+          με
+          <select class="gap-select" data-answer="φτερωτή">
+            <option value="">Επίλεξε...</option>
+            <option value="ηνία">ηνία</option>
+            <option value="ηλεκτρόδια">ηλεκτρόδια</option>
+            <option value="φτερωτή">φτερωτή</option>
+          </select>
+          που περιστρέφει έναν
+          <select class="gap-select" data-answer="ρότορα">
+            <option value="">Επίλεξε...</option>
+            <option value="στάτορα">στάτορα</option>
+            <option value="ρότορα">ρότορα</option>
+            <option value="πυκνωτή">πυκνωτή</option>
+          </select>
+          μέσω
+          <select class="gap-select" data-answer="κιβωτίου μετάδοσης κίνησης">
+            <option value="">Επίλεξε...</option>
+            <option value="αντιστάτη">αντιστάτη</option>
+            <option value="διακόπτη">διακόπτη</option>
+            <option value="κιβωτίου μετάδοσης κίνησης">κιβωτίου μετάδοσης κίνησης</option>
+          </select>,
+          παράγοντας ρεύμα με
+          <select class="gap-select" data-answer="επαγωγή">
+            <option value="">Επίλεξε...</option>
+            <option value="επαγωγή">επαγωγή</option>
+            <option value="τριβής">τριβής</option>
+            <option value="βαρύτητας">βαρύτητας</option>
+          </select>.
+          Περιλαμβάνουν μεγάλους
+          <select class="gap-select" data-answer="πυλώνες">
+            <option value="">Επίλεξε...</option>
+            <option value="σωλήνες">σωλήνες</option>
+            <option value="μοχλούς">μοχλούς</option>
+            <option value="πυλώνες">πυλώνες</option>
+          </select>,
+          βαριά
+          <select class="gap-select" data-answer="πτερύγια">
+            <option value="">Επίλεξε...</option>
+            <option value="πτερύγια">πτερύγια</option>
+            <option value="καλώδια">καλώδια</option>
+            <option value="ασφάλειες">ασφάλειες</option>
+          </select>
+          και αποδίδουν ισχύ της τάξεως των
+          <select class="gap-select" data-answer="1-10 MW">
+            <option value="">Επίλεξε...</option>
+            <option value="1-10 W">1-10 W</option>
+            <option value="1-10 kW">1-10 kW</option>
+            <option value="1-10 MW">1-10 MW</option>
+          </select>.
+          Τα
+          <select class="gap-select" data-answer="παράκτια">
+            <option value="">Επίλεξε...</option>
+            <option value="παράκτια">παράκτια</option>
+            <option value="ορεινά">ορεινά</option>
+            <option value="υπόγεια">υπόγεια</option>
+          </select>
+          αιολικά πάρκα προσφέρουν υψηλή
+          <select class="gap-select" data-answer="απόδοση">
+            <option value="">Επίλεξε...</option>
+            <option value="κατανάλωση">κατανάλωση</option>
+            <option value="απόδοση">απόδοση</option>
+            <option value="πίεση">πίεση</option>
+          </select>,
+          αλλά αντιμετωπίζουν προκλήσεις
+          <select class="gap-select" data-answer="εγκατάστασης">
+            <option value="">Επίλεξε...</option>
+            <option value="θέρμανσης">θέρμανσης</option>
+            <option value="μετάδοσης">μετάδοσης</option>
+            <option value="εγκατάστασης">εγκατάστασης</option>
+          </select>
+          και
+          <select class="gap-select" data-answer="συντήρησης">
+            <option value="">Επίλεξε...</option>
+            <option value="συντήρησης">συντήρησης</option>
+            <option value="εξάτμισης">εξάτμισης</option>
+            <option value="διάχυσης">διάχυσης</option>
+          </select>.
+
+          <br><br>
+
+          Το πρόβλημα
+          <select class="gap-select" data-answer="αποθήκευσης">
+            <option value="">Επίλεξε...</option>
+            <option value="μόνωσης">μόνωσης</option>
+            <option value="άνωσης">άνωσης</option>
+            <option value="αποθήκευσης">αποθήκευσης</option>
+          </select>
+          της
+          <select class="gap-select" data-answer="πλεονάζουσας ενέργειας">
+            <option value="">Επίλεξε...</option>
+            <option value="θερμικής ενέργειας">θερμικής ενέργειας</option>
+            <option value="ενέργειας">ενέργειας</option>
+            <option value="πλεονάζουσας ενέργειας">πλεονάζουσας ενέργειας</option>
+            <option value="χημικής ενέργειας">χημικής ενέργειας</option>
+          </select>
+          αποτελεί βασική πρόκληση, καθώς η περιορισμένη
+          <select class="gap-select" data-answer="χωρητικότητα">
+            <option value="">Επίλεξε...</option>
+            <option value="πυκνότητα">πυκνότητα</option>
+            <option value="αντίσταση">αντίσταση</option>
+            <option value="χωρητικότητα">χωρητικότητα</option>
+          </select>
+          των μονάδων αποθήκευσης οδηγεί σε προσωρινή
+          <select class="gap-select" data-answer="διακοπή λειτουργίας">
+            <option value="">Επίλεξε...</option>
+            <option value="διακοπή λειτουργίας">διακοπή λειτουργίας</option>
+            <option value="αύξηση πίεσης">αύξηση πίεσης</option>
+            <option value="μείωση βάρους">μείωση βάρους</option>
+          </select>,
+          περιορίζοντας την ενεργειακή
+          <select class="gap-select" data-answer="αυτάρκεια">
+            <option value="">Επίλεξε...</option>
+            <option value="οξύτητα">οξύτητα</option>
+            <option value="αυτάρκεια">αυτάρκεια</option>
+            <option value="ταχύτητα">ταχύτητα</option>
+          </select>.
+          Καινοτόμες λύσεις, όπως
+          <select class="gap-select" data-answer="προηγμένες μπαταρίες">
+            <option value="">Επίλεξε...</option>
+            <option value="πηνία θέρμανσης">πηνία θέρμανσης</option>
+            <option value="ασφάλειες τήξης">ασφάλειες τήξης</option>
+            <option value="προηγμένες μπαταρίες">προηγμένες μπαταρίες</option>
+          </select>,
+          αναζητούνται για την αντιμετώπισή του.
+        </p>
+      </div>
+
+      <div class="buttons">
+        <button type="button" onclick="calculateScore()">Υπολογισμός Βαθμολογίας</button>
+</div>
+
+      <div id="result"></div>
+      <div class="difficulty">Βαθμός δυσκολίας: ★★☆</div>
+    </div>
+  </div>
+
+  <script>
+    
+    // =========================
+    // SFX
+    // - Click σε κουμπιά: AppClick.m4a
+    // - Προσθήκη XP: cuteLevel.mp3
+    // =========================
+    const GG_SFX = (() => {
+      const click = new Audio('AppClick.m4a');
+      const xp = new Audio('cuteLevel.mp3');
+      try { click.preload = 'auto'; xp.preload = 'auto'; } catch(e) {}
+      return { click, xp };
+    })();
+
+    function ggPlaySfx(a){
+      if(!a) return;
+      try{
+        a.pause();
+        a.currentTime = 0;
+        const p = a.play();
+        if (p && typeof p.catch === 'function') p.catch(()=>{});
+      }catch(e){}
+    }
+    function ggPlayClick(){ ggPlaySfx(GG_SFX.click); }
+    function ggPlayXp(){ ggPlaySfx(GG_SFX.xp); }
+
+    // Click SFX σε ΟΛΑ τα κουμπιά
+    document.addEventListener('click', (e) => {
+      const btn = e.target && e.target.closest ? e.target.closest('button,[role="button"],.btn') : null;
+      if (!btn) return;
+      ggPlayClick();
+    }, true);
+
+// ===== Λογική quiz συμπλήρωσης κειμένου =====
+    let timeLeft = 3 * 60; // 3 λεπτά σε δευτερόλεπτα
+    let timer = setInterval(updateTimer, 1000);
+
+    // ===== Result Card UI =====
+    function ggRenderResultCard(percentage, correctCount, totalQuestions){
+      const resultEl = document.getElementById('result');
+      if (!resultEl) return;
+
+      const pct = Math.max(0, Math.min(100, Number(percentage) || 0));
+      const correct = Math.max(0, Number(correctCount) || 0);
+      const total = Math.max(1, Number(totalQuestions) || 1);
+
+      const label = (pct >= 90) ? 'Εξαιρετικά!' : (pct >= 70) ? 'Πολύ καλά!' : (pct >= 50) ? 'Καλή προσπάθεια!' : 'Συνέχισε!';
+      const emoji = (pct >= 90) ? '🏆' : (pct >= 70) ? '👏' : (pct >= 50) ? '🙂' : '💪';
+
+      resultEl.innerHTML = `
+        <div class="result-panel" role="dialog" aria-modal="true" aria-label="Αποτέλεσμα">
+        <div class="result-title">
+          <span>${emoji} Αποτέλεσμα</span>
+          <span class="result-pill">${label}</span>
+        </div>
+
+        <div class="result-row">
+          <div class="result-box">
+            <div class="result-label">Βαθμολογία</div>
+            <div class="result-value">${pct.toFixed(2)}%</div>
+          </div>
+          <div class="result-box">
+            <div class="result-label">Σωστές συμπληρώσεις</div>
+            <div class="result-value">${correct}/${total}</div>
+          </div>
+        </div>
+
+        <div class="result-bar" role="progressbar" aria-valuenow="${Math.round(pct)}" aria-valuemin="0" aria-valuemax="100">
+          <span></span>
+        </div>
+
+        <div class="result-note-slot"></div>
+
+        <div class="result-actions">
+          <button type="button" onclick="resetQuiz()">Επανεκκίνηση</button>
+          <button type="button" class="btn-ghost" onclick="ggCloseResultCard()">Κλείσιμο</button>
+        </div>
+      `;
+
+      resultEl.style.display = 'flex';
+
+      if (!resultEl.dataset.ggModalBound){
+        resultEl.addEventListener('click', (e) => {
+          if (e.target === resultEl) ggCloseResultCard();
+        });
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') ggCloseResultCard();
+        });
+        resultEl.dataset.ggModalBound = '1';
+      }
+
+      const fill = resultEl.querySelector('.result-bar > span');
+      if (fill){
+        requestAnimationFrame(() => { fill.style.width = pct + '%'; });
+      }
+    }
+
+    function ggCloseResultCard(){
+      const el = document.getElementById('result');
+      if (!el) return;
+      el.style.display = 'none';
+    }
+    
+
+    function updateTimer() {
+      let minutes = Math.floor(timeLeft / 60);
+      let seconds = timeLeft % 60;
+
+      document.getElementById("timer").textContent =
+        `Χρόνος: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+      timeLeft--;
+
+      if (timeLeft < 0) {
+        clearInterval(timer);
+        document.getElementById("timer").textContent = "Ο χρόνος έληξε!";
+        calculateScore();
+        lockQuestions();
+      }
+    }
+
+    function lockQuestions() {
+      const selects = document.querySelectorAll('.gap-select');
+      selects.forEach(sel => { sel.disabled = true; });
+    }
+
+    function unlockQuestions() {
+      const selects = document.querySelectorAll('.gap-select');
+      selects.forEach(sel => { sel.disabled = false; });
+    }
+
+    function calculateScore() {
+      const selects = document.querySelectorAll('.gap-select');
+      let correctCount = 0;
+      const totalQuestions = selects.length;
+
+      selects.forEach(sel => {
+        const correct = sel.dataset.answer;
+
+        if (sel.value === correct) {
+          correctCount++;
+          sel.classList.add('gap-correct');
+          sel.classList.remove('gap-wrong');
+        } else {
+          if (sel.value) {
+            sel.classList.add('gap-wrong');
+            sel.classList.remove('gap-correct');
+          } else {
+            sel.classList.remove('gap-wrong');
+            sel.classList.remove('gap-correct');
+          }
+        }
+      });
+
+      const percentage = (correctCount / totalQuestions) * 100;
+      ggRenderResultCard(percentage, correctCount, totalQuestions);
+
+      clearInterval(timer);
+      lockQuestions();
+    
+
+      try { ggSummaryAfterScore(percentage); } catch(e) {}
+}
+
+    function resetQuiz() {
+      const _r = document.getElementById('result');
+      if (_r){ _r.style.display = 'none'; _r.innerHTML = ''; }
+
+      const selects = document.querySelectorAll('.gap-select');
+      selects.forEach(sel => {
+        sel.value = '';
+        sel.classList.remove('gap-correct', 'gap-wrong');
+      });
+
+      timeLeft = 3 * 60;
+      clearInterval(timer);
+      timer = setInterval(updateTimer, 1000);
+      unlockQuestions();
+    
+
+      try { ggSummaryAfterReset(); } catch(e) {}
+}
+  
+
+    // =========================
+    // GG XP Bridge: Summaries → Parent (EmApp Split View)
+    // - Αποθήκευση στο localStorage ΜΟΝΟ όταν η περίληψη είναι 100% σωστή
+    // - XP κερδίζεται ΜΟΝΟ την 1η φορά
+    // - Αποστολή XP_STATE / XP_EARNED στο parent όπως τα άλλα μαθήματα/ερωτήσεις
+    // =========================
+    const GG_SUMMARY_XP_STORE_KEY = 'gg_em_summaries_xp_awarded_v1';
+    const GG_SUMMARY_SOURCE_ID = 'EM_Summaries';
+    const GG_SUMMARY_SOURCE_TITLE = 'Περιλήψεις';
+    const GG_SUMMARY_XP_PER_COMPLETE = 10;
+
+    const GG_SUMMARY_LESSON_ID = (() => {
+      try{
+        const p = (location.pathname || '').split('/').pop() || '';
+        const base = p.replace(/\.[^.]+$/, '');
+        return (base || 'Summary').trim();
+      }catch(e){
+        return 'Summary';
+      }
+    })();
+
+    const GG_SUMMARY_LESSON_TITLE = (() => {
+      const h1 = document.querySelector('h1');
+      const t = (h1 && (h1.textContent||'').trim()) || (document.title||'').trim();
+      return (t || ('Περίληψη ' + GG_SUMMARY_LESSON_ID)).trim();
+    })();
+
+    function ggLSGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+    function ggLSSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+
+    function ggLoadSummaryStore(){
+      const raw = ggLSGet(GG_SUMMARY_XP_STORE_KEY);
+      if (!raw) return { updatedAt: 0, lessons: {} };
+      try{
+        const o = JSON.parse(raw);
+        if (!o || typeof o !== 'object') return { updatedAt: 0, lessons: {} };
+        if (!o.lessons || typeof o.lessons !== 'object') o.lessons = {};
+        return o;
+      }catch(e){
+        return { updatedAt: 0, lessons: {} };
+      }
+    }
+
+    function ggSaveSummaryStore(store){
+      try{
+        store = store || { lessons: {} };
+        if (!store.lessons || typeof store.lessons !== 'object') store.lessons = {};
+        store.updatedAt = Date.now();
+        ggLSSet(GG_SUMMARY_XP_STORE_KEY, JSON.stringify(store));
+      }catch(e){}
+    }
+
+    function ggSummaryTotalXp(store){
+      let t = 0;
+      const lessons = (store && store.lessons) ? store.lessons : {};
+      const keys = Object.keys(lessons);
+      for (let i=0; i<keys.length; i++){
+        const rec = lessons[keys[i]] || {};
+        t += Number(rec.xp || 0);
+      }
+      return t;
+    }
+
+    function ggSummaryLessonsArray(store){
+      const out = [];
+      const lessons = (store && store.lessons) ? store.lessons : {};
+      const keys = Object.keys(lessons);
+      for (let i=0; i<keys.length; i++){
+        const id = keys[i];
+        const rec = lessons[id] || {};
+        out.push({
+          id,
+          title: rec.title || id,
+          xp: Number(rec.xp || 0),
+          completed: !!rec.completed
+        });
+      }
+      // Ταξινόμηση: με βάση πρώτο αριθμό στο id (αν υπάρχει), αλλιώς αλφαβητικά
+      out.sort((a,b)=>{
+        const am = String(a.id).match(/(\d+)/);
+        const bm = String(b.id).match(/(\d+)/);
+        const an = am ? parseInt(am[1],10) : NaN;
+        const bn = bm ? parseInt(bm[1],10) : NaN;
+        if (!isNaN(an) && !isNaN(bn) && an !== bn) return an - bn;
+        return String(a.id).localeCompare(String(b.id), 'el');
+      });
+      return out;
+    }
+
+    function ggPostToParent(payload){
+      try{
+        if (!window.parent || window.parent === window) return;
+        window.parent.postMessage(payload, '*');
+      }catch(e){}
+    }
+
+    function ggSendXpState(){
+      const store = ggLoadSummaryStore();
+      const total = ggSummaryTotalXp(store);
+      const lessons = ggSummaryLessonsArray(store);
+      // Μην “λερώνεις” το parent με άδειο section (0 XP)
+      if (!lessons.length && !total) return;
+      ggPostToParent({
+        source: 'GG-XP',
+        type: 'XP_STATE',
+        appId: GG_SUMMARY_SOURCE_ID,
+        appTitle: GG_SUMMARY_SOURCE_TITLE,
+        totalXp: total,
+        lessons: lessons
+      });
+    }
+window.addEventListener('message', function(ev){
+      const d = ev.data;
+      if (!d || d.source !== 'GG-XP') return;
+      if (d.type === 'REQUEST_STATE') ggSendXpState();
+    });
+
+    function ggCollectAnswers(){
+      const selects = document.querySelectorAll('.gap-select');
+      const arr = [];
+      selects.forEach(sel => arr.push(sel.value || ''));
+      return arr;
+    }
+
+    function ggRestoreIfCompleted(){
+      const store = ggLoadSummaryStore();
+      const rec = (store.lessons || {})[GG_SUMMARY_LESSON_ID];
+      if (!rec || !rec.completed) return;
+
+      // Επαναφορά επιλογών (μόνο αν έχουμε αποθηκεύσει answers)
+      if (Array.isArray(rec.answers)){
+        const selects = document.querySelectorAll('.gap-select');
+        selects.forEach((sel, idx) => {
+          if (idx < rec.answers.length) sel.value = rec.answers[idx];
+        });
+      }
+
+      // Εμφάνισε αποτέλεσμα/χρώματα/κλείδωμα
+      try{ calculateScore(); }catch(e){}
+    }
+
+    function ggSetResultNote(text){
+      const resultEl = document.getElementById('result');
+      if (!resultEl) return;
+      const old = resultEl.querySelector('.gg-xp-note');
+      if (old) old.remove();
+
+      if (!text) return;
+
+      const note = document.createElement('div');
+      note.className = 'gg-xp-note';
+      note.style.marginTop = '6px';
+      note.style.fontSize = '0.92em';
+      note.style.fontWeight = '800';
+      note.style.opacity = '0.95';
+      note.textContent = text;
+      const slot = resultEl.querySelector('.result-note-slot');
+      if (slot) slot.appendChild(note); else resultEl.appendChild(note);
+    }
+
+    function ggSummaryAfterScore(percentage){
+      const store = ggLoadSummaryStore();
+      const existing = (store.lessons || {})[GG_SUMMARY_LESSON_ID];
+
+      // Μόνο στο 100% “κλειδώνουμε” progress & δίνουμε XP (μία φορά)
+      const isPerfect = (typeof percentage === 'number') && isFinite(percentage) && Math.abs(percentage - 100) < 1e-9;
+
+      if (!isPerfect){
+        if (existing && existing.completed){
+          ggSetResultNote(`✅ Ολοκληρωμένο — έχεις ήδη κερδίσει +${existing.xp || GG_SUMMARY_XP_PER_COMPLETE} XP.`);
+        } else {
+          ggSetResultNote(`ℹ️ Για XP από την περίληψη χρειάζεται 100% σωστό.`);
+        }
+        // Στείλε τρέχουσα κατάσταση (αν υπάρχει κάτι αποθηκευμένο) για να “φαίνεται” στο parent
+        ggSendXpState();
+        return;
+      }
+
+      // 100% σωστό
+      if (existing && existing.completed){
+        ggSetResultNote(`✅ Έχεις ήδη κερδίσει +${existing.xp || GG_SUMMARY_XP_PER_COMPLETE} XP (μόνο την 1η φορά).`);
+        ggSendXpState();
+        return;
+      }
+
+      // 1η φορά 100%: αποθήκευση + XP
+      const rec = {
+        title: GG_SUMMARY_LESSON_TITLE,
+        xp: GG_SUMMARY_XP_PER_COMPLETE,
+        completed: true,
+        at: Date.now(),
+        answers: ggCollectAnswers()
+      };
+      store.lessons = store.lessons || {};
+      store.lessons[GG_SUMMARY_LESSON_ID] = rec;
+      ggSaveSummaryStore(store);
+
+      const totalXp = ggSummaryTotalXp(store);
+
+      ggPlayXp();
+
+      ggPostToParent({
+      source: 'GG-XP',
+      type: 'XP_EARNED',
+        appId: GG_SUMMARY_SOURCE_ID,
+        appTitle: GG_SUMMARY_SOURCE_TITLE,
+        lessonId: GG_SUMMARY_LESSON_ID,
+        lessonTitle: GG_SUMMARY_LESSON_TITLE,
+        delta: GG_SUMMARY_XP_PER_COMPLETE,
+        totalXp: totalXp,
+        lessonXp: GG_SUMMARY_XP_PER_COMPLETE,
+        completed: true
+      });
+
+      ggSetResultNote(`🏆 Κέρδισες +${GG_SUMMARY_XP_PER_COMPLETE} XP! (μόνο την 1η φορά)`);
+      ggSendXpState();
+    }
+
+    function ggSummaryAfterReset(){
+      const store = ggLoadSummaryStore();
+      const existing = (store.lessons || {})[GG_SUMMARY_LESSON_ID];
+      if (existing && existing.completed){
+        ggSetResultNote(`ℹ️ Έχεις ήδη κερδίσει +${existing.xp || GG_SUMMARY_XP_PER_COMPLETE} XP — η επανεκκίνηση είναι για εξάσκηση.`);
+      } else {
+        ggSetResultNote('');
+      }
+      ggSendXpState();
+    }
+
+    // Init: ενημέρωση parent + πιθανή επαναφορά ολοκλήρωσης
+    setTimeout(() => {
+      ggSendXpState();
+      ggRestoreIfCompleted();
+    }, 30);
+
+</script>
+</body>
+</html>

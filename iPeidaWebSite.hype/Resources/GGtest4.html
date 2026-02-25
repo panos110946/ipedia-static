@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ηλεκτρικός Κινητήρας, Ηλεκτρογεννήτρια, Ανεμογεννήτρια</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <style>
+    :root{
+        --accent:#FF7E79;
+        --ink:#625C5C;
+        --card:#ffffff;
+        --shadow: 0 10px 30px rgba(0,0,0,.12);
+        --r: 18px;
+
+        /* responsive spacing */
+        --pad: clamp(10px, 2.8vw, 20px);
+        --cardpad: clamp(12px, 3.2vw, 24px);
+
+        /* responsive typography */
+        --h1: clamp(18px, 4.4vw, 28px);
+        --p: clamp(14px, 3.6vw, 16px);
+        --small: clamp(12px, 3.2vw, 14px);
+    }
+
+    *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+    html, body{ height:100%; }
+
+    body{
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "San Francisco", "Segoe UI", Roboto, Arial, sans-serif;
+        margin: 0;
+        padding:
+            calc(var(--pad) + env(safe-area-inset-top))
+            calc(var(--pad) + env(safe-area-inset-right))
+            calc(var(--pad) + env(safe-area-inset-bottom))
+            calc(var(--pad) + env(safe-area-inset-left));
+        color: var(--ink);
+        line-height: 1.6;
+        background: transparent;
+
+        /* important for small iframes */
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .quiz-container{
+        width: min(1000px, 100%);
+        margin: 0 auto;
+        background: var(--card);
+        padding: var(--cardpad);
+        border-radius: var(--r);
+        box-shadow: var(--shadow);
+    }
+
+    .question{ margin-bottom: clamp(18px, 3.6vw, 28px); }
+
+    h1{
+        color: var(--accent);
+        font-size: var(--h1);
+        font-weight: 700;
+        text-align: center;
+        margin: 0 0 clamp(12px, 2.6vw, 20px);
+        line-height: 1.15;
+    }
+
+    /* (kept for backwards compatibility with existing markup) */
+    h10{
+        display:block;
+        color: var(--accent);
+        font-size: var(--small);
+        font-weight: 600;
+        text-align: left;
+        margin-top: 12px;
+    }
+
+    p{
+        margin: 0 0 12px;
+        font-size: var(--p);
+        font-weight: 700;
+        overflow-wrap: anywhere;
+    }
+
+    .question-number{ color: var(--accent); font-weight: 800; }
+
+    input[type="radio"]{ margin-right: 10px; transform: translateY(1px) scale(1.05); }
+    .radio-label{ font-size: var(--p); font-weight: 500; }
+
+    select, input[type="text"]{
+        width: 100%;
+        max-width: 100%;
+        padding: 10px 12px;
+        margin-top: 8px;
+        border: 1px solid #D2D2D7;
+        border-radius: 10px;
+        font-size: 16px; /* prevent iOS zoom */
+        color: var(--ink);
+        background-color: #F5F5F7;
+    }
+
+    .buttons{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+        margin-top: clamp(14px, 3vw, 24px);
+    }
+
+    button{
+        padding: 12px 18px;
+        background-color: var(--accent);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        min-height: 44px;
+        flex: 1 1 180px;
+        max-width: 320px;
+    }
+    button:hover{ background-color: #E66F6A; }
+
+    #timer{
+        text-align: center;
+        font-size: clamp(15px, 4vw, 18px);
+        color: var(--ink);
+        margin-bottom: clamp(12px, 2.8vw, 20px);
+        font-weight: 600;
+    }
+
+    #result{
+        text-align: center;
+        font-size: clamp(16px, 4.2vw, 20px);
+        color: var(--accent);
+        margin-top: 18px;
+        display: none;
+        font-weight: 700;
+        overflow-wrap: anywhere;
+    
+        white-space: pre-line;
+}
+
+    .hint{
+        background-color: #fff3e0;
+        border-left: 4px solid #ffa726;
+        padding: 10px;
+        margin: 10px 0 0;
+        display: none;
+        font-size: var(--small);
+        color: var(--ink);
+        border-radius: 10px;
+        overflow-wrap: anywhere;
+    }
+
+    .disabled-input{
+        background-color: #E5E5EA !important;
+        color: #AEAEB2 !important;
+        cursor: not-allowed;
+    }
+    .disabled-radio{ cursor: not-allowed; }
+    .disabled-radio-label{ color: #AEAEB2; }
+
+    /* Small width (small iframes): keep actions on ONE line to save vertical space */
+    @media (max-width: 420px){
+        .quiz-container{ border-radius: 14px; }
+        .buttons{
+            flex-wrap: nowrap;
+            justify-content: space-between;
+            gap: 8px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .buttons button{
+            flex: 1 1 0;
+            width: auto;
+            min-width: 0;
+            padding: 10px 10px;
+            font-size: 0.95rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+
+    /* Small height (typical small iframes): keep actions visible and reduce vertical waste */
+    @media (max-height: 520px){
+        body{ padding: calc(8px + env(safe-area-inset-top)) calc(8px + env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) calc(8px + env(safe-area-inset-left)); }
+        .quiz-container{ padding: 12px; }
+        #timer{
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            background: rgba(255,255,255,.92);
+            backdrop-filter: blur(8px);
+            padding: 8px 10px;
+            border-radius: 12px;
+        }
+        .buttons{
+            display: flex;
+            flex-wrap: nowrap;
+            justify-content: space-between;
+            gap: 8px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            position: sticky;
+            bottom: 0;
+            z-index: 5;
+            background: rgba(255,255,255,.92);
+            backdrop-filter: blur(8px);
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+        .buttons button{
+            flex: 1 1 0;
+            min-width: 0;
+            padding: 10px 10px;
+            font-size: 0.95rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+
+    /* ===== Quiz lockout (3 αποτυχημένες προσπάθειες <50% ανά ημέρα ⇒ κλείδωμα 2 ημερών) ===== */
+    .lock-overlay{
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: rgba(245,245,247,.72);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 9999;
+    }
+    .lock-overlay.show{ display:flex; }
+
+    .lock-card{
+      width: min(560px, 100%);
+      background: rgba(255,255,255,.96);
+      border: 1px solid rgba(0,0,0,.08);
+      border-radius: 16px;
+      box-shadow: 0 14px 44px rgba(0,0,0,.18);
+      padding: 18px 16px;
+      text-align: center;
+      color: var(--ink);
+    }
+
+/* Make overlay cards fit inside very small iframes (fallback: scroll inside the card, not the whole page) */
+.lock-card{
+  max-height: calc(100vh - 32px);
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Start overlay: scale down card *and* its contents in small iframes so it's fully visible */
+#startOverlay .start-card{ --startScale: 1; }
+
+/* Trigger on small height OR small width (common in split-view iframes) */
+@media (max-height: 560px), (max-width: 420px){
+  #startOverlay{ padding: 10px; }
+  #startOverlay .start-card{ --startScale: .92; }
+}
+@media (max-height: 440px), (max-width: 360px){
+  #startOverlay{ padding: 8px; }
+  #startOverlay .start-card{ --startScale: .86; }
+}
+@media (max-height: 360px), (max-width: 320px){
+  #startOverlay{ padding: 6px; }
+  #startOverlay .start-card{ --startScale: .55; }
+}
+
+/* Apply scale to paddings/typography (no transform blur) */
+#startOverlay .start-card{
+  padding: calc(18px * var(--startScale)) calc(16px * var(--startScale));
+  border-radius: calc(16px * var(--startScale));
+}
+#startOverlay .start-card .lock-icon{
+  font-size: calc(34px * var(--startScale));
+  margin-bottom: calc(10px * var(--startScale));
+}
+#startOverlay .start-card .lock-title{
+  font-size: calc(18px * var(--startScale));
+  margin-bottom: calc(6px * var(--startScale));
+}
+#startOverlay .start-card .lock-msg{
+  font-size: calc(14px * var(--startScale));
+  line-height: 1.30;
+  margin-bottom: calc(12px * var(--startScale));
+}
+#startOverlay .start-card button{
+  min-height: calc(44px * var(--startScale));
+  padding: calc(12px * var(--startScale)) calc(18px * var(--startScale));
+  border-radius: calc(12px * var(--startScale));
+  font-size: calc(16px * var(--startScale));
+}
+#startOverlay .start-card .lock-meta{
+  font-size: calc(12px * var(--startScale));
+  margin-top: calc(10px * var(--startScale));
+}
+
+
+
+    .lock-icon{
+      font-size: 34px;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+    .lock-title{
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .lock-msg{
+      font-size: 14px;
+      font-weight: 600;
+      opacity: .92;
+      line-height: 1.35;
+      margin-bottom: 12px;
+      overflow-wrap: anywhere;
+    }
+    .lock-meta{
+      font-size: 12px;
+      font-weight: 600;
+      opacity: .75;
+      margin-top: 10px;
+      overflow-wrap: anywhere;
+    }
+    /* ===== Result overlay (card like start/lock) ===== */
+    .result-actions{
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .result-actions button{
+      flex: 1 1 220px;
+      max-width: 320px;
+    }
+
+
+    /* Βεβαιώσου ότι το κουμπί στο overlay δεν “σπάει” σε μικρά iframes */
+    .lock-card button{
+      width: 100%;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+
+    /* Lock card feedback (sound + flicker) */
+    @keyframes ggLockFlicker {
+      0%   { transform: translate3d(0,0,0) scale(1);   opacity: 1;   filter: saturate(1); }
+      10%  { transform: translate3d(-2px,0,0) scale(1.01); opacity: .92; }
+      20%  { transform: translate3d(2px,0,0) scale(1.01);  opacity: 1; }
+      30%  { transform: translate3d(-3px,0,0) scale(1.01); opacity: .9; }
+      40%  { transform: translate3d(3px,0,0) scale(1.01);  opacity: 1; }
+      50%  { transform: translate3d(-2px,0,0) scale(1.01); opacity: .92; }
+      60%  { transform: translate3d(2px,0,0) scale(1.01);  opacity: 1; }
+      70%  { transform: translate3d(-1px,0,0) scale(1.005); opacity: .95; }
+      80%  { transform: translate3d(1px,0,0) scale(1.005);  opacity: 1; }
+      100% { transform: translate3d(0,0,0) scale(1);   opacity: 1; }
+    }
+    .lock-card.lock-flicker{
+      animation: ggLockFlicker .65s linear 1;
+    }
+
+</style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1></h1>
+        <div id="timer">Χρόνος: 15:00</div>
+
+        <form id="quizForm">
+            <div id="questionContainer"></div>
+
+            <div class="buttons">
+                <button type="button" onclick="calculateScore()">Σκορ</button>
+                <button type="button" onclick="resetQuiz()">Ξαναδοκίμασε</button>
+            </div>
+        </form>
+        <div id="result"></div>
+        <h10>Βαθμός δυσκολίας: ★★ ☆</h10>
+    </div>
+
+  <!-- Lock overlay (anti-spam attempts) -->
+  <div id="lockOverlay" class="lock-overlay" role="dialog" aria-modal="true" aria-live="polite">
+    <div class="lock-card">
+      <div class="lock-icon"><i class="fas fa-lock"></i></div>
+      <div class="lock-title">Το τεστ κλειδώθηκε</div>
+      <div id="lockMsg" class="lock-msg"></div>
+      <button id="lockRefreshBtn" type="button">Έλεγχος ξεκλειδώματος</button>
+      <div id="lockMeta" class="lock-meta"></div>
+    </div>
+  </div>
+  <!-- Start overlay (home screen: starts the timer) -->
+  <div id="startOverlay" class="lock-overlay show" role="dialog" aria-modal="true" aria-live="polite">
+    <div class="lock-card start-card">
+      <div class="lock-icon"><i class="fas fa-play-circle"></i></div>
+      <div class="lock-title">Έτοιμος/η για το τεστ;</div>
+      <div id="startMsg" class="lock-msg">Πάτησε «Έναρξη» για να ξεκινήσει η χρονομέτρηση (15:00) και να αρχίσει το τεστ.</div>
+      <button id="startBtn" type="button">Έναρξη</button>
+      <div id="startMeta" class="lock-meta">Καλή επιτυχία!</div>
+    </div>
+  </div>
+  <!-- Result overlay (card like start/lock) -->
+  <div id="resultOverlay" class="lock-overlay" role="dialog" aria-modal="true" aria-live="polite">
+    <div class="lock-card result-card">
+      <div class="lock-icon"><i class="fas fa-award"></i></div>
+      <div class="lock-title">Αποτελέσματα τεστ</div>
+      <div id="resultMsg" class="lock-msg"></div>
+      <div id="resultMeta" class="lock-meta"></div>
+      <div class="result-actions">
+        <button id="resultCloseBtn" type="button">Δες τις απαντήσεις</button>
+        <button id="resultRetryBtn" type="button">Ξαναδοκίμασε</button>
+      </div>
+    </div>
+  </div>
+
+
+
+
+    <!-- External question banks (must be in the same folder as this HTML) -->
+    <script src="questionbank4_easy.js"></script>
+    <script src="questionbank4_medium.js"></script>
+    <script src="questionbank4_hard.js"></script>
+
+    <script>
+
+        // ===== Μεταδεδομένα & επικοινωνία με τον γονέα (Split View) =====
+        const QUIZ_META = {
+            id: 'ggtest4-motor-generator-wind-231',
+            title: 'Ηλεκτρικός Κινητήρας, Ηλεκτρογεννήτρια, Ανεμογεννήτρια'
+        };
+
+        function notifyParentQuizReady() {
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({
+                    source: 'GG-QUIZ',
+                    type: 'QUIZ_READY',
+                    quizId: QUIZ_META.id,
+                    title: QUIZ_META.title
+                }, '*');
+            }
+        }
+
+        function sendQuizResultToParent(percentage, score, totalQuestions) {
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({
+                    source: 'GG-QUIZ',
+                    type: 'QUIZ_RESULT',
+                    quizId: QUIZ_META.id,
+                    title: QUIZ_META.title,
+                    difficulty: (typeof currentDifficulty !== 'undefined') ? currentDifficulty : null,
+                    difficultyLabel: (typeof _difficultyLabelGR === 'function' && typeof currentDifficulty !== 'undefined') ? _difficultyLabelGR(currentDifficulty) : null,
+                    percentage: Number(percentage),
+                    score,
+                    totalQuestions,
+                    timestamp: Date.now()
+                }, '*');
+            }
+
+    }
+
+    // ===== Lockout (3 συνεχόμενες προσπάθειες <50% ανά ημέρα ⇒ κλείδωμα 2 ημερών) =====
+    const QUIZ_LOCK_CFG = {
+      threshold: 50,                 // %
+      maxConsecutiveFailsPerDay: 3,   // attempts
+      lockDays: 2                    // days
+    };
+
+    // Αν δύο αρχεία έχουν κατά λάθος ίδιο quizId, το location.pathname τα “ξεχωρίζει”.
+    const QUIZ_LOCK_LS_KEY = `GGQUIZ_LOCK_STATE::${QUIZ_META?.id || "unknown"}::${location.pathname}`;
+
+    
+
+    // ===== Lock feedback (sounds + flicker) =====
+    const LOCK_SOUND = new Audio('locksound.mp3');
+    LOCK_SOUND.preload = 'auto';
+    const UNLOCK_SOUND = new Audio('unlocksound.mp3');
+    UNLOCK_SOUND.preload = 'auto';
+
+    // App click (button taps)
+    const APP_CLICK_SOUND = new Audio('AppClick.m4a');
+    APP_CLICK_SOUND.preload = 'auto';
+
+    function _playAudio(a){
+      try{
+        if (!a) return;
+        a.currentTime = 0;
+        const p = a.play();
+        if (p && typeof p.catch === 'function') p.catch(() => {});
+      }catch(e){}
+    }
+
+    // Global button click sound (AppClick.m4a)
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn || btn.disabled) return;
+      _playAudio(APP_CLICK_SOUND);
+    }, true);
+
+    function _flickerLockCard(){
+      const card = document.querySelector('#lockOverlay .lock-card');
+      if (!card) return;
+      card.classList.remove('lock-flicker');
+      // force reflow so the animation restarts
+      void card.offsetWidth;
+      card.classList.add('lock-flicker');
+      window.setTimeout(() => card.classList.remove('lock-flicker'), 700);
+    }
+let hasSubmitted = false;
+
+    function _ymdLocal(d = new Date()){
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    }
+
+    function _safeParseJSON(s){
+      try { return JSON.parse(s); } catch { return null; }
+    }
+
+    function _readLockState(){
+      const raw = localStorage.getItem(QUIZ_LOCK_LS_KEY);
+      const st = _safeParseJSON(raw) || {};
+      // normalize types
+      st.date = String(st.date || "");
+      st.failStreak = Number(st.failStreak || 0);
+      st.lockUntil = Number(st.lockUntil || 0);
+      st.lastAttemptAt = Number(st.lastAttemptAt || 0);
+      st.lastPercentage = (st.lastPercentage === undefined) ? null : Number(st.lastPercentage);
+      return st;
+    }
+
+    function _writeLockState(st){
+      localStorage.setItem(QUIZ_LOCK_LS_KEY, JSON.stringify(st || {}));
+    }
+
+    function _normalizeDay(st){
+      const today = _ymdLocal();
+      if (st.date !== today){
+        st.date = today;
+        st.failStreak = 0; // “ανά μέρα”
+      }
+      // auto-unlock if time passed
+      if (st.lockUntil && st.lockUntil <= Date.now()){
+        st.lockUntil = 0;
+        st.failStreak = 0;
+      }
+      return st;
+    }
+
+    function isQuizLocked(){
+      const st = _normalizeDay(_readLockState());
+      return !!(st.lockUntil && st.lockUntil > Date.now());
+    }
+
+    function _formatUnlock(ts){
+      try{
+        return new Date(ts).toLocaleString('el-GR', {
+          year:'numeric', month:'long', day:'2-digit',
+          hour:'2-digit', minute:'2-digit'
+        });
+      }catch{
+        return new Date(ts).toString();
+      }
+    }
+
+    function _disableActionButtons(disabled){
+      document.querySelectorAll('.buttons button').forEach(b => {
+        b.disabled = !!disabled;
+        if (disabled) b.classList.add('disabled-input');
+        else b.classList.remove('disabled-input');
+      });
+    }
+
+    function _showLockOverlay(lockUntil){
+      const overlay = document.getElementById('lockOverlay');
+      const msg = document.getElementById('lockMsg');
+      const meta = document.getElementById('lockMeta');
+      if (!overlay || !msg || !meta) return;
+
+      const st = _normalizeDay(_readLockState());
+      const unlockStr = _formatUnlock(lockUntil);
+      msg.textContent = `Έκανες ${QUIZ_LOCK_CFG.maxConsecutiveFailsPerDay} συνεχόμενες προσπάθειες με βαθμολογία κάτω από ${QUIZ_LOCK_CFG.threshold}% σήμερα. Για να συνεχίσεις, περίμενε 2 μέρες. Εκμεταλλεύσου τον χρόνο αυτό για να κάνεις μια καλή επανάληψη! `;
+      meta.textContent = `Ξεκλείδωμα: ${unlockStr}` + (Number.isFinite(st.lastPercentage) ? ` • Τελευταίο σκορ: ${Number(st.lastPercentage).toFixed(2)}%` : ``);
+
+      overlay.classList.add('show');
+    }
+
+    function _hideLockOverlay(){
+      const overlay = document.getElementById('lockOverlay');
+      if (overlay) overlay.classList.remove('show');
+    }
+
+    function applyLockFromStorage(){
+      const st = _normalizeDay(_readLockState());
+      _writeLockState(st);
+
+      if (st.lockUntil && st.lockUntil > Date.now()){
+        // freeze UI
+        _stopTimer();
+        testStarted = false;
+        lockQuestions();
+        _disableActionButtons(true);
+        _showStartOverlay(false);
+        _showResultOverlay(false);
+        _showLockOverlay(st.lockUntil);
+
+        // (optional) ενημέρωση γονέα
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({
+            source: 'GG-QUIZ',
+            type: 'QUIZ_LOCKED',
+                  requestClose: true,
+                  reason: 'LOW_SCORE_STREAK',
+            quizId: QUIZ_META.id,
+            title: QUIZ_META.title,
+            lockUntil: st.lockUntil,
+            date: st.date
+          }, '*');
+        }
+        return true;
+      }
+
+      _hideLockOverlay();
+      return false;
+    }
+
+    function recordAttemptAndMaybeLock(percentage){
+      const p = Number(percentage);
+      let st = _normalizeDay(_readLockState());
+
+      const failed = Number.isFinite(p) && p < QUIZ_LOCK_CFG.threshold;
+
+      if (failed) st.failStreak = (st.failStreak || 0) + 1;
+      else st.failStreak = 0;
+
+      st.lastAttemptAt = Date.now();
+      st.lastPercentage = p;
+
+      if (failed && st.failStreak >= QUIZ_LOCK_CFG.maxConsecutiveFailsPerDay){
+        // Lock just triggered (on the Nth consecutive fail)
+        if (!st.lockUntil && st.failStreak === QUIZ_LOCK_CFG.maxConsecutiveFailsPerDay){
+          _playAudio(LOCK_SOUND);
+        }
+        st.lockUntil = Date.now() + (QUIZ_LOCK_CFG.lockDays * 24 * 60 * 60 * 1000);
+      }
+
+      _writeLockState(st);
+
+      if (st.lockUntil && st.lockUntil > Date.now()){
+        applyLockFromStorage();
+        return true;
+      }
+      return false;
+    }
+
+    // Refresh button
+    window.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('lockRefreshBtn');
+      if (btn){
+        btn.addEventListener('click', () => {
+          const overlay = document.getElementById('lockOverlay');
+          const overlayWasShowing = !!(overlay && overlay.classList.contains('show'));
+
+          const nowLocked = applyLockFromStorage();
+
+          if (nowLocked){
+            // still locked ⇒ play lock sound + flicker feedback
+            _playAudio(LOCK_SOUND);
+            _flickerLockCard();
+            return;
+          }
+
+          // unlocked via the button
+          if (overlayWasShowing){
+            _playAudio(UNLOCK_SOUND);
+
+            // reset attempt state for a clean retry
+            hasSubmitted = false;
+            try{ resetQuiz(); }catch{}
+            if (window.parent && window.parent !== window) {
+              window.parent.postMessage({
+                source: 'GG-QUIZ',
+                type: 'QUIZ_UNLOCKED',
+                quizId: QUIZ_META.id,
+                title: QUIZ_META.title
+              }, '*');
+            }
+          }
+        });
+      }
+
+      // Start button (home screen)
+      const startBtn = document.getElementById('startBtn');
+      if (startBtn){
+        startBtn.addEventListener('click', () => {
+          if (isQuizLocked()) { applyLockFromStorage(); return; }
+          if (testStarted) return;
+          startTest();
+        });
+      }
+// Κλείδωμα αν χρειάζεται με το άνοιγμα του τεστ
+      applyLockFromStorage();
+      updateDifficultyUI();
+
+      // Result overlay buttons
+      const resClose = document.getElementById('resultCloseBtn');
+      if (resClose){
+        resClose.addEventListener('click', () => {
+          _showResultOverlay(false);
+        });
+      }
+      const resRetry = document.getElementById('resultRetryBtn');
+      if (resRetry){
+        resRetry.addEventListener('click', () => {
+          _showResultOverlay(false);
+          try{ resetQuiz(); }catch{}
+        });
+      }
+
+    });
+
+
+        // ===== External question banks (easy/medium/hard) =====
+        // Loaded via: questionbank_easy.js, questionbank_medium.js, questionbank_hard.js
+        const QUESTION_BANKS = window.GG_QUESTION_BANKS || {};
+        const BANK_SIZES_EXPECTED = { easy: 30, medium: 20, hard: 15 };
+
+        // Persisted adaptive difficulty (per quizId + pathname)
+        const DIFFICULTY_LS_KEY = `GGQUIZ_DIFFICULTY::${QUIZ_META?.id || "unknown"}::${location.pathname}`;
+        const DIFFICULTY_ORDER = ["easy", "medium", "hard"];
+
+        function _readDifficulty(){
+            const v = String(localStorage.getItem(DIFFICULTY_LS_KEY) || "").toLowerCase();
+            return DIFFICULTY_ORDER.includes(v) ? v : "easy";
+        }
+        function _writeDifficulty(v){
+            if (!DIFFICULTY_ORDER.includes(v)) return;
+            localStorage.setItem(DIFFICULTY_LS_KEY, v);
+        }
+
+        let currentDifficulty = _readDifficulty();
+
+        // 15 ερωτήσεις ανά τεστ (διαβαθμίσεις)
+        // easy: μόνο εύκολες
+        // medium: λίγες εύκολες + περισσότερες μέτριες
+        // hard: λίγες μέτριες + περισσότερες δύσκολες
+        const DIFFICULTY_MIX = {
+            easy:   { easy: 15, medium: 0,  hard: 0 },
+            medium: { easy: 5,  medium: 10, hard: 0 },
+            hard:   { easy: 0,  medium: 4,  hard: 11 }
+        };
+
+        function _difficultyLabelGR(d){
+            if (d === "easy") return "Εύκολη";
+            if (d === "medium") return "Μέτρια";
+            return "Δύσκολη";
+        }
+        function _starsForDifficulty(d){
+            if (d === "easy") return "★ ☆☆";
+            if (d === "medium") return "★★ ☆";
+            return "★★★";
+        }
+
+        function updateDifficultyUI(){
+            const el = document.querySelector('h10');
+            if (el){
+                el.textContent = `Βαθμός δυσκολίας: ${_starsForDifficulty(currentDifficulty)} (${_difficultyLabelGR(currentDifficulty)})`;
+            }
+            const startMsg = document.getElementById('startMsg');
+            if (startMsg){
+                startMsg.textContent = `Πάτησε «Έναρξη» για να ξεκινήσει η χρονομέτρηση (15:00) και να αρχίσει το τεστ. Δυσκολία: ${_difficultyLabelGR(currentDifficulty)}.`;
+            }
+        }
+
+        function _shuffle(arr){
+            const a = Array.isArray(arr) ? arr.slice() : [];
+            for (let i = a.length - 1; i > 0; i--){
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function _banksOk(){
+            const e = Array.isArray(QUESTION_BANKS.easy) ? QUESTION_BANKS.easy.length : 0;
+            const m = Array.isArray(QUESTION_BANKS.medium) ? QUESTION_BANKS.medium.length : 0;
+            const h = Array.isArray(QUESTION_BANKS.hard) ? QUESTION_BANKS.hard.length : 0;
+            return (e > 0 && m > 0 && h > 0);
+        }
+
+        // Αποφυγή επαναλήψεων “ανά δεξαμενή” (μέσα στο ίδιο άνοιγμα σελίδας)
+        const usedIdsByBank = { easy: new Set(), medium: new Set(), hard: new Set() };
+
+        function _pickFromBank(bankName, n){
+            if (!n || n <= 0) return [];
+            const bank = Array.isArray(QUESTION_BANKS[bankName]) ? QUESTION_BANKS[bankName] : [];
+            const used = usedIdsByBank[bankName] || (usedIdsByBank[bankName] = new Set());
+
+            // προσπάθεια να μη ξαναπέσουν ίδιες ερωτήσεις μέχρι να “εξαντληθεί” η δεξαμενή
+            let available = bank.filter(q => q && q.id && !used.has(q.id));
+            if (available.length < n){
+                used.clear(); // reset για τη δεξαμενή
+                available = bank.filter(q => q && q.id);
+            }
+
+            const picked = _shuffle(available).slice(0, n);
+            picked.forEach(q => used.add(q.id));
+            return picked;
+        }
+
+        function getRandomQuestions(){
+            const mix = DIFFICULTY_MIX[currentDifficulty] || DIFFICULTY_MIX.easy;
+            let out = [];
+            out = out.concat(_pickFromBank("easy",   mix.easy));
+            out = out.concat(_pickFromBank("medium", mix.medium));
+            out = out.concat(_pickFromBank("hard",   mix.hard));
+            return _shuffle(out).slice(0, 15);
+        }
+
+        function maybeIncreaseDifficulty(percentageNumber){
+            const p = Number(percentageNumber);
+            if (!(Number.isFinite(p) && p > 75)) return false;
+
+            const idx = DIFFICULTY_ORDER.indexOf(currentDifficulty);
+            if (idx < 0) return false;
+            const next = DIFFICULTY_ORDER[Math.min(idx + 1, DIFFICULTY_ORDER.length - 1)];
+
+            if (next !== currentDifficulty){
+                currentDifficulty = next;
+                _writeDifficulty(currentDifficulty);
+                updateDifficultyUI();
+                return true;
+            }
+            return false;
+        }
+
+        let currentQuestions = [];
+        let timeLeft = 15 * 60; // 15 minutes in seconds
+        let timer = null;       // starts on "Έναρξη"
+        let testStarted = false;
+        let testStartTs = null; // timestamp when user presses «Έναρξη»
+        function _setTimerLabel() {
+            let minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            document.getElementById("timer").textContent = `Χρόνος: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }
+
+        function _startTimer(){
+            if (timer) clearInterval(timer);
+            timer = setInterval(updateTimer, 1000);
+        }
+
+        function _stopTimer(){
+            if (timer) { clearInterval(timer); timer = null; }
+        }
+
+        function _showStartOverlay(show){
+            const o = document.getElementById('startOverlay');
+            if (!o) return;
+            if (show) o.classList.add('show');
+            else o.classList.remove('show');
+        }
+
+        function _showResultOverlay(show){
+            const o = document.getElementById('resultOverlay');
+            if (!o) return;
+            if (show) o.classList.add('show');
+            else o.classList.remove('show');
+        }
+
+        function _formatElapsed(sec){
+            const s = Math.max(0, Math.round(Number(sec)||0));
+            const m = Math.floor(s/60);
+            const r = s % 60;
+            return `${m}:${String(r).padStart(2,'0')}`;
+        }
+
+
+        function initHomeScreen(){
+            testStarted = false;
+            hasSubmitted = false;
+            testStartTs = null;
+            _showResultOverlay(false);
+            _stopTimer();
+            timeLeft = 15 * 60;
+            _setTimerLabel();
+            lockQuestions();
+            _disableActionButtons(true);
+            _showStartOverlay(true);
+                    updateDifficultyUI();
+        }
+
+        function startTest(){
+            if (isQuizLocked()) { applyLockFromStorage(); return; }
+            testStarted = true;
+            hasSubmitted = false;
+
+            testStartTs = Date.now();
+            _showResultOverlay(false);
+
+
+            _showStartOverlay(false);
+            unlockQuestions();
+            _disableActionButtons(false);
+
+            timeLeft = 15 * 60;
+            _setTimerLabel();
+            _startTimer();
+}
+
+function updateTimer() {
+            _setTimerLabel();
+            timeLeft--;
+            if (timeLeft < 0) {
+                _stopTimer();
+                calculateScore();
+                document.getElementById("timer").textContent = "Ο χρόνος έληξε!";
+                lockQuestions();
+            }
+        }
+
+        function lockQuestions() {
+            const inputs = document.querySelectorAll('#quizForm input, #quizForm select');
+            inputs.forEach(input => {
+                input.disabled = true;
+                if (input.type === "text" || input.tagName === "SELECT") {
+                    input.classList.add("disabled-input");
+                } else if (input.type === "radio") {
+                    input.classList.add("disabled-radio");
+                    const label = input.nextElementSibling;
+                    if (label && label.tagName === "SPAN") {
+                        label.classList.add("disabled-radio-label");
+                    }
+                }
+            });
+        }
+
+        function unlockQuestions() {
+            const inputs = document.querySelectorAll('#quizForm input, #quizForm select');
+            inputs.forEach(input => {
+                input.disabled = false;
+                if (input.type === "text" || input.tagName === "SELECT") {
+                    input.classList.remove("disabled-input");
+                } else if (input.type === "radio") {
+                    input.classList.remove("disabled-radio");
+                    const label = input.nextElementSibling;
+                    if (label && label.tagName === "SPAN") {
+                        label.classList.remove("disabled-radio-label");
+                    }
+                }
+            });
+        }
+
+        function renderQuestions() {
+            const container = document.getElementById('questionContainer');
+            container.innerHTML = '';
+            if (!_banksOk()){
+                container.innerHTML = `<div class="hint" style="display:block">Δεν βρέθηκαν οι δεξαμενές θεμάτων. Βεβαιώσου ότι υπάρχουν τα αρχεία <b>questionbank_easy.js</b>, <b>questionbank_medium.js</b>, <b>questionbank_hard.js</b> στον ίδιο φάκελο με το test.html.</div>`;
+                currentQuestions = [];
+                lockQuestions();
+                _disableActionButtons(true);
+                return;
+            }
+            currentQuestions = getRandomQuestions();
+            currentQuestions.forEach((q, index) => {
+                const div = document.createElement('div');
+                div.className = 'question';
+                div.innerHTML = `<p><span class="question-number">${index + 1}.</span> ${q.text}</p>`;
+                if (q.type === 'radio') {
+                    div.innerHTML += q.options.map(opt => `<input type="radio" name="${q.id}" value="${opt}"> <span class="radio-label">${opt}</span><br>`).join('');
+                } else if (q.type === 'text') {
+                    div.innerHTML += `<input type="text" name="${q.id}" placeholder="Γράψτε την απάντηση...">`;
+                } else if (q.type === 'select') {
+                    div.innerHTML += `<select name="${q.id}"><option value="">Επέλεξε</option>${q.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}</select>`;
+                }
+                div.innerHTML += `<div id="hint${index + 1}" class="hint"></div>`;
+                container.appendChild(div);
+            });
+        }
+
+        function calculateScore() {
+            
+      if (isQuizLocked()) { applyLockFromStorage(); return; }
+      if (hasSubmitted) return;
+      hasSubmitted = true;
+let score = 0;
+            const totalQuestions = currentQuestions.length;
+
+            currentQuestions.forEach((question, index) => {
+                const hintElement = document.getElementById(`hint${index + 1}`);
+                let isCorrect = false;
+
+                if (question.type === "radio") {
+                    const answer = document.querySelector(`input[name="${question.id}"]:checked`)?.value;
+                    if (answer === question.correct) {
+                        score++;
+                        isCorrect = true;
+                    }
+                } else if (question.type === "select") {
+                    const answer = document.querySelector(`select[name="${question.id}"]`).value;
+                    if (answer === question.correct) {
+                        score++;
+                        isCorrect = true;
+                    }
+                } else if (question.type === "text") {
+                    const answer = document.querySelector(`input[name="${question.id}"]`).value.trim().toLowerCase();
+                    if (question.correct.every(keyword => answer.includes(keyword))) {
+                        score++;
+                        isCorrect = true;
+                    }
+                }
+
+                if (!isCorrect) {
+                    hintElement.innerText = question.hint;
+                    hintElement.style.display = "block";
+                } else {
+                    hintElement.innerText = "";
+                    hintElement.style.display = "none";
+                }
+            });
+
+            const percentageNumber = (score / totalQuestions) * 100;
+            const percentage = percentageNumber.toFixed(2);
+
+
+            // Results as fullscreen card (like start/lock)
+            const elapsedSecs = (testStartTs ? (Date.now() - testStartTs) / 1000 : (15*60 - Math.max(0,timeLeft)));
+            const resultMsg = document.getElementById('resultMsg');
+            const resultMeta = document.getElementById('resultMeta');
+            if (resultMsg) resultMsg.textContent = `Σκορ: ${percentage}%\nΣωστές απαντήσεις: ${score}/${totalQuestions}`;
+            if (resultMeta) resultMeta.textContent = `Δυσκολία τεστ: ${_difficultyLabelGR(currentDifficulty)} • Χρόνος: ${_formatElapsed(elapsedSecs)}`;
+
+
+            document.getElementById("result").style.display = "none";
+
+            // Στείλε τα αποτελέσματα στον γονέα (Split View)
+            sendQuizResultToParent(percentageNumber, score, totalQuestions);
+
+            // Adaptive difficulty: >75% ⇒ ανεβαίνει επίπεδο για το επόμενο τεστ
+            const bumped = maybeIncreaseDifficulty(percentageNumber);
+            if (bumped){
+                if (resultMeta) resultMeta.textContent += `
+✅ Μπράβο! Η δυσκολία ανέβηκε σε: ${_difficultyLabelGR(currentDifficulty)}.`;
+            }
+
+            
+
+      // Lockout update
+      const nowLocked = recordAttemptAndMaybeLock(percentageNumber);
+      if (!nowLocked){
+        _showResultOverlay(true);
+      }
+            _stopTimer();
+            testStarted = false;
+            lockQuestions();
+        }
+
+        function resetQuiz() {
+            
+      if (isQuizLocked()) { applyLockFromStorage(); return; }
+      hasSubmitted = false;
+      testStarted = false;
+document.getElementById("quizForm").reset();
+            document.getElementById("result").style.display = "none";
+            document.querySelectorAll('.hint').forEach(hint => {
+                hint.innerText = "";
+                hint.style.display = "none";
+            });
+            renderQuestions();
+            initHomeScreen();
+        }
+
+        // Initial render
+        renderQuestions();
+        initHomeScreen();
+
+        // Δήλωσε στον γονέα ότι αυτό το iframe περιέχει τεστ
+        notifyParentQuizReady();
+    </script>
+</body>
+</html>

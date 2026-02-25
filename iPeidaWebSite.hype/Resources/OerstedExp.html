@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>Κύκλωμα με Μπαταρία και Πυξίδα</title>
+
+  <style>
+    :root{
+      --accent:#FF7E79;
+      --accent-dark:#D75A55;
+      --ink:#625C5C;
+
+      /* Ενημερώνονται από JS */
+      --ui-scale: 1;
+      --ui-font-scale: 1;
+
+      /* Θέση κουμπιού Οδηγίες (CSS-only) */
+      --instructions-justify: center;   /* flex-start | center | flex-end */
+      --instructions-align: center;     /* flex-start | center | flex-end */
+      --instructions-offset-x: 0px;     /* + δεξιά, - αριστερά */
+      --instructions-offset-y: -50px;     /* + κάτω, - πάνω */
+    }
+
+    *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html, body{
+      width:100%; height:100%;
+      margin:0; padding:0;
+      overflow:hidden;
+      touch-action:none;
+      background:transparent;
+      font-family:-apple-system, Arial, sans-serif;
+    }
+
+    /* Γεμίζει το iframe, κέντρο οριζόντια, ΠΑΝΩ κάθετα */
+    #app{
+      width:100%;
+      height:100%;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+
+      padding-top: max(8px, env(safe-area-inset-top));
+      padding-right: 8px;
+      padding-bottom: max(8px, env(safe-area-inset-bottom));
+      padding-left: 8px;
+    }
+
+    /* Stage = γεμίζει όλο το διαθέσιμο ύψος/πλάτος του iframe */
+    #stage{
+      position:relative;
+      width:100%;
+      height:100%;
+      border-radius:12px;
+      background: rgba(255,255,255,0.90);
+      overflow:hidden;
+      user-select:none;
+      -webkit-user-select:none;
+    }
+
+    /* Scene = η “πραγματική” σκηνή που κλιμακώνεται, ΠΑΝΤΑ κολλημένη πάνω */
+    #scene{
+      position:absolute;
+      top:0;
+      left:50%;
+      transform: translateX(-50%);
+      /* width/height μπαίνουν από JS */
+    }
+
+    /* Canvas (πάνω περιοχή της σκηνής) */
+    #cv{
+      position:absolute;
+      top:0; left:0;
+      display:block;
+      border:0;
+      /* width/height μπαίνουν από JS */
+    }
+
+    /* UI row (κάτω περιοχή της σκηνής) */
+    #uiRow{
+      position:absolute;
+      left:0;
+      bottom:0;
+      width:100%;
+      display:flex;
+
+      justify-content: var(--instructions-justify, center);
+      align-items: var(--instructions-align, center);
+
+      pointer-events:auto;
+      background: transparent;
+      /* height μπαίνει από JS */
+    }
+
+    #instructionsButton{
+      padding: calc(10px * var(--ui-font-scale)) calc(16px * var(--ui-font-scale));
+      font-size: calc(14px * var(--ui-font-scale));
+      color:#fff;
+      background-color: var(--accent);
+      border:none;
+      border-radius: calc(10px * var(--ui-font-scale));
+      cursor:pointer;
+
+      min-height: calc(44px * var(--ui-font-scale));
+      min-width:  calc(120px * var(--ui-font-scale));
+
+      transition: background-color .2s;
+
+      /* CSS-only μετακίνηση (ακολουθεί το scale) */
+      transform: translate(
+        calc(var(--instructions-offset-x, 0px) * var(--ui-scale)),
+        calc(var(--instructions-offset-y, 0px) * var(--ui-scale))
+      );
+    }
+    #instructionsButton:hover{ background-color: var(--accent-dark); }
+    #instructionsButton:focus{ outline:2px solid var(--accent); outline-offset:2px; }
+
+    /* ---------------- Battery ---------------- */
+    .battery-wrapper{
+      position:absolute;
+      top:  calc(45px * var(--ui-scale));
+      right:calc(50px * var(--ui-scale));
+      transform: scale(calc(var(--ui-scale) * 0.7));
+      transform-origin: top right;
+      z-index: 30;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      pointer-events:auto;
+    }
+    .battery-container{
+      width:250px;
+      height:120px;
+      border:10px solid var(--ink);
+      border-radius:20px;
+      position:relative;
+      background: linear-gradient(145deg, #e0e0e0, #f8f8f8);
+      box-shadow: 0 8px 15px rgba(0,0,0,.10), 0 -8px 15px rgba(0,0,0,.10);
+      cursor:pointer;
+    }
+    .battery-level{
+      width:100%;
+      height:100%;
+      background-color:#4A9948;
+      border-radius:10px;
+      transition: width 1s ease-in-out;
+      will-change: width;
+    }
+    .battery-cap{
+      width:40px; height:25px;
+      background-color: var(--ink);
+      position:absolute;
+      top:-20px;
+      left:50%;
+      transform: translateX(-50%);
+      border-radius:10px;
+    }
+    .negative-terminal-battery, .positive-terminal-battery{
+      width:25px; height:25px;
+      background-color:red;
+      border-radius:50%;
+      position:absolute;
+
+      /* ✅ κρατάω την αλλαγή σου */
+      bottom:95px;
+
+      border:3px solid #fff;
+      box-shadow: 0 0 10px rgba(0,0,0,.15);
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      font-size:18px;
+      color:#fff;
+      font-weight:bold;
+    }
+    .negative-terminal-battery{ left:45px; background:red; box-shadow:0 0 10px rgba(255,0,0,.6); }
+    .positive-terminal-battery{ right:45px; background:green; box-shadow:0 0 10px rgba(0,255,0,.6); }
+    .negative-terminal-battery.swapped{ right:45px; left:auto; }
+    .positive-terminal-battery.swapped{ left:45px; right:auto; }
+
+    .battery-base{
+      width:270px; height:20px;
+      background-color: var(--ink);
+      border-radius:10px;
+      margin-top:1px;
+      box-shadow:0 8px 15px rgba(0,0,0,.10);
+    }
+    .battery-label{
+      font-size:1.5em;
+      padding:10px;
+      background:#333;
+      color:green;
+      font-family: Arial, sans-serif;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      position:absolute;
+      top:50%;
+      left:50%;
+      transform: translate(-50%, -50%);
+      white-space:nowrap;
+    }
+
+    /* ---------------- Compass ---------------- */
+    .compass{
+      position:absolute;
+      z-index:40;
+      cursor:grab;
+      width:  calc(60px * var(--ui-scale));
+      height: calc(60px * var(--ui-scale));
+      border: calc(5px * var(--ui-scale)) solid #333;
+      border-radius:50%;
+      background: rgba(255,255,255,0.8);
+      transform-origin:center;
+      touch-action:none;
+    }
+    .compass:active{ cursor:grabbing; }
+    .needle{
+      width:  calc(2px  * var(--ui-scale));
+      height: calc(30px * var(--ui-scale));
+      background: linear-gradient(to bottom, red 50%, #333 50%);
+      position:absolute;
+      top:50%;
+      left:50%;
+      transform: translate(-50%, -50%);
+      transform-origin: 50% 50%;
+      border-radius:2px;
+    }
+    .north,.south,.east,.west{
+      position:absolute;
+      font-size: calc(8px * var(--ui-scale));
+      font-weight:bold;
+    }
+    .north{ top:5px; left:50%; transform:translateX(-50%); }
+    .south{ bottom:5px; left:50%; transform:translateX(-50%); }
+    .east { right:5px; top:50%; transform:translateY(-50%); }
+    .west { left:5px; top:50%; transform:translateY(-50%); }
+
+    /* ---------------- Lamp ---------------- */
+    .lamp{
+      position:absolute;
+      z-index:35;
+      width:  calc(100px * var(--ui-scale));
+      height: calc(150px * var(--ui-scale));
+      left:  calc(120px * var(--ui-scale));
+      top:   calc(114px * var(--ui-scale));
+      pointer-events:none;
+    }
+    .bulb{
+      width:100%;
+      height: calc(100px * var(--ui-scale));
+      background: radial-gradient(circle, #ffeb3b, #fdd835);
+      border-radius:50%;
+      position:absolute;
+      top:0; left:0;
+      box-shadow: 0 0 20px 10px rgba(255,235,59,.7);
+    }
+    .bulb.off{ background:#cccccc; box-shadow:none; }
+    .baselamp{
+      width: calc(40px * var(--ui-scale));
+      height:calc(50px * var(--ui-scale));
+      background-color:#757575;
+      border-radius:5px;
+      position:absolute;
+      bottom:0;
+      left: calc(30px * var(--ui-scale));
+    }
+    .wire{
+      width: calc(10px * var(--ui-scale));
+      height:calc(20px * var(--ui-scale));
+      background-color:#424242;
+      position:absolute;
+      bottom: calc(50px * var(--ui-scale));
+      left:   calc(45px * var(--ui-scale));
+    }
+    .negative-terminal-lamp,.positive-terminal-lamp{
+      width: calc(25px * var(--ui-scale));
+      height:calc(25px * var(--ui-scale));
+      border-radius:50%;
+      position:absolute;
+      bottom:0;
+      border: calc(3px * var(--ui-scale)) solid #fff;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      font-size: calc(18px * var(--ui-scale));
+      color:#fff;
+      font-weight:bold;
+    }
+    .negative-terminal-lamp{ left:  calc(10px * var(--ui-scale)); background:red;   box-shadow:0 0 10px rgba(255,0,0,.6); }
+    .positive-terminal-lamp{ right: calc(10px * var(--ui-scale)); background:green; box-shadow:0 0 10px rgba(0,255,0,.6); }
+
+    /* ---------------- Modal ---------------- */
+    .modal-overlay{
+      display:none;
+      position:fixed;
+      inset:0;
+      background-color: rgba(0,0,0,0.5);
+      z-index:1000;
+      justify-content:center;
+      align-items:center;
+      padding:12px;
+    }
+    .modal-content{
+      background-color:#fff;
+      border-radius:12px;
+      padding:18px;
+      width:min(720px, 92vw);
+      max-height:min(70vh, 520px);
+      overflow:auto;
+      box-shadow:0 4px 12px rgba(0,0,0,.15);
+      position:relative;
+    }
+    .modal-content h2{
+      font-size:12px;
+      color: var(--accent);
+      margin: 0 0 8px 0;
+    }
+    .modal-content p{
+      font-size:10px;
+      color: var(--ink);
+      margin: 0 0 14px 0;
+      line-height:1.5;
+    }
+    .close-button{
+      position:absolute;
+      top:6px;
+      right:10px;
+      background:none;
+      border:none;
+      font-size:22px;
+      color: var(--accent);
+      font-weight:700;
+      cursor:pointer;
+      padding:8px;
+      min-height:44px;
+      min-width:44px;
+    }
+    .close-button:hover{ color: var(--accent-dark); }
+    .close-button:focus{ outline:2px solid var(--accent); outline-offset:2px; }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <div id="stage">
+      <div id="scene">
+        <canvas id="cv"></canvas>
+
+        <div class="battery-wrapper">
+          <div class="battery-container" id="batteryContainer">
+            <div class="battery-level" id="batteryLevel"></div>
+            <div class="battery-cap"></div>
+            <div class="negative-terminal-battery" id="negTerm">-</div>
+            <div class="positive-terminal-battery" id="posTerm">+</div>
+          </div>
+          <div class="battery-base"></div>
+          <div class="battery-label" id="screen" aria-live="polite">12 V</div>
+        </div>
+
+        <div class="compass" id="compass">
+          <div class="needle" id="needle"></div>
+          <div class="north">N</div>
+          <div class="south">S</div>
+          <div class="east">E</div>
+          <div class="west">W</div>
+        </div>
+
+        <div class="lamp" id="lamp">
+          <div class="bulb" id="bulb"></div>
+          <div class="wire"></div>
+          <div class="baselamp"></div>
+          <div class="negative-terminal-lamp">-</div>
+          <div class="positive-terminal-lamp">+</div>
+        </div>
+
+        <div id="uiRow">
+          <button id="instructionsButton" aria-label="Οδηγίες">Οδηγίες</button>
+        </div>
+
+        <div class="modal-overlay" id="instructionsModal" role="dialog" aria-labelledby="modalTitle" aria-modal="true">
+          <div class="modal-content">
+            <button class="close-button" aria-label="Κλείσιμο" tabindex="0">×</button>
+            <h2 id="modalTitle">Περιγραφή Εφαρμογής</h2>
+            <p>Η εφαρμογή προσομοιώνει ένα ηλεκτρικό κύκλωμα με μπαταρία, διακόπτη και λαμπτήρα. Ο χρήστης μπορεί να μετακινεί μια πυξίδα με το ποντίκι ή την αφή. Κλείσε τον διακόπτη του κυκλώματος και πλησίασε την πυξίδα πάνω από τα καλώδια. Τι παρατηρείς;</p>
+
+            <h2>Στοιχεία του κυκλώματος</h2>
+            <p>
+              <strong>- Μπαταρία</strong>: Η τάση της μπαταρίας είναι 12 V. Το επίπεδο φόρτισης μειώνεται όταν ο διακόπτης είναι κλειστός. Κάνε κλικ/άγγιγμα στη μπαταρία για αντιστροφή πολικότητας.<br>
+              <strong>- Διακόπτης</strong>: Κλικ/άγγιγμα πάνω στον διακόπτη στο κύκλωμα για άνοιγμα/κλείσιμο.<br>
+              <strong>- Πυξίδα</strong>: Σύρε την πυξίδα. Όταν ρέει ρεύμα και η πυξίδα είναι κοντά στα καλώδια, η βελόνα προσανατολίζεται στο πεδίο (κανόνας δεξιού χεριού).<br>
+              <strong>- Σύμβολα</strong>: "×" προς τα μέσα στη σελίδα, "•" προς τα έξω.
+            </p>
+
+            <h2>Εκπαιδευτικοί Σκοποί</h2>
+            <p>
+              <strong>-</strong> Σχέση ρεύματος–μαγνητικού πεδίου.<br>
+              <strong>-</strong> Εφαρμογή κανόνα δεξιού χεριού.<br>
+              <strong>-</strong> Παρατήρηση/ερμηνεία φαινομένων.
+            </p>
+          </div>
+        </div>
+
+      </div><!-- /scene -->
+    </div><!-- /stage -->
+  </div><!-- /app -->
+
+  <script>
+    /* =========================
+       BASE διαστάσεις (δεν αλλάζουν)
+    ========================== */
+    var BASE_W = 700;
+    var BASE_H_CANVAS = 350;
+    var BASE_H_UI = 70;
+    var BASE_H_SCENE = BASE_H_CANVAS + BASE_H_UI;
+
+    var COMPASS_SIZE = 60;
+
+    /* =========================
+       Parent UI scale (Split View)
+    ========================== */
+    var parentUIScale = null;
+
+    function requestParentUIScale(){
+      try { window.parent.postMessage({ type:'GG_UI_SCALE_REQUEST' }, '*'); } catch(e){}
+    }
+
+    window.addEventListener('message', function(e){
+      if (!e.data || e.data.type !== 'GG_UI_SCALE') return;
+      var n = Number(e.data.scale);
+      if (n > 0) { parentUIScale = n; resizeScene(); }
+    }, false);
+
+    /* =========================
+       DOM
+    ========================== */
+    var stage = document.getElementById('stage');
+    var scene = document.getElementById('scene');
+    var uiRow = document.getElementById('uiRow');
+
+    var cv = document.getElementById('cv');
+    var ctx = cv.getContext('2d');
+
+    var screen = document.getElementById('screen');
+    var batteryLevelElement = document.getElementById('batteryLevel');
+    var instructionsButton = document.getElementById('instructionsButton');
+    var instructionsModal = document.getElementById('instructionsModal');
+    var closeButton = document.querySelector('.close-button');
+
+    var batteryContainer = document.getElementById('batteryContainer');
+    var positiveTerminal = document.getElementById('posTerm');
+    var negativeTerminal = document.getElementById('negTerm');
+
+    var compass = document.getElementById('compass');
+    var needle = document.getElementById('needle');
+    var bulb = document.getElementById('bulb');
+
+    /* =========================
+       Ήχοι
+    ========================== */
+    var clickSound  = new Audio('AppClick.m4a');  clickSound.preload = 'auto';
+    var switchSound = new Audio('switch01.mp3');  switchSound.preload = 'auto';
+
+    /* =========================
+       Καταστάσεις
+    ========================== */
+    var switchClosed = false;
+    var batteryPolarity = true;
+    var batteryLevel = 100;
+    var dischargeRate = 0.0167;
+
+    var compassX = 50, compassY = 50;
+    var offsetX = 0, offsetY = 0;
+    var isDraggingCompass = false;
+
+    var sphereCount = 30, pathLength = 1410, sphereSpeed = 1;
+    var spheres = Array.from({length: sphereCount}, function(_, i){
+      return { pathPosition: (i * pathLength) / sphereCount };
+    });
+
+    var wirePin = { x: 200, y: 140 };
+    var earthB = 0.8;
+    var wireB0 = 28.0;
+    var currentBoost = 2.5;
+    var rMin = 15;
+
+    /* =========================
+       Responsive scaling (layout ίδιο, μόνο scale)
+    ========================== */
+    var uiScale = 1;
+    var dpr = window.devicePixelRatio || 1;
+
+    function clamp(v,a,b){ return Math.max(a, Math.min(b,v)); }
+
+    function resizeScene(){
+      // Το διαθέσιμο “κουτί” είναι το stage (γεμίζει όλο το iframe)
+      var rect = stage.getBoundingClientRect();
+      var availW = Math.max(120, rect.width);
+      var availH = Math.max(120, rect.height);
+
+      // fit μέσα στο διαθέσιμο, χωρίς αλλαγή διάταξης
+      var fitScale = Math.min(availW / BASE_W, availH / BASE_H_SCENE);
+
+      // 1:1 με parent scale αλλά ποτέ > fit
+      var desired = fitScale;
+      if (parentUIScale && parentUIScale > 0) desired = Math.min(fitScale, parentUIScale);
+
+      uiScale = clamp(desired, 0.38, 2.5);
+
+      // Το κουμπί να ακολουθεί πραγματικά το scale
+      var uiFontScale = clamp(uiScale, 0.55, 1.35);
+
+      // vars (στο scene ώστε να κληρονομούνται παντού μέσα)
+      scene.style.setProperty('--ui-scale', uiScale);
+      scene.style.setProperty('--ui-font-scale', uiFontScale);
+
+      // CSS size scene
+      var cssW = Math.round(BASE_W * uiScale);
+      var cssH = Math.round(BASE_H_SCENE * uiScale);
+
+      scene.style.width  = cssW + 'px';
+      scene.style.height = cssH + 'px';
+
+      // Canvas CSS size (μόνο πάνω περιοχή)
+      var cssCanvasH = Math.round(BASE_H_CANVAS * uiScale);
+      cv.style.width  = cssW + 'px';
+      cv.style.height = cssCanvasH + 'px';
+
+      // UI row height
+      uiRow.style.height = Math.round(BASE_H_UI * uiScale) + 'px';
+
+      // High DPI canvas backing store
+      dpr = window.devicePixelRatio || 1;
+      cv.width  = Math.round(cssW * dpr);
+      cv.height = Math.round(cssCanvasH * dpr);
+
+      applyCompassCSSPosition();
+      drawCircuit();
+      updateCompassDirection();
+    }
+
+    // Παρακολούθηση αλλαγών μεγέθους (rotation / fullscreen / split view)
+    if (window.ResizeObserver){
+      var ro = new ResizeObserver(function(){ resizeScene(); });
+      ro.observe(stage);
+    }
+    window.addEventListener('resize', resizeScene);
+
+    /* =========================
+       Helpers
+    ========================== */
+    function beginDraw(){
+      ctx.setTransform(1,0,0,1,0,0);
+      ctx.clearRect(0,0,cv.width,cv.height);
+
+      var s = uiScale * dpr;     // base units -> pixels
+      ctx.setTransform(s,0,0,s,0,0);
+    }
+
+    function setNeedleAngleDeg(angleDeg){
+      needle.style.transform = 'translate(-50%, -50%) rotate(' + angleDeg + 'deg)';
+    }
+
+    function applyCompassCSSPosition(){
+      compass.style.left = (compassX * uiScale) + 'px';
+      compass.style.top  = (compassY * uiScale) + 'px';
+    }
+
+    function getSphereCoordinates(pathPosition){
+      var t = pathPosition % pathLength;
+      if (batteryPolarity){
+        if (t < 200) return { x:600, y:50 + t };
+        else if (t < 480) return { x:600 - (t - 200), y:250 };
+        else if (t < 730) return { x:280 - (t - 480), y:250 };
+        else if (t < 930) return { x:30, y:250 - (t - 730) };
+        else return { x:30 + (t - 930), y:50 };
+      } else {
+        t = pathLength - t; if (t <= 0) t += pathLength;
+        if (t < 475) return { x:505 - t, y:50 };
+        else if (t < 675) return { x:30, y:50 + (t - 475) };
+        else if (t < 925) return { x:30 + (t - 675), y:250 };
+        else if (t < 1205) return { x:320 + (t - 925), y:250 };
+        else return { x:600, y:250 - (t - 1205) };
+      }
+    }
+
+    function pinFieldVectorAtPoint(x, y, IzSign, boost){
+      var dx = x - wirePin.x, dy = y - wirePin.y;
+      var r = Math.hypot(dx, dy); if (r < rMin) r = rMin;
+      var phi = Math.atan2(dy, dx);
+      var thetaWire = phi + (IzSign > 0 ? Math.PI/2 : -Math.PI/2);
+      var Bmag = (wireB0 * boost) / r;
+      return { Bx: Bmag * Math.cos(thetaWire), By: Bmag * Math.sin(thetaWire) };
+    }
+
+    function togglePolarity(){
+      batteryPolarity = !batteryPolarity;
+      clickSound.play().catch(function(){});
+      if (batteryPolarity){
+        positiveTerminal.classList.remove('swapped');
+        negativeTerminal.classList.remove('swapped');
+      } else {
+        positiveTerminal.classList.add('swapped');
+        negativeTerminal.classList.add('swapped');
+      }
+      drawCircuit();
+      updateCompassDirection();
+    }
+
+    /* =========================
+       Compass direction
+    ========================== */
+    function updateCompassDirection(){
+      var cx = compassX + COMPASS_SIZE/2;
+      var cy = compassY + COMPASS_SIZE/2;
+
+      var Bx = 0, By = earthB;
+
+      if (switchClosed && batteryLevel > 0){
+        var IzSign = batteryPolarity ? +1 : -1;
+        var Bw = pinFieldVectorAtPoint(cx, cy, IzSign, currentBoost);
+        Bx += Bw.Bx; By += Bw.By;
+      }
+
+      var angleDeg = (Math.atan2(By, Bx) * 180 / Math.PI) - 90;
+      setNeedleAngleDeg(angleDeg);
+    }
+
+    /* =========================
+       Animation
+    ========================== */
+    var lastTime = performance.now();
+    function animate(now){
+      var deltaTime = Math.min((now - lastTime) / 16.67, 2);
+      lastTime = now;
+
+      if (switchClosed && batteryLevel > 0){
+        batteryLevel = Math.max(0, batteryLevel - dischargeRate * deltaTime);
+        batteryLevelElement.style.width = batteryLevel + '%';
+      }
+
+      if (switchClosed && batteryLevel > 0){
+        spheres.forEach(function(s){
+          s.pathPosition = (s.pathPosition + sphereSpeed * (batteryPolarity ? 1 : -1) * deltaTime) % pathLength;
+          if (s.pathPosition < 0) s.pathPosition += pathLength;
+        });
+      }
+
+      applyCompassCSSPosition();
+      updateCompassDirection();
+      drawCircuit();
+
+      if (switchClosed && batteryLevel > 0) requestAnimationFrame(animate);
+    }
+
+    /* =========================
+       Draw
+    ========================== */
+    function drawCircuit(){
+      beginDraw();
+
+      // wires
+      ctx.beginPath();
+      ctx.strokeStyle = "green";
+      ctx.lineWidth = 15;
+      ctx.moveTo(505, 50);
+      ctx.lineTo(360, 50);
+      ctx.lineTo(30, 50);
+      ctx.lineTo(30, 250);
+      ctx.lineTo(280, 250);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(320, 250);
+      ctx.lineTo(600, 250);
+      ctx.lineTo(600, 50);
+      ctx.stroke();
+
+      // bulb on/off
+      if (switchClosed && batteryLevel > 0) bulb.classList.remove('off');
+      else bulb.classList.add('off');
+
+      // field symbols
+      if (switchClosed && batteryLevel > 0){
+        ctx.fillStyle = "black";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.font = "20px Arial";
+
+        var top = [{x:50,y:50},{x:150,y:50},{x:250,y:50},{x:350,y:50},{x:450,y:50}];
+        top.forEach(function(p){
+          ctx.fillText(batteryPolarity ? "•" : "×", p.x, p.y - 20);
+          ctx.fillText(batteryPolarity ? "×" : "•", p.x, p.y + 20);
+        });
+
+        var left = [{x:30,y:80},{x:30,y:120},{x:30,y:160},{x:30,y:200}];
+        left.forEach(function(p){
+          ctx.fillText(batteryPolarity ? "•" : "×", p.x - 20, p.y);
+          ctx.fillText(batteryPolarity ? "×" : "•", p.x + 20, p.y);
+        });
+
+        var bottom = [{x:50,y:250},{x:150,y:250},{x:250,y:250},{x:350,y:250},{x:450,y:250},{x:550,y:250}];
+        bottom.forEach(function(p){
+          ctx.fillText(batteryPolarity ? "×" : "•", p.x, p.y - 20);
+          ctx.fillText(batteryPolarity ? "•" : "×", p.x, p.y + 20);
+        });
+
+        var right = [{x:600,y:80},{x:600,y:120},{x:600,y:160},{x:600,y:200}];
+        right.forEach(function(p){
+          ctx.fillText(batteryPolarity ? "×" : "•", p.x - 20, p.y);
+          ctx.fillText(batteryPolarity ? "•" : "×", p.x + 20, p.y);
+        });
+      }
+
+      // spheres
+      spheres.forEach(function(s){
+        var p = getSphereCoordinates(s.pathPosition);
+        ctx.beginPath();
+        ctx.fillStyle = "#9DD3B2";
+        ctx.strokeStyle = "grey";
+        ctx.lineWidth = 1;
+        ctx.arc(p.x, p.y, 5, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "grey";
+        ctx.font = "10px Arial";
+        ctx.fillText("+", p.x, p.y);
+      });
+
+      // switch
+      ctx.beginPath();
+      ctx.fillStyle = "black";
+      ctx.arc(280, 250, 10, 0, 2 * Math.PI);
+      ctx.arc(320, 250, 10, 0, 2 * Math.PI);
+      ctx.fill();
+
+      if (switchClosed){
+        ctx.beginPath();
+        ctx.lineWidth = 5;
+        ctx.moveTo(280, 250);
+        ctx.lineTo(320, 250);
+        ctx.stroke();
+      } else {
+        ctx.beginPath();
+        ctx.lineWidth = 7;
+        ctx.moveTo(280, 250);
+        ctx.lineTo(300, 230);
+        ctx.stroke();
+      }
+
+      // pin symbol
+      if (switchClosed && batteryLevel > 0){
+        ctx.fillStyle = "black";
+        ctx.font = "28px Arial";
+        ctx.fillText(batteryPolarity ? "•" : "×", wirePin.x, wirePin.y);
+      }
+
+      screen.textContent = "12 V";
+    }
+
+    /* =========================
+       Pointer -> base coords (canvas area only)
+    ========================== */
+    function pointerToBase(evt){
+      var rect = cv.getBoundingClientRect();
+      var clientX, clientY;
+
+      if (evt.touches && evt.touches[0]){
+        clientX = evt.touches[0].clientX;
+        clientY = evt.touches[0].clientY;
+      } else {
+        clientX = evt.clientX;
+        clientY = evt.clientY;
+      }
+
+      var x = (clientX - rect.left) / uiScale;
+      var y = (clientY - rect.top)  / uiScale;
+      return { x:x, y:y };
+    }
+
+    /* =========================
+       Interaction
+    ========================== */
+    function handleCircuitInteraction(evt){
+      evt.preventDefault();
+      var p = pointerToBase(evt);
+      var x = p.x, y = p.y;
+
+      // switch hitbox
+      if (x >= 280 && x <= 320 && y >= 230 && y <= 270){
+        switchClosed = !switchClosed;
+        switchSound.play().catch(function(){});
+        updateCompassDirection();
+        drawCircuit();
+        if (switchClosed) requestAnimationFrame(animate);
+        return;
+      }
+
+      // optional polarity hitbox (kept)
+      if (x >= 461 && x <= 650 && y >= 45 && y <= 143){
+        togglePolarity();
+      }
+    }
+
+    function onCompassDown(evt){
+      evt.preventDefault();
+      var p = pointerToBase(evt);
+      offsetX = p.x - compassX;
+      offsetY = p.y - compassY;
+      isDraggingCompass = true;
+      compass.style.cursor = 'grabbing';
+    }
+
+    function onCompassMove(evt){
+      if (!isDraggingCompass) return;
+      evt.preventDefault();
+
+      var p = pointerToBase(evt);
+      var newX = p.x - offsetX;
+      var newY = p.y - offsetY;
+
+      var maxX = BASE_W - COMPASS_SIZE;
+      var maxY = BASE_H_CANVAS - COMPASS_SIZE;
+
+      compassX = clamp(newX, 0, maxX);
+      compassY = clamp(newY, 0, maxY);
+
+      applyCompassCSSPosition();
+      updateCompassDirection();
+    }
+
+    function onCompassUp(){
+      isDraggingCompass = false;
+      compass.style.cursor = 'grab';
+    }
+
+    // canvas
+    cv.addEventListener('click', handleCircuitInteraction, false);
+    cv.addEventListener('touchstart', handleCircuitInteraction, { passive:false });
+
+    // compass drag
+    compass.addEventListener('mousedown', onCompassDown, false);
+    compass.addEventListener('touchstart', onCompassDown, { passive:false });
+
+    document.addEventListener('mousemove', onCompassMove, false);
+    document.addEventListener('touchmove', onCompassMove, { passive:false });
+
+    document.addEventListener('mouseup', onCompassUp, false);
+    document.addEventListener('touchend', onCompassUp, false);
+
+    // modal
+    instructionsButton.addEventListener('click', function(){
+      clickSound.play().catch(function(){});
+      instructionsModal.style.display = 'flex';
+      closeButton.focus();
+    }, false);
+
+    closeButton.addEventListener('click', function(){
+      instructionsModal.style.display = 'none';
+    }, false);
+
+    instructionsModal.addEventListener('click', function(e){
+      if (e.target === instructionsModal) instructionsModal.style.display = 'none';
+    }, false);
+
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape' && instructionsModal.style.display === 'flex'){
+        instructionsModal.style.display = 'none';
+      }
+    }, false);
+
+    // polarity
+    batteryContainer.addEventListener('click', togglePolarity, false);
+    batteryContainer.addEventListener('touchstart', function(e){
+      e.preventDefault();
+      togglePolarity();
+    }, { passive:false });
+
+    /* =========================
+       Init
+    ========================== */
+    requestParentUIScale();
+    resizeScene();
+    drawCircuit();
+    updateCompassDirection();
+    applyCompassCSSPosition();
+  </script>
+</body>
+</html>

@@ -1,0 +1,775 @@
+<!doctype html>
+<html lang="el">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,height=device-height,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+  <title>Ηλεκτρομαγνητισμός — Ερώτηση Ανάπτυξης</title>
+  <style>
+    :root{
+      --accent:#FF7E79;
+      --ink:#625C5C;
+      --card-bg:#fff7f6;
+      --card-border:#ffc0bc;
+      --border:#e5e7eb;
+      --panel:#f6f7fb;
+    }
+    *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html,body{ height:100%; margin:0; }
+    body{
+      font-family: Arial, sans-serif;
+      font-size: clamp(13px, 1.6vw, 18px);
+      color: var(--ink);
+      background:#fff;
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+    }
+    header{
+      flex: 0 0 auto;
+      padding: 0.7rem 0.9rem;
+      background: var(--accent);
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 0.6rem;
+    }
+    .title-wrap{ min-width:0; display:flex; flex-direction:column; gap:0.1rem; }
+    .title{ font-weight:800; font-size: clamp(15px, 2.2vw, 20px); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .subtitle{ opacity:.92; font-size: clamp(11px, 1.6vw, 14px); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .xp-pill{
+      flex: 0 0 auto;
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      border: 1px solid rgba(255,255,255,.35);
+      background: rgba(255,255,255,.14);
+      color:#fff;
+      padding: 0.35rem 0.65rem;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 0.9em;
+      white-space:nowrap;
+    }
+    .xp-pill .xp-num{ font-variant-numeric: tabular-nums; }
+
+    main{
+      flex: 1 1 auto;
+      min-height:0;
+      overflow:auto;
+      -webkit-overflow-scrolling:touch;
+      padding: 14px 14px 20px;
+      display:flex;
+      justify-content:center;
+    }
+
+    .card{
+      width: min(860px, 100%);
+      background: #fff;
+      border-radius: 18px;
+      border: 1px solid rgba(0,0,0,.06);
+      box-shadow: 0 14px 40px rgba(15,23,42,.10);
+      padding: 14px 14px 16px;
+    }
+
+    .section-label{
+      font-size: 0.72em;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      color: #9ca3af;
+      margin-bottom: 0.25rem;
+    }
+
+    h2{
+      margin: 0.15rem 0 0.65rem;
+      color: var(--accent);
+      font-size: clamp(18px, 2.2vw, 22px);
+      line-height:1.25;
+    }
+
+    .q{
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 12px 12px 12px;
+      box-shadow: 0 10px 26px rgba(0,0,0,.06);
+    }
+    .q p{ margin:0; line-height:1.55; }
+    .q strong.num{ color: var(--accent); }
+
+    /* Basic reveal (Υπόδειξη) — minimal */
+    .reveal-block{
+      margin-top: 10px;
+    }
+    .reveal-toggle{
+      display:block;
+      width:100%;
+      text-align:left;
+      border: none;
+      background: transparent;
+      color: var(--accent);
+      font-weight: 800;
+      cursor:pointer;
+      padding: 0;
+      font-size: 0.95em;
+    }
+    .reveal-toggle::after{ content:" ▾"; font-size:0.9em; }
+    .reveal-toggle.is-open::after{ content:" ▴"; }
+    .reveal-content{
+      display:none;
+      margin-top: 8px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px dashed rgba(0,0,0,.16);
+      background: #f9fafb;
+      color: var(--ink);
+      font-size: 0.95em;
+    }
+    .reveal-content.is-open{ display:block; }
+
+    /* ===== Reveal Answer Block (reveal-block1) — same look & behavior as EmApp ===== */
+    .reveal-block1{
+      margin: 12px 0 0;
+      border: 1px solid rgba(255,126,121,.35);
+      background: rgba(0,0,0,0.04);
+      border-radius: 14px;
+      padding: 8px;
+    }
+
+    .reveal-block1 .reveal-toggle{
+      width: 100%;
+      text-align: left;
+      padding: 10px 12px;
+      background: #fff; /* white header for the toggle */
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 12px;
+      margin: 0;
+      color: var(--accent);
+      font-weight: 800;
+    }
+
+    .reveal-block1 .reveal-content{
+      background: #f9fafb;
+      padding: 10px;
+      margin: 8px 0 0;
+      border-radius: 12px;
+      border: 1px solid rgba(255,126,121,.22);
+      display:none;
+    }
+    .reveal-block1 .reveal-content.is-open{ display:block; }
+
+    .reveal-block1 .reveal1-hint{
+      margin: 10px 0 8px;
+      font: 13px Arial, sans-serif;
+      color: #625C5C;
+    }
+
+    .reveal-block1 .reveal-answer{
+      width: 100%;
+      resize: vertical;
+      min-height: 110px;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font: 13px Arial, sans-serif;
+      color: #625C5C;
+      outline: none;
+      background: rgba(255,255,255,.95);
+      border: 0; /* ✅ no border */
+    }
+    .reveal-block1 .reveal-answer:focus{ background:#fff; box-shadow:none; }
+
+    .reveal-block1 .reveal-actions{
+      display:flex;
+      gap:10px;
+      margin-top:10px;
+      flex-wrap:wrap;
+      position: relative;
+      z-index: 3;
+    }
+    .reveal-block1 .reveal-eval-btn,
+    .reveal-block1 .reveal-clear-btn{
+      border:0;
+      border-radius:12px;
+      padding:10px 12px;
+      font: 13px Arial, sans-serif;
+      cursor:pointer;
+      position: relative;
+      z-index: 4;
+      pointer-events:auto;
+      touch-action: manipulation;
+    }
+    .reveal-block1 .reveal-eval-btn{ background: var(--accent); color:#fff; font-weight:800; }
+    .reveal-block1 .reveal-clear-btn{ background: rgba(0,0,0,.08); color: #625C5C; font-weight:700; }
+
+    .reveal-block1 .reveal-score{
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.7);
+      border: 1px dashed rgba(0,0,0,.18);
+      font: 13px Arial, sans-serif;
+      color: #625C5C;
+    }
+    .reveal-block1 .reveal-score strong{ color: var(--accent); }
+
+    /* progress as bar (no %) */
+    .reveal-block1 .reveal-progress-row{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+    }
+    .reveal-block1 .reveal-progress{
+      flex: 1 1 auto;
+      height: 10px;
+      border-radius: 999px;
+      overflow:hidden;
+      background: rgba(0,0,0,.08);
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+    }
+    .reveal-block1 .reveal-progress > i{
+      display:block;
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, rgba(255,126,121,.35), rgba(255,126,121,1));
+      box-shadow: 0 0 14px rgba(255,126,121,.28);
+      transition: width 220ms ease-out;
+    }
+
+    /* checklist (2 columns) */
+    .reveal-block1 .reveal-checklist{
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.75);
+      border: 1px solid rgba(0,0,0,.10);
+    }
+    .reveal-block1 .reveal-checklist-title{
+      font: 13px Arial, sans-serif;
+      font-weight: 800;
+      color:#625C5C;
+      margin-bottom:6px;
+    }
+    .reveal-block1 .reveal-checklist-grid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px 12px;
+    }
+    .reveal-block1 .reveal-kw{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      font: 13px Arial, sans-serif;
+      color:#625C5C;
+    }
+    .reveal-block1 .reveal-kw input{
+      width:16px; height:16px;
+      accent-color: var(--accent);
+    }
+    .reveal-block1 .reveal-kw.is-missing{ opacity:.95; }
+    .reveal-block1 .reveal-kw.is-missing .reveal-kw-label{ font-weight:800; }
+
+    /* small screens */
+    @media (max-width: 420px){
+      header{ padding: 0.6rem 0.7rem; }
+      .reveal-block1 .reveal-checklist-grid{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="title-wrap">
+      <div class="title">Ηλεκτρομαγνητισμός Γυμνασίου</div>
+      <div class="subtitle">Ερώτηση ανάπτυξης</div>
+    </div>
+
+    <div class="xp-pill" title="Συνολική XP (τοπικά)">
+      🏆 <span class="xp-num" id="xpTotal">0</span> XP
+    </div>
+  </header>
+
+  <main>
+    <div class="card">
+      <div class="section-label">Ερώτηση ανάπτυξης</div>
+      <h2>Ηλεκτρομαγνητική επαγωγή (Faraday)</h2>
+
+      <div class="q">
+        <p>
+          <strong class="num">3.</strong>
+          Τι είναι η ηλεκτρομαγνητική επαγωγή; Να περιγράψεις το πείραμα του Faraday με τα δύο πηνία
+          και να εξηγήσεις πώς η μεταβολή του μαγνητικού πεδίου οδηγεί στην παραγωγή επαγόμενου ρεύματος.
+        </p>
+
+        <div class="reveal-block">
+          <button type="button" class="reveal-toggle" data-toggle>Υπόδειξη</button>
+          <div class="reveal-content" data-content>
+            <p style="margin:0;">
+              Αναμένεται <strong>ορισμός</strong>, περιγραφή της <strong>διάταξης με τα πηνία</strong>,
+              η <strong>παρατήρηση στο γαλβανόμετρο</strong> και η εξήγηση ότι η επαγωγή συμβαίνει
+              λόγω <strong>μεταβολής του μαγνητικού πεδίου</strong>.
+            </p>
+          </div>
+        </div>
+
+        <div class="reveal-block1"
+             data-qid="em_q3"
+             data-keywords="2:επαγωγή|ηλεκτρομαγνητική επαγωγή|ηλεκτρομαγνητικη επαγωγη;2:μεταβολή|μεταβολη|αλλαγή|αλλαγη;2:μαγνητικό πεδίο|μαγνητικο πεδιο;2:γαλβανόμετρο|γαλβανομετρο;2:επαγόμενο ρεύμα|επαγομενο ρευμα;1:μόνο όταν αλλάζει|μονο οταν αλλαζει">
+          <button type="button" class="reveal-toggle" data-toggle>Απάντηση</button>
+          <div class="reveal-content" data-content>
+            <p class="reveal1-hint">
+              Δώσε ορισμό και περιέγραψε το πείραμα: τι αλλάζει, τι δείχνει το γαλβανόμετρο και γιατί.
+            </p>
+
+            <textarea class="reveal-answer" rows="7" placeholder="Γράψε εδώ την απάντησή σου…"></textarea>
+
+            <div class="reveal-actions">
+              <button type="button" class="reveal-eval-btn">Αξιολόγηση</button>
+              <button type="button" class="reveal-clear-btn">Καθαρισμός</button>
+            </div>
+
+            <div class="reveal-score" aria-live="polite"></div>
+            <div class="reveal-checklist" aria-label="Checklist λέξεων-κλειδιών"></div>
+          </div>
+        </div>        
+
+      </div>
+    </div>
+  </main>
+
+  <!-- (προαιρετικό) click sfx — αν υπάρχει tick.m4a στον ίδιο φάκελο -->
+  <audio id="clickSound" preload="auto" src="tick.m4a"></audio>
+
+  <script>
+    // ---------------------------------------------------------
+    // Small helpers (adapted from EmApp reveal-block1)
+    // ---------------------------------------------------------
+    const XP_KEY = 'gg_mini_xp_v1';
+    const REVEAL_ANSWER_STORAGE_KEY = 'gg_mini_reveal_answers_v1';
+    const REVEAL_XP_AWARDED_KEY = 'gg_mini_reveal_xp_awarded_v1';
+
+    // thresholds (same as EmApp)
+    const REVEAL_XP_PER_COMPLETE = 10;
+    const REVEAL_COMPLETE_PCT = 85;
+    const REVEAL_MIN_WORDS = 10;
+    const REVEAL_MIN_CHARS = 60;
+    const REVEAL_EVAL_MIN_WORDS = 4;
+    const REVEAL_EVAL_MIN_CHARS = 25;
+
+    // pseudo lesson/tab ids (so keys stay stable)
+    const currentLessonId = 'em';
+    const currentTabId = 'mini';
+
+    function safeLSGet(key){
+      try { return localStorage.getItem(key); } catch(e){ return null; }
+    }
+    function safeLSSet(key,val){
+      try { localStorage.setItem(key,val); } catch(e){}
+    }
+
+    function playTick(){
+      const a = document.getElementById('clickSound');
+      if (!a) return;
+      try{
+        a.currentTime = 0;
+        const p = a.play();
+        if (p && typeof p.catch === 'function') p.catch(()=>{});
+      }catch(e){}
+    }
+
+    function normalizeGreek(s){
+      if (!s) return '';
+      return String(s)
+        .toLowerCase()
+        .replace(/ς/g,'σ')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g,'');
+    }
+
+    function escapeHtml(s){
+      return String(s ?? '')
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;')
+        .replace(/'/g,'&#039;');
+    }
+
+    function loadXp(){
+      try{
+        const raw = safeLSGet(XP_KEY);
+        if (!raw) return 0;
+        const n = Number(JSON.parse(raw));
+        return isFinite(n) ? Math.max(0, Math.floor(n)) : 0;
+      }catch(e){ return 0; }
+    }
+    function saveXp(n){
+      n = Math.max(0, Math.floor(Number(n||0)));
+      safeLSSet(XP_KEY, JSON.stringify(n));
+      const el = document.getElementById('xpTotal');
+      if (el) el.textContent = String(n);
+    }
+
+    function postXpToParent(delta, meta){
+      delta = Math.max(0, Math.floor(Number(delta||0)));
+      if (!delta) return;
+      try{
+        if (window.parent && window.parent !== window){
+          window.parent.postMessage({
+            type: 'GG_XP_ADD',
+            delta,
+            meta: meta || {}
+          }, '*');
+        }
+      }catch(e){}
+    }
+
+    function loadRevealStore(){
+      const raw = safeLSGet(REVEAL_ANSWER_STORAGE_KEY);
+      if (!raw) return {};
+      try{
+        const o = JSON.parse(raw);
+        return (o && typeof o === 'object') ? o : {};
+      }catch(e){ return {}; }
+    }
+    function saveRevealStore(store){
+      safeLSSet(REVEAL_ANSWER_STORAGE_KEY, JSON.stringify(store || {}));
+    }
+
+    function loadRevealXpStore(){
+      const raw = safeLSGet(REVEAL_XP_AWARDED_KEY);
+      if (!raw) return {};
+      try{
+        const o = JSON.parse(raw);
+        return (o && typeof o === 'object') ? o : {};
+      }catch(e){ return {}; }
+    }
+    function saveRevealXpStore(store){
+      safeLSSet(REVEAL_XP_AWARDED_KEY, JSON.stringify(store || {}));
+    }
+    function revealGetAwardByKey(k){
+      const s = loadRevealXpStore();
+      return (s && s[k]) ? s[k] : null;
+    }
+
+    function getRevealKey(block){
+      const qid = (block.getAttribute('data-qid') || '').trim() || 'q';
+      return currentLessonId + '::' + currentTabId + '::' + qid;
+    }
+
+    function revealCountWords(s){
+      s = String(s || '').trim();
+      if (!s) return 0;
+      return s.split(/\s+/).filter(Boolean).length;
+    }
+
+    function revealTextIsLongEnough(answer){
+      answer = String(answer || '').trim();
+      if (!answer) return false;
+      if (answer.length >= REVEAL_MIN_CHARS) return true;
+      return revealCountWords(answer) >= REVEAL_MIN_WORDS;
+    }
+
+    function revealTextIsEvaluable(answer){
+      answer = String(answer || '').trim();
+      if (!answer) return false;
+      if (answer.length >= REVEAL_EVAL_MIN_CHARS) return true;
+      return revealCountWords(answer) >= REVEAL_EVAL_MIN_WORDS;
+    }
+
+    function parseKeywordSpec(spec){
+      spec = String(spec || '').trim();
+      if (!spec) return { groups: [], totalWeight: 0 };
+
+      const groups = [];
+      let total = 0;
+
+      spec.split(';').map(s => s.trim()).filter(Boolean).forEach(part=>{
+        let weight = 1;
+        let body = part;
+
+        const m = body.match(/^(\d+(?:\.\d+)?)\s*:\s*(.+)$/);
+        if (m){
+          weight = Math.max(0, parseFloat(m[1]) || 1);
+          body = (m[2] || '').trim();
+        }
+
+        const synonyms = body.split('|').map(x=>x.trim()).filter(Boolean);
+        if (!synonyms.length) return;
+
+        total += weight;
+        groups.push({ weight, synonyms, label: synonyms[0] });
+      });
+
+      return { groups, totalWeight: total };
+    }
+
+    function containsAny(normText, synonyms){
+      for (let i=0;i<synonyms.length;i++){
+        const kwNorm = normalizeGreek(synonyms[i]);
+        if (kwNorm && normText.indexOf(kwNorm) !== -1) return true;
+      }
+      return false;
+    }
+
+    function evaluateAnswer(answer, keywordSpec){
+      const norm = normalizeGreek(answer || '');
+      const parsed = parseKeywordSpec(keywordSpec);
+      const totalW = parsed.totalWeight || 0;
+      let matchedW = 0;
+
+      const items = parsed.groups.map(g=>{
+        const hit = containsAny(norm, g.synonyms);
+        if (hit) matchedW += g.weight;
+        return { label: g.label, hit, weight: g.weight };
+      });
+
+      let pct = (totalW > 0) ? Math.round((matchedW / totalW) * 100) : 0;
+      pct = Math.max(0, Math.min(100, pct));
+      return { percent: pct, totalWeight: totalW, matchedWeight: matchedW, items };
+    }
+
+    function revealEssentialOk(res){
+      if (!res || !Array.isArray(res.items)) return false;
+      for (let i=0;i<res.items.length;i++){
+        const it = res.items[i];
+        if ((it.weight || 0) >= 2 && !it.hit) return false;
+      }
+      return true;
+    }
+
+    function revealIsComplete(answer, res){
+      if (!revealTextIsLongEnough(answer)) return false;
+      if (!revealEssentialOk(res)) return false;
+      return Number(res.percent || 0) >= REVEAL_COMPLETE_PCT;
+    }
+
+    function renderChecklist(block, items){
+      const wrap = block.querySelector('.reveal-checklist');
+      if (!wrap) return;
+
+      let html = '<div class="reveal-checklist-title">Λίστα λέξεων</div>';
+      html += '<div class="reveal-checklist-grid">';
+      for (let i=0;i<items.length;i++){
+        const it = items[i];
+        const cls = 'reveal-kw' + (it.hit ? '' : ' is-missing');
+        html += (
+          '<label class="'+cls+'">' +
+            '<input type="checkbox" ' + (it.hit ? 'checked' : '') + ' disabled>' +
+            '<span class="reveal-kw-label">' + escapeHtml(it.label) + '</span>' +
+          '</label>'
+        );
+      }
+      html += '</div>';
+      wrap.innerHTML = html;
+    }
+
+    function updateRevealUI(block){
+      const ta = block.querySelector('.reveal-answer');
+      const out = block.querySelector('.reveal-score');
+      if (!ta) return;
+
+      const spec = block.getAttribute('data-keywords') || '';
+      const res = evaluateAnswer(ta.value || '', spec);
+
+      if (out){
+        out.innerHTML =
+          '<div class="reveal-progress-row">' +
+            '<strong>Πρόοδος:</strong>' +
+            '<div class="reveal-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+res.percent+'">' +
+              '<i style="width:'+res.percent+'%"></i>' +
+            '</div>' +
+          '</div>' +
+          '<div>Κάλυψες ' + res.items.filter(x=>x.hit).length + ' / ' + res.items.length + ' λέξεις.</div>';
+
+        // XP status (one time)
+        try{
+          const k = getRevealKey(block);
+          const aw = revealGetAwardByKey(k);
+          if (aw && aw.xp){
+            out.innerHTML += '<div style="margin-top:6px;"><strong>🏆 Κερδισμένη XP:</strong> +' + Math.round(aw.xp) + '</div>';
+          } else if (revealIsComplete(ta.value || '', res)){
+            out.innerHTML += '<div style="margin-top:6px;"><strong>✅ Ολοκληρωμένη απάντηση</strong> — πάτα «Αξιολόγηση» για να κερδίσεις XP.</div>';
+          }
+        }catch(e){}
+      }
+
+      renderChecklist(block, res.items);
+    }
+
+    function restoreRevealAnswer(block){
+      const store = loadRevealStore();
+      const k = getRevealKey(block);
+      const val = (store && store[k]) ? String(store[k]) : '';
+      const ta = block.querySelector('.reveal-answer');
+      if (ta) ta.value = val;
+      updateRevealUI(block);
+    }
+
+    function saveRevealAnswerDebounced(block){
+      if (block._saveT) clearTimeout(block._saveT);
+      block._saveT = setTimeout(()=>{
+        const ta = block.querySelector('.reveal-answer');
+        if (!ta) return;
+        const store = loadRevealStore();
+        const k = getRevealKey(block);
+        store[k] = ta.value || '';
+        saveRevealStore(store);
+      }, 180);
+    }
+
+    function revealTryAwardXp(block){
+      const ta = block.querySelector('.reveal-answer');
+      const answer = ta ? (ta.value || '') : '';
+      const spec = block.getAttribute('data-keywords') || '';
+      const res = evaluateAnswer(answer, spec);
+
+      if (!revealIsComplete(answer, res)) return false;
+
+      const k = getRevealKey(block);
+      const s = loadRevealXpStore();
+      if (s && s[k]) return false; // already awarded
+
+      // award locally
+      const oldXp = loadXp();
+      const nextXp = oldXp + REVEAL_XP_PER_COMPLETE;
+      saveXp(nextXp);
+
+      // remember award
+      s[k] = { xp: REVEAL_XP_PER_COMPLETE, at: Date.now(), qid: block.getAttribute('data-qid') || 'q' };
+      saveRevealXpStore(s);
+
+      // notify parent (optional)
+      postXpToParent(REVEAL_XP_PER_COMPLETE, { qid: s[k].qid, lessonId: currentLessonId, tabId: currentTabId });
+
+      return true;
+    }
+
+    function init(){
+      // init xp badge
+      saveXp(loadXp());
+
+      // restore reveal answers
+      document.querySelectorAll('.reveal-block1').forEach(restoreRevealAnswer);
+
+      // open answer block by default (optional nice UX)
+      const ab = document.querySelector('.reveal-block1');
+      if (ab){
+        const t = ab.querySelector('[data-toggle]');
+        const c = ab.querySelector('[data-content]');
+        if (t && c){
+          t.classList.add('is-open');
+          c.classList.add('is-open');
+        }
+      }
+    }
+
+    // ---------------------------------------------------------
+    // UI events (delegation)
+    // ---------------------------------------------------------
+    document.addEventListener('click', (e)=>{
+      const tgl = e.target.closest('[data-toggle]');
+      if (tgl){
+        playTick();
+        const wrap = tgl.closest('.reveal-block, .reveal-block1');
+        const content = wrap ? wrap.querySelector('[data-content]') : null;
+        if (!content) return;
+
+        const isOpen = content.classList.contains('is-open');
+        content.classList.toggle('is-open', !isOpen);
+        tgl.classList.toggle('is-open', !isOpen);
+        return;
+      }
+
+      const evalBtn = e.target.closest('.reveal-eval-btn');
+      if (evalBtn){
+        e.preventDefault();
+        playTick();
+        const block = evalBtn.closest('.reveal-block1');
+        if (!block) return;
+
+        // too short -> show message, no eval, no XP
+        try{
+          const ta = block.querySelector('.reveal-answer');
+          const ans = ta ? (ta.value || '') : '';
+          if (!revealTextIsEvaluable(ans)){
+            const out = block.querySelector('.reveal-score');
+            if (out){
+              out.innerHTML =
+                '<div><strong>⚠️</strong> Η απάντηση είναι πολύ σύντομη και δεν μπορεί να αξιολογηθεί. Εμπλούτισε την απάντηση σου και προσπάθησε ξανά.</div>';
+            }
+            const cl = block.querySelector('.reveal-checklist');
+            if (cl) cl.innerHTML = '';
+            saveRevealAnswerDebounced(block);
+            return;
+          }
+        }catch(err){}
+
+        updateRevealUI(block);
+        saveRevealAnswerDebounced(block);
+
+        // award xp once if complete
+        try{ revealTryAwardXp(block); }catch(err){}
+
+        updateRevealUI(block);
+        return;
+      }
+
+      const clearBtn = e.target.closest('.reveal-clear-btn');
+      if (clearBtn){
+        e.preventDefault();
+        playTick();
+        const block = clearBtn.closest('.reveal-block1');
+        if (!block) return;
+
+        const ta = block.querySelector('.reveal-answer');
+        if (ta) ta.value = '';
+
+        // clear store
+        const store = loadRevealStore();
+        const k = getRevealKey(block);
+        if (store && Object.prototype.hasOwnProperty.call(store, k)){
+          delete store[k];
+          saveRevealStore(store);
+        }
+
+        updateRevealUI(block);
+        return;
+      }
+    }, true);
+
+    // live progress on input
+    document.addEventListener('input', (e)=>{
+      const ta = e.target.closest('.reveal-answer');
+      if (!ta) return;
+      const block = ta.closest('.reveal-block1');
+      if (!block) return;
+
+      // throttle per block
+      if (block._uiT) cancelAnimationFrame(block._uiT);
+      block._uiT = requestAnimationFrame(()=>{
+        updateRevealUI(block);
+        saveRevealAnswerDebounced(block);
+      });
+    }, true);
+
+    // optional: parent may ask for state
+    window.addEventListener('message', (ev)=>{
+      const msg = ev && ev.data;
+      if (!msg || typeof msg !== 'object') return;
+
+      if (msg.type === 'GG_XP_REQUEST'){
+        // send current total
+        try{
+          const total = loadXp();
+          window.parent && window.parent.postMessage({
+            type:'GG_XP_STATE',
+            total,
+            source:'mini-reveal'
+          }, '*');
+        }catch(e){}
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

@@ -1,0 +1,423 @@
+    :root{
+      --accent:#FF7E79;
+      --ink:#625C5C;
+      --glass: rgba(255,255,255,.92);
+      --shadow: 0 10px 30px rgba(0,0,0,.12);
+      --r: 16px;
+
+      /* ✅ responsive UI scale (from MotorAnatomy UI) */
+      --ui: 1;
+      --hud-maxh: none;
+      --hudbarh: 44px;
+    }
+
+    *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+
+    html, body{
+      margin:0; height:100%;
+      background: transparent;
+      overflow:hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Arial, sans-serif;
+    }
+
+    #wrap{
+      position:relative;
+      width:100%;
+      height:100%;
+      touch-action:none;
+    }
+
+    canvas{
+      display:block;
+      width:100%;
+      height:100%;
+      touch-action:none;
+    }
+
+    /* =========================
+       HUD (MotorAnatomy responsive)
+       ========================= */
+    .hud{
+      position:absolute;
+      top: max(10px, env(safe-area-inset-top));
+      left:max(10px, env(safe-area-inset-left));
+      right:max(10px, env(safe-area-inset-right));
+
+      padding:0;
+      border-radius: var(--r);
+      background: var(--glass);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(0,0,0,.06);
+
+      user-select:none;
+      -webkit-user-select:none;
+
+      z-index: 90;
+      overflow:hidden;
+
+      display:flex;
+      flex-direction:column;
+      align-items:stretch;
+      gap:0;
+
+      max-height: var(--hud-maxh, none);
+    }
+
+    .hudbar{
+      display:flex;
+      align-items:center;
+      gap: calc(8px * var(--ui));
+      padding: calc(8px * var(--ui));
+      width:100%;
+      flex: 0 0 auto;
+    }
+
+    .hudpanel{
+      width:100%;
+      display:none;
+      flex-wrap: wrap;
+      align-items:center;
+      gap: calc(8px * var(--ui));
+      padding: 0 calc(8px * var(--ui)) calc(8px * var(--ui));
+      border-top: 1px solid rgba(0,0,0,.06);
+
+      flex: 0 1 auto;
+      min-height: 0;
+
+      max-height: calc(var(--hud-maxh, 70vh) - var(--hudbarh, 44px));
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+
+      align-content:flex-start;
+      justify-content:flex-start;
+    }
+
+    #wrap.tiny .hudpanel,
+    #wrap.micro .hudpanel{ display:flex; }
+
+    .hud.is-collapsed .hudpanel{ display:none !important; border-top:0; }
+
+    #btnHudToggle{ display:none; }
+    #wrap.tiny #btnHudToggle,
+    #wrap.micro #btnHudToggle{ display:inline-flex; }
+
+    #wrap.tiny .hudbar,
+    #wrap.micro .hudbar{
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    #wrap.tiny .hudbar::-webkit-scrollbar,
+    #wrap.micro .hudbar::-webkit-scrollbar{ display:none; }
+
+    /* =========================
+       Buttons (scaled)
+       ========================= */
+    .btn{
+      appearance:none;
+      border: 1px solid rgba(0,0,0,.12);
+      background:#fff;
+      color: var(--ink);
+      padding: calc(8px * var(--ui)) calc(10px * var(--ui));
+      border-radius: calc(12px * var(--ui));
+      font-size: calc(13px * var(--ui));
+      font-weight: 800;
+      line-height: 1;
+      cursor:pointer;
+      white-space: nowrap;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap: calc(8px * var(--ui));
+    }
+    .btn.primary{
+      border-color: rgba(255,126,121,.35);
+      background: rgba(255,126,121,.12);
+    }
+    .btn.icon{
+      width: calc(34px * var(--ui));
+      height: calc(34px * var(--ui));
+      padding: 0;
+      font-weight: 900;
+      font-size: calc(16px * var(--ui));
+      display:grid;
+      place-items:center;
+    }
+    .btn:active{ transform: translateY(1px); }
+
+    /* =========================
+       Slider (scaled)
+       ========================= */
+    .range{
+      display:flex;
+      align-items:center;
+      gap: calc(10px * var(--ui));
+      padding: calc(8px * var(--ui)) calc(10px * var(--ui));
+      border-radius: calc(12px * var(--ui));
+      border: 1px dashed rgba(0,0,0,.18);
+      background: rgba(255,255,255,.6);
+      color: rgba(0,0,0,.65);
+      font-size: calc(12px * var(--ui));
+      white-space: nowrap;
+      max-width: min(92vw, 560px);
+    }
+    .range label{
+      font-weight:800;
+      color: rgba(0,0,0,.65);
+    }
+    .range input[type="range"]{
+      width: calc(180px * var(--ui));
+      accent-color: var(--accent);
+    }
+    .range .val{
+      font-variant-numeric: tabular-nums;
+      min-width: calc(52px * var(--ui));
+      text-align:right;
+      color: rgba(0,0,0,.6);
+      font-weight:700;
+    }
+
+    /* =========================
+       Legend (scaled)
+       ========================= */
+    .legend{
+      position:absolute;
+      left: max(10px, env(safe-area-inset-left));
+      bottom: max(10px, env(safe-area-inset-bottom));
+      z-index: 6;
+      background: var(--glass);
+      border: 1px solid rgba(0,0,0,.08);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: calc(10px * var(--ui)) calc(12px * var(--ui));
+      max-width: min(92vw, 460px);
+      pointer-events: none;
+    }
+    .legend .h{
+      font-weight: 900;
+      color: var(--ink);
+      font-size: calc(12px * var(--ui));
+      margin: 0 0 calc(8px * var(--ui)) 0;
+      letter-spacing: .2px;
+    }
+    .legend .row{
+      display:flex;
+      align-items:center;
+      gap: calc(10px * var(--ui));
+      margin: calc(6px * var(--ui)) 0;
+      font-size: calc(12px * var(--ui));
+      color: rgba(0,0,0,.72);
+      line-height: 1.15;
+    }
+    .sw{
+      width: calc(14px * var(--ui));
+      height: calc(14px * var(--ui));
+      border-radius: 4px;
+      border: 1px solid rgba(0,0,0,.12);
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+      flex: 0 0 auto;
+    }
+    .legend .note{
+      margin-top: calc(8px * var(--ui));
+      font-size: calc(11px * var(--ui));
+      color: rgba(0,0,0,.55);
+    }
+
+    /* =========================
+       ✅ Legend toggle on tiny/micro
+       ========================= */
+    .legendToggle{
+      position:absolute;
+      left: max(10px, env(safe-area-inset-left));
+      bottom: max(10px, env(safe-area-inset-bottom));
+      z-index: 7;
+      display:none;
+      align-items:center;
+      gap: calc(8px * var(--ui));
+      padding: calc(8px * var(--ui)) calc(10px * var(--ui));
+      border-radius: calc(14px * var(--ui));
+      pointer-events: auto;
+    }
+
+    #wrap.tiny .legendToggle,
+    #wrap.micro .legendToggle{ display:inline-flex; }
+
+    #wrap.tiny .legend,
+    #wrap.micro .legend{ display:none; }
+
+    #wrap.tiny .legend.is-open,
+    #wrap.micro .legend.is-open{ display:block; }
+
+    #wrap.tiny .legend.is-open,
+    #wrap.micro .legend.is-open{
+      bottom: calc(
+        max(10px, env(safe-area-inset-bottom))
+        + calc(44px * var(--ui))
+        + calc(12px * var(--ui))
+      );
+    }
+
+    #wrap.micro .legendToggle .lgT{ display:none; }
+
+    /* =========================
+       Loader
+       ========================= */
+    .loader{
+      position:absolute; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      background: radial-gradient(ellipse at center, rgba(255,255,255,.78), rgba(255,255,255,.35));
+      z-index:10;
+    }
+    .card{
+      background: var(--glass);
+      border: 1px solid rgba(0,0,0,.08);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 14px 16px;
+      min-width: min(360px, 86vw);
+    }
+    .title{
+      font-weight: 900;
+      color: var(--ink);
+      margin: 0 0 8px 0;
+      font-size: 14px;
+    }
+    .bar{
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.08);
+      overflow:hidden;
+    }
+    .bar > i{
+      display:block; height:100%; width:0%;
+      background: var(--accent);
+      border-radius: 999px;
+    }
+    .small{ margin-top: 8px; font-size: 12px; color: rgba(0,0,0,.6); }
+
+    /* ---------------------------
+       ✅ ΟΔΗΓΙΕΣ MODAL
+    --------------------------- */
+    .modalBack{
+      position:absolute; inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:
+        max(14px, env(safe-area-inset-top))
+        max(14px, env(safe-area-inset-right))
+        max(14px, env(safe-area-inset-bottom))
+        max(14px, env(safe-area-inset-left));
+      background: rgba(0,0,0,.28);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 200;
+    }
+    .modalBack.show{ display:flex; }
+
+    .modal{
+      width: min(900px, 96vw);
+      max-height: min(84vh, 820px);
+      overflow:auto;
+      background: rgba(255,255,255,.95);
+      border: 1px solid rgba(0,0,0,.10);
+      border-radius: 18px;
+      box-shadow: 0 18px 60px rgba(0,0,0,.22);
+      padding: 14px 16px 16px;
+    }
+    .modalTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      position: sticky;
+      top: 0;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      padding: 6px 0 10px;
+      border-bottom: 1px solid rgba(0,0,0,.08);
+      margin-bottom: 10px;
+      z-index: 1;
+    }
+    .modalClose{
+      border: 1px solid rgba(0,0,0,.14);
+      background:#fff;
+      color: var(--ink);
+      border-radius: 12px;
+      padding: 8px 10px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor:pointer;
+    }
+    .modalClose:active{ transform: translateY(1px); }
+
+    .modal, .modal *{ font-family: Arial, sans-serif; }
+    .mH{
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--accent);
+      margin: 10px 0 6px;
+    }
+    .mP, .mList{
+      font-size: 12px;
+      color: var(--ink);
+      line-height: 1.5;
+      margin: 0 0 8px 0;
+    }
+    .mList{
+      margin: 0 0 10px 16px;
+      padding: 0;
+    }
+    .mList li{ margin: 5px 0; }
+    .mDivider{
+      height: 1px;
+      background: rgba(0,0,0,.10);
+      margin: 12px 0;
+    }
+    .kbd{
+      display:inline-block;
+      padding: 1px 6px;
+      border-radius: 8px;
+      border: 1px solid rgba(0,0,0,.12);
+      background: rgba(255,255,255,.7);
+      font-weight: 700;
+      font-size: 11px;
+      color: rgba(0,0,0,.65);
+    }
+
+    /* =========================
+       ✅ "Χεράκι" πάνω στο outer
+       ========================= */
+    .outerHand{
+      position:absolute;
+      z-index: 80;
+      display:none;
+      width: calc(34px * var(--ui));
+      height: calc(34px * var(--ui));
+      padding: 0;
+      border-radius: 999px;
+      border: 1px solid rgba(0,0,0,.12);
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 10px 30px rgba(0,0,0,.14);
+      color: rgba(0,0,0,.78);
+      font-size: calc(18px * var(--ui));
+      line-height: 1;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      pointer-events:auto;
+      transform: translate(-50%, -110%);
+      animation: outerBlink 1.05s infinite ease-in-out;
+    }
+    .outerHand:active{ transform: translate(-50%, -110%) scale(0.97); }
+
+    @keyframes outerBlink{
+      0%   { opacity: 0.35; transform: translate(-50%, -110%) scale(0.96); }
+      50%  { opacity: 1.00; transform: translate(-50%, -110%) scale(1.04); }
+      100% { opacity: 0.35; transform: translate(-50%, -110%) scale(0.96); }
+    }
+

@@ -1,0 +1,1775 @@
+<!doctype html>
+<html lang="el">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, viewport-fit=cover" />
+  <title>Γεωμαγνητικό Πεδίο — Duolingo Μαθήματα</title>
+
+  <style>
+    :root{
+      --accent:#FF7E79;
+      --ink:#625C5C;
+      --glass: rgba(255,255,255,.92);
+      --shadow: 0 18px 60px rgba(0,0,0,.14);
+      --r: 18px;
+      --ui: 1;
+    }
+
+    *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+    html, body{
+      margin:0; height:100%;
+      overflow:hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(1000px 650px at 20% 10%, rgba(255,126,121,.18), transparent 55%),
+        radial-gradient(900px 600px at 80% 20%, rgba(10,132,255,.14), transparent 55%),
+        radial-gradient(900px 700px at 60% 85%, rgba(52,199,89,.12), transparent 60%),
+        #f6f6f7;
+    }
+
+    /* Shell */
+    .shell{
+      height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:
+        max(14px, env(safe-area-inset-top))
+        max(14px, env(safe-area-inset-right))
+        max(14px, env(safe-area-inset-bottom))
+        max(14px, env(safe-area-inset-left));
+    }
+
+    /* Modal look (same vibe as your app) */
+    .modal{
+      width: min(980px, 100%);
+      height: min(860px, 100%);
+      max-height: 100%;
+      overflow:hidden;
+      background: rgba(255,255,255,.95);
+      border: 1px solid rgba(0,0,0,.10);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      display:flex;
+      flex-direction:column;
+    }
+
+    .modalTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(0,0,0,.08);
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      flex: 0 0 auto;
+    }
+
+    .topLeft{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      min-width: 0;
+    }
+    .mH{
+      font-size: 14px;
+      font-weight: 900;
+      color: var(--accent);
+      margin: 0;
+      letter-spacing:.2px;
+    }
+    .mP{
+      margin:0;
+      font-size: 10px;
+      color: rgba(0,0,0,.55);
+      font-weight: 00;
+      line-height: 1.25;
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+      max-width: 66vw;
+    }
+
+    .topRight{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
+
+    .btn{
+      appearance:none;
+      border: 1px solid rgba(0,0,0,.12);
+      background:#fff;
+      color: var(--ink);
+      padding: calc(9px * var(--ui)) calc(11px * var(--ui));
+      border-radius: calc(12px * var(--ui));
+      font-size: calc(13px * var(--ui));
+      font-weight: 900;
+      line-height: 1;
+      cursor:pointer;
+      white-space: nowrap;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap: calc(8px * var(--ui));
+      user-select:none;
+    }
+    .btn.primary{
+      border-color: rgba(255,126,121,.35);
+      background: rgba(255,126,121,.12);
+    }
+    .btn.ghost{
+      background: rgba(255,255,255,.7);
+    }
+    .btn:active{ transform: translateY(1px); }
+
+    /* Body area */
+    .content{
+      flex: 1 1 auto;
+      overflow:auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 14px 14px 16px;
+    }
+
+    /* =========================
+       ✅ Duolingo-style Lessons UI
+       ========================= */
+    .duoHome{
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+    }
+
+    .duoHomeHeader{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(0,0,0,.08);
+      background: rgba(255,255,255,.85);
+    }
+
+    .duoHomeHeader .t{
+      font-weight: 900;
+      color: var(--accent);
+      font-size: 13px;
+    }
+
+    .duoHomeHeader .s{
+      font-size: 10px;
+      color: rgba(0,0,0,.6);
+      font-weight: 900;
+    }
+
+    .duoUnit{
+      border: 1px solid rgba(0,0,0,.08);
+      border-radius: 18px;
+      background: rgba(255,255,255,.85);
+      overflow:hidden;
+    }
+
+    .duoUnitHead{
+      padding: 10px 12px;
+      font-weight: 900;
+      color: var(--accent);
+      border-bottom: 1px solid rgba(0,0,0,.06);
+      background: rgba(255,255,255,.75);
+      font-size: 13px;
+    }
+
+    .duoLessonGrid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+      padding: 10px 12px 12px;
+    }
+
+    .duoLessonBtn{
+      display:flex;
+      flex-direction:column;
+      gap: 6px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(0,0,0,.10);
+      background: #fff;
+      cursor:pointer;
+      text-align:left;
+      user-select:none;
+    }
+
+    .duoLessonBtn .h{
+      font-weight: 900;
+      color: var(--accent);
+      font-size: 11px;
+    }
+    .duoLessonBtn .p{
+      font-size: 10px;
+      color: rgba(0,0,0,.60);
+      line-height: 1.3;
+      font-weight: 00;
+    }
+    .duoLessonBtn .tag{
+      font-size: 9px;
+      font-weight: 900;
+      color: var(--accent);
+
+    }
+
+    .duoLessonBtn.done{
+      border-color: rgba(52,199,89,.35);
+      background: rgba(52,199,89,.08);
+    }
+
+    .duoPlayer{
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+    }
+
+    .duoTopRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 16px;
+      border: 1px solid rgba(0,0,0,.08);
+      background: rgba(255,255,255,.85);
+    }
+
+    .duoMeta{
+      display:flex;
+      align-items:center;
+      gap: 12px;
+    }
+
+    .duoXp{
+      font-size: 12px;
+      color: rgba(0,0,0,.65);
+      font-weight: 900;
+    }
+    .duoLbl{ color: rgba(0,0,0,.55); }
+
+    .duoHearts{
+      display:flex;
+      gap: 4px;
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    .duoProg{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+    }
+
+    .duoProgBar{
+      width: 160px;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.10);
+      overflow:hidden;
+    }
+    .duoProgBar > i{
+      display:block;
+      height:100%;
+      width:0%;
+      background: var(--accent);
+      border-radius: 999px;
+    }
+    .duoProgTxt{
+      font-size: 12px;
+      color: rgba(0,0,0,.6);
+      font-weight: 900;
+      min-width: 48px;
+      text-align:right;
+    }
+
+    .duoCard{
+      border-radius: 18px;
+      border: 1px solid rgba(0,0,0,.08);
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 18px 60px rgba(0,0,0,.10);
+      padding: 12px 12px 12px;
+    }
+
+    .duoLessonTitle{
+      font-size: 9px;
+            color: var(--accent);
+
+      font-weight: 900;
+      margin-bottom: 6px;
+    }
+
+    .duoPrompt{
+      font-size: 13px;
+      font-weight: 900;
+            color: rgba(0,0,0,.55);
+
+      margin-bottom: 10px;
+      line-height: 1.25;
+    }
+
+    .duoBody{
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+    }
+
+    .duoChoices{
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+    }
+
+    .duoChoice{
+      padding: 10px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(0,0,0,.12);
+      background: #fff;
+      cursor:pointer;
+      font-weight: 900;
+      color: rgba(0,0,0,.75);
+      user-select:none;
+      text-align:left;
+    }
+
+    .duoChoice.selected{
+      border-color: rgba(10,132,255,.35);
+      background: rgba(10,132,255,.08);
+    }
+
+    .duoChoice.correct{
+      border-color: rgba(52,199,89,.45);
+      background: rgba(52,199,89,.10);
+    }
+
+    .duoChoice.wrong{
+      border-color: rgba(255,59,48,.45);
+      background: rgba(255,59,48,.10);
+    }
+
+    .duoFillRow{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      flex-wrap: wrap;
+    }
+    .duoFillRow input{
+      flex: 1 1 240px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,.14);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .duoOrder{
+      display:flex;
+      flex-direction:column;
+      gap: 8px;
+    }
+    .duoOrderItem{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(0,0,0,.12);
+      background: #fff;
+      font-weight: 900;
+      color: rgba(0,0,0,.75);
+    }
+    .duoOrderBtns{
+      display:flex;
+      gap: 8px;
+    }
+    .duoMiniBtn{
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,.12);
+      background: rgba(255,255,255,.95);
+      font-weight: 900;
+      cursor:pointer;
+    }
+
+    .duoFeedback{
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(0,0,0,.10);
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1.35;
+    }
+
+    .duoFeedback.ok{
+      border-color: rgba(52,199,89,.35);
+      background: rgba(52,199,89,.10);
+      color: rgba(0,0,0,.78);
+    }
+    .duoFeedback.bad{
+      border-color: rgba(255,59,48,.35);
+      background: rgba(255,59,48,.10);
+      color: rgba(0,0,0,.78);
+    }
+    .duoFeedback.hint{
+      border-color: rgba(255,159,10,.35);
+      background: rgba(255,159,10,.10);
+      color: rgba(0,0,0,.78);
+    }
+
+    .duoActions{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .duoSpacer{ flex: 1 1 auto; }
+
+.duoBody .mP{ white-space: pre-wrap; }
+
+
+    /* small screens scaling */
+    @media (max-width: 560px), (max-height: 520px){
+      :root{ --ui: 0.86; }
+      .duoProgBar{ width: 130px; }
+    }
+    @media (max-width: 420px), (max-height: 360px){
+      :root{ --ui: 0.78; }
+      .duoProgBar{ width: 110px; }
+      .mP{ max-width: 56vw; }
+    }
+    
+    .duoBody .mP{
+  white-space: pre-wrap;
+  overflow: visible;
+  text-overflow: clip;
+  max-width: none;
+}
+
+  
+
+    /* =========================
+       Simulation modal (EarthMagneticField)
+       ========================= */
+    .simModal{
+      position:fixed; inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      background: rgba(0,0,0,.35);
+      z-index: 50;
+      padding:
+        max(12px, env(safe-area-inset-top))
+        max(12px, env(safe-area-inset-right))
+        max(12px, env(safe-area-inset-bottom))
+        max(12px, env(safe-area-inset-left));
+      backdrop-filter: blur(2px);
+    }
+    .simCard{
+      width: min(1100px, 100%);
+      height: min(92vh, 100%);
+      background: var(--glass);
+      border: 1px solid rgba(0,0,0,.08);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+    }
+    .simTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(0,0,0,.08);
+      background: rgba(255,255,255,.72);
+      backdrop-filter: blur(10px);
+    }
+    .simTitle{
+      font-weight: 900;
+      color: rgba(0,0,0,.72);
+      font-size: 14px;
+      overflow:hidden;
+      white-space:nowrap;
+      text-overflow:ellipsis;
+    }
+    .simTop .btn{ padding: 8px 10px; }
+    .simFrameWrap{ flex:1; position:relative; background:#000; }
+    #simFrame{
+      position:absolute; inset:0;
+      width:100%; height:100%;
+      border:0;
+      background:#000;
+    }
+    .simRow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+</style>
+</head>
+
+<body>
+  <div class="shell">
+    <div class="modal" role="application" aria-label="Γεωμαγνητικό Πεδίο — Μαθήματα">
+      <div class="modalTop">
+        <div class="topLeft">
+          <h2 class="mH" style="margin:0;">Ολοκλήρωσε την πρόκληση — Γεωμαγνητικό Πεδίο</h2>
+          <p class="mP" id="topSub">Κάθε φορά που ολοκληρώνεις ένα μάθημα κερδίζεις εμπειρία (XP).</p>
+             <p class="mP" id="topSub">Τα ολοκληρωμένα μαθήματα δεν ξαναδίνουν XP.</p>
+        </div>
+ 
+      </div>
+
+      <div class="content">
+        <!-- Home -->
+        <div class="duoHome" id="lessonHome"></div>
+
+        <!-- Player -->
+        <div class="duoPlayer" id="lessonPlayer" style="display:none;">
+          <div class="duoTopRow">
+            <div class="duoMeta">
+              <div class="duoXp"><span class="duoLbl">XP:</span> <span id="duoXp">0</span></div>
+              <div class="duoHearts" id="duoHearts" aria-label="Καρδιές"></div>
+            </div>
+
+            <div class="duoProg">
+              <div class="duoProgBar"><i id="duoProgFill"></i></div>
+              <div class="duoProgTxt"><span id="duoProgTxt">1/1</span></div>
+            </div>
+          </div>
+
+          <div class="duoCard" id="duoCard">
+            <div class="duoLessonTitle" id="duoLessonTitle">—</div>
+            <div class="duoPrompt" id="duoPrompt">—</div>
+
+            <div class="duoBody" id="duoBody"></div>
+
+            <div class="duoFeedback" id="duoFeedback" style="display:none;"></div>
+          </div>
+
+          <div class="duoActions">
+            <button class="btn" id="duoBackBtn">Πίσω</button>
+            <button class="btn" id="duoHintBtn">Υπόδειξη</button>
+            <span class="duoSpacer"></span>
+            <button class="btn primary" id="duoCheckBtn">Έλεγχος</button>
+            <button class="btn primary" id="duoNextBtn" style="display:none;">Συνέχεια</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Simulation modal (EarthMagneticField.html) -->
+  <div class="simModal" id="simModal" aria-hidden="true">
+    <div class="simCard" role="dialog" aria-label="Προσομοίωση">
+      <div class="simTop">
+        <div class="simTitle" id="simTitle">Εφαρμογή - Γεωμαγνητικό Πεδίο</div>
+        <div style="display:flex; gap:10px; align-items:center;">
+<button class="btn primary" id="simCloseBtn" type="button">Κλείσιμο</button>
+        </div>
+      </div>
+      <div class="simFrameWrap">
+        <iframe id="simFrame" title="Εφαρμογή - Γεωμαγνητικό Πεδίο" src="about:blank" allow="fullscreen; autoplay; clipboard-read; clipboard-write"></iframe>
+      </div>
+    </div>
+  </div>
+
+
+
+<script>
+/* =========================
+   Storage
+   ========================= */
+const LS_KEY = 'Geomagnetic_DuoLessons_v1';
+
+function loadCourseState(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return { xp:0, completed:{}, lessonXp:{} };
+    const o = JSON.parse(raw);
+    return {
+      xp: Number(o?.xp || 0),
+      completed: (o?.completed && typeof o.completed === 'object') ? o.completed : {},
+      lessonXp: (o?.lessonXp && typeof o.lessonXp === 'object') ? o.lessonXp : {}
+    };
+  }catch{
+    return { xp:0, completed:{}, lessonXp:{} };
+  }
+}
+
+function saveCourseState(){
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(courseState)); }catch{}
+}
+
+const courseState = loadCourseState();
+
+/* =========================
+   Lessons (Γεωμαγνητικό Πεδίο)
+   ========================= */
+const LESSONS = [
+  {
+    unit: 'Ενότητα 1 — Η Γη ως μαγνήτης',
+    lessons: [
+      {
+        id:'G1',
+        title:'Η Γη: ένας τεράστιος φυσικός μαγνήτης',
+        blurb:'Δυναμικές γραμμές, ισχύς πεδίου, ομοιότητα με ραβδόμορφο μαγνήτη.',
+        steps:[
+          { type:'info', title:'Βασική ιδέα', text:
+            'Η Γη συμπεριφέρεται σαν ένας τεράστιος φυσικός μαγνήτης, με χαρακτηριστικά παρόμοια με ενός ραβδόμορφου μαγνήτη.'+            ' Γύρω της υπάρχει ένα γεωμαγνητικό πεδίο, παρότι δεν το βλέπουμε.'+            ' Σημείωση: έξω από τη Γη οι δυναμικές γραμμές βγαίνουν κοντά στον γεωγραφικό Νότο και μπαίνουν κοντά στον γεωγραφικό Βορρά.'
+          },
+
+          { type:'mcq', prompt:'Ποιο όργανο επιβεβαιώνει την ύπαρξη του γεωμαγνητικού πεδίου;',
+            choices:['Θερμόμετρο','Μαγνητική πυξίδα','Ζυγαριά'], answer:1,
+            hint:'Η βελόνα της πυξίδας είναι μικρός μαγνήτης.',
+            explain:'Σωστά: η πυξίδα «νιώθει» το γεωμαγνητικό πεδίο.'
+          },
+
+          { type:'fill2', prompt:'Οι δυναμικές γραμμές του γεωμαγνητικού πεδίου (έξω από τη Γη) ξεκινούν από τον γεωγραφικό ____ πόλο και καταλήγουν στον γεωγραφικό ____ πόλο.',
+            answers:['νότιο|νοτιο|S','βόρειο|βορειο|N'],
+            hint:'Θυμήσου: στη Γη οι γραμμές βγαίνουν κοντά στον γεωγραφικό Νότο και μπαίνουν κοντά στον γεωγραφικό Βορρά (εκεί βρίσκεται ο μαγνητικός νότιος πόλος).'
+          },
+
+          { type:'tf', prompt:'Οι δυναμικές γραμμές γύρω από τη Γη σχηματίζουν καμπύλες (καμπυλωτό μοτίβο) γύρω από τον πλανήτη.', answer:true,
+            hint:'Οι γραμμές δεν είναι ευθείες· «αγκαλιάζουν» τον πλανήτη.'
+          },
+
+          { type:'mcq', prompt:'Πού είναι γενικά ισχυρότερο το γεωμαγνητικό πεδίο;',
+            choices:['Κοντά στους πόλους','Στον ισημερινό','Έχει παντού την ίδια ένταση'], answer:0,
+            hint:'Πυκνότερες γραμμές → ισχυρότερο πεδίο.'
+          },
+
+          { type:'order', prompt:'Βάλε τη σωστή σειρά όταν χρησιμοποιείς πυξίδα:',
+            items:[
+              'Διαβάζω προς τα πού δείχνει το «Ν» της βελόνας',
+              'Κρατάω την πυξίδα οριζόντια και μακριά από μεταλλικά αντικείμενα',
+              'Περιμένω να σταθεροποιηθεί η βελόνα'
+            ],
+            answerOrder:[1,2,0],
+            hint:'Πρώτα σωστή θέση, μετά σταθεροποίηση, μετά ανάγνωση.'
+          }
+        ]
+      },
+
+      {
+        id:'G2',
+        title:'Η μαγνητική πυξίδα',
+        blurb:'Γιατί πάντα δείχνει τον βορρά και τι «μετρά» στην πράξη.',
+        steps:[
+          { type:'info', title:'Τι κάνει η πυξίδα', text:
+            'Η μαγνητική πυξίδα μας δείχνει τον βορρά (πρακτικά προς τον γεωγραφικό Βορρά) επειδή η μαγνητισμένη βελόνα της δέχεται δύναμη από το γεωμαγνητικό πεδίο και ευθυγραμμίζεται με αυτό.'
+          },
+
+          { type:'tf', prompt:'Η πυξίδα δείχνει τον βορρά επειδή η βελόνα της δέχεται μαγνητική δύναμη από το γεωμαγνητικό πεδίο.', answer:true,
+            hint:'Η βελόνα συμπεριφέρεται σαν μικρός μαγνήτης.'
+          },
+
+          { type:'mcq', prompt:'Αν μετακινηθώ σε άλλο σημείο της Γης, τι θα κάνει η βελόνα;',
+            choices:[
+              'Θα παραμείνει όπως ήταν',
+              'Θα ευθυγραμμιστεί ξανά με το τοπικό γεωμαγνητικό πεδίο',
+              'Θα δείχνει τυχαία κατεύθυνση'
+            ],
+            answer:1,
+            hint:'Η βελόνα «ακολουθεί» το πεδίο στο σημείο που βρίσκεσαι.'
+          },
+
+          { type:'fill', prompt:'Η βελόνα της πυξίδας είναι ένας μικρός _____.',
+            answer:'μαγνήτης|μαγνητης',
+            hint:'Είναι μαγνητισμένο μεταλλικό σώμα.'
+          },
+
+          { type:'sim', prompt:'Μικρή εξερεύνηση (προσομοίωση)',
+            text:
+              'Άνοιξε την προσομοίωση και δοκίμασε: (1) «Γεωμαγνητικό Πεδίο: ON», (2) «Πυξίδα: ON», (3) αύξησε/μείωσε τις «Δυναμικές Γραμμές».',
+            src:'EarthMagneticField.html',
+            openLabel:'Άνοιγμα Εφαρμογής'
+          }
+        ]
+      }
+    ]
+  },
+
+  {
+    unit: 'Ενότητα 2 — Πόλοι, άξονες & μεταβολές',
+    lessons: [
+      {
+        id:'G3',
+        title:'Μαγνητικός και γεωγραφικός άξονας',
+        blurb:'Οι μαγνητικοί πόλοι δεν συμπίπτουν με τους γεωγραφικούς.',
+        steps:[
+          { type:'info', title:'Δύο διαφορετικοί άξονες', text:
+            'Ο μαγνητικός άξονας είναι η ευθεία που ενώνει τους γεωμαγνητικούς πόλους. Δεν συμπίπτει με τον άξονα περιστροφής της Γης, άρα οι μαγνητικοί πόλοι δεν συμπίπτουν με τους γεωγραφικούς.'
+          },
+
+          { type:'mcq', prompt:'Τι ισχύει για μαγνητικούς και γεωγραφικούς πόλους;',
+            choices:[
+              'Συμπίπτουν πάντα',
+              'Δεν συμπίπτουν, γιατί ο μαγνητικός άξονας δεν ταυτίζεται με τον άξονα περιστροφής',
+              'Εναλλάσσονται κάθε μέρα'
+            ],
+            answer:1,
+            hint:'Οι δύο άξονες έχουν διαφορετική διεύθυνση.'
+          },
+
+          { type:'fill', prompt:'Ο μαγνητικός άξονας είναι η ευθεία που ενώνει τους γεωμαγνητικούς _____.',
+            answer:'πόλους|πολους',
+            hint:'Είναι οι μαγνητικοί πόλοι της Γης.'
+          },
+
+          { type:'tf', prompt:'Οι μαγνητικοί πόλοι συμπίπτουν με τους γεωγραφικούς πόλους.', answer:false,
+            hint:'Οι άξονες δεν συμπίπτουν.'
+          },
+
+          { type:'sim', prompt:'Παρατήρηση αξόνων στην προσομοίωση',
+            text:
+              'Άνοιξε την προσομοίωση και κοίτα τους άξονες: «Γεωγραφικός Άξονας: ON» και «Σχέση Αξόνων: ON». Παρατήρησε ότι οι άξονες σχηματίζουν γωνία.',
+            src:'EarthMagneticField.html',
+            openLabel:'Άνοιγμα Εφαρμογής'
+          }
+        ]
+      },
+
+      {
+        id:'G4',
+        title:'Μετακίνηση πόλων και μεταβολή της έντασης Β',
+        blurb:'Οι πόλοι μετακινούνται και το Β αλλάζει, αλλά πολύ αργά.',
+        steps:[
+          { type:'info', title:'Γιατί αλλάζει;', text:
+            'Οι γεωμαγνητικοί πόλοι μετακινούνται με την πάροδο του χρόνου λόγω των κινήσεων του ρευστού σιδήρου στον πυρήνα της Γης. Έτσι, η ένταση Β του γεωμαγνητικού πεδίου σε ένα σημείο δεν είναι απόλυτα σταθερή.'
+          },
+
+          { type:'mcq', prompt:'Σε τι κλίμακα χρόνου μεταβάλλεται συνήθως αργά το γεωμαγνητικό πεδίο (ώστε πρακτικά να το θεωρούμε σταθερό);',
+            choices:['Σε δευτερόλεπτα','Σε ώρες','Σε έτη ή αιώνες'], answer:2,
+            hint:'Οι αλλαγές είναι πολύ αργές για να τις δεις «την ώρα του μαθήματος».'
+          },
+
+          { type:'tf', prompt:'Σε πολλές σχολικές εφαρμογές θεωρούμε την ένταση Β πρακτικά σταθερή.', answer:true,
+            hint:'Επειδή μεταβάλλεται πολύ αργά.'
+          },
+
+          { type:'fill', prompt:'Η ένταση του μαγνητικού πεδίου συμβολίζεται με το γράμμα ____.',
+            answer:'Β|b',
+            hint:'Στη Φυσική γράφουμε συνήθως Β.'
+          },
+
+          { type:'mcq', prompt:'Ποια αιτία αναφέρεται για τη μετακίνηση των μαγνητικών πόλων;',
+            choices:['Η κίνηση του ρευστού σιδήρου στον πυρήνα','Η περιστροφή της Σελήνης','Οι βροχές και οι άνεμοι'], answer:0,
+            hint:'Σχετίζεται με τον πυρήνα της Γης.'
+          },
+
+          { type:'sim', prompt:'Χαρακτηριστικά & προβλέψεις (προσομοίωση)',
+            text:
+              'Άνοιξε την προσομοίωση και πάτησε «Χαρακτηριστικά και προβλέψεις». Δες πώς το πεδίο μπορεί να αλλάζει σε μεγάλες χρονικές κλίμακες.',
+            src:'EarthMagneticField.html',
+            openLabel:'Άνοιγμα Εφαρμογής'
+          }
+        ]
+      }
+    ]
+  },
+
+  {
+    unit: 'Ενότητα 3 — Η «αόρατη ασπίδα» & σύνοψη',
+    lessons: [
+      {
+        id:'G5',
+        title:'Η αόρατη μαγνητική ασπίδα',
+        blurb:'Το πεδίο εκτρέπει φορτισμένα σωματίδια (ηλιακό άνεμο).',
+        steps:[
+          { type:'info', title:'Γιατί είναι σημαντικό;', text:
+            'Το γεωμαγνητικό πεδίο λειτουργεί σαν «ασπίδα»: εκτρέπει φορτισμένα σωματίδια του διαστήματος, όπως αυτά του ηλιακού ανέμου, μειώνοντας τις βλαβερές επιδράσεις τους στην ατμόσφαιρα.'
+          },
+
+          { type:'mcq', prompt:'Τι εκτρέπει το γεωμαγνητικό πεδίο;',
+            choices:['Ουδέτερα σωματίδια χωρίς φορτίο','Φορτισμένα σωματίδια (π.χ. ηλεκτρόνια/πρωτόνια)','Ακτίνες φωτός ορατού'], answer:1,
+            hint:'Μαγνητικές δυνάμεις δρουν σε φορτισμένα σωματίδια που κινούνται.'
+          },
+
+          { type:'tf', prompt:'Το γεωμαγνητικό πεδίο συμβάλλει στην προστασία της ατμόσφαιρας της Γης.', answer:true,
+            hint:'Είναι μια «αόρατη ασπίδα».'
+          },
+
+          { type:'fill', prompt:'Ο άνεμος από τον Ήλιο ονομάζεται ____ άνεμος.',
+            answer:'ηλιακός|ηλιακος',
+            hint:'Η-λι-α-κός.'
+          },
+
+          { type:'sim', prompt:'Ηλιακός άνεμος (προσομοίωση)',
+            text:
+              'Άνοιξε την προσομοίωση και πάτησε «Αόρατη Ασπίδα». Παρατήρησε τον «ηλιακό άνεμο» και πώς εκτρέπεται γύρω από τη Γη.',
+            src:'EarthMagneticField.html',
+            openLabel:'Άνοιγμα Εφαρμογής'
+          },
+
+          { type:'mcq', prompt:'Σε ποια περιοχή είναι γενικά πιο αδύναμο το γεωμαγνητικό πεδίο;',
+            choices:['Κοντά στους πόλους','Στον ισημερινό','Μόνο πάνω από τους ωκεανούς'], answer:1,
+            hint:'Κοντά στον ισημερινό οι γραμμές είναι πιο «αραιές».'
+          }
+        ]
+      },
+
+      {
+        id:'G6',
+        title:'Σύνοψη — Γεωμαγνητικό πεδίο',
+        blurb:'Γρήγορη επανάληψη όλων των βασικών ιδεών.',
+        steps:[
+          { type:'info', title:'Σύνοψη', text:
+            '• Η Γη συμπεριφέρεται σαν φυσικός μαγνήτης. '+
+            '• Η πυξίδα ευθυγραμμίζεται με το γεωμαγνητικό πεδίο και δείχνει τον βορρά. '+
+            '• Οι μαγνητικοί πόλοι/άξονας δεν συμπίπτουν με τους γεωγραφικούς. '+
+            '• Οι πόλοι μετακινούνται και το Β μεταβάλλεται, αλλά συνήθως πολύ αργά. '+
+            '• Το πεδίο είναι ισχυρό κοντά στους πόλους, ασθενέστερο στον ισημερινό, και προστατεύει τη Γη από τον ηλιακό άνεμο.'
+          },
+
+          { type:'mcq', prompt:'Ποια φράση περιγράφει καλύτερα το γεωμαγνητικό πεδίο;',
+            choices:[
+              'Ένα ορατό «πλέγμα» γύρω από τη Γη',
+              'Ένα αόρατο μαγνητικό πεδίο που μοιάζει με ραβδόμορφο μαγνήτη',
+              'Ένα ηλεκτρικό κύκλωμα μέσα στην ατμόσφαιρα'
+            ],
+            answer:1,
+            hint:'Είναι μαγνητικό πεδίο (αόρατο).'
+          },
+
+          { type:'fill2', prompt:'Το πεδίο είναι πιο ____ κοντά στους πόλους και πιο ____ στον ισημερινό.',
+            answers:['ισχυρό|ισχυρο|δυνατό|δυνατο','αδύναμο|αδυναμο|ασθενές|ασθενες'],
+            hint:'Πυκνές γραμμές στους πόλους, αραιές στον ισημερινό.'
+          },
+
+          { type:'tf', prompt:'Οι γεωμαγνητικοί πόλοι παραμένουν απολύτως ακίνητοι στον χρόνο.', answer:false,
+            hint:'Μετακινούνται λόγω κινήσεων στον πυρήνα.'
+          },
+
+          { type:'order', prompt:'Σειρά εννοιών (από το «τι δείχνει» στο «τι προστατεύει»):',
+            items:[
+              'Η πυξίδα ευθυγραμμίζεται με το πεδίο',
+              'Η Γη έχει γεωμαγνητικό πεδίο σαν μαγνήτης',
+              'Το πεδίο εκτρέπει φορτισμένα σωματίδια (ηλιακό άνεμο)'
+            ],
+            answerOrder:[1,0,2],
+            hint:'Πρώτα ύπαρξη πεδίου, μετά ένδειξη με πυξίδα, μετά ρόλος προστασίας.'
+          }
+        ]
+      }
+    ]
+  }
+];
+
+
+/* =========================
+   DOM refs
+   ========================= */
+const lessonHomeEl   = document.getElementById('lessonHome');
+const lessonPlayerEl = document.getElementById('lessonPlayer');
+
+const duoXpEl        = document.getElementById('duoXp');
+const duoHeartsEl    = document.getElementById('duoHearts');
+const duoProgFillEl  = document.getElementById('duoProgFill');
+const duoProgTxtEl   = document.getElementById('duoProgTxt');
+
+const duoLessonTitleEl = document.getElementById('duoLessonTitle');
+const duoPromptEl      = document.getElementById('duoPrompt');
+const duoBodyEl        = document.getElementById('duoBody');
+const duoFeedbackEl    = document.getElementById('duoFeedback');
+
+const duoBackBtn     = document.getElementById('duoBackBtn');
+const duoHintBtn     = document.getElementById('duoHintBtn');
+const duoCheckBtn    = document.getElementById('duoCheckBtn');
+const duoNextBtn     = document.getElementById('duoNextBtn');
+
+/* =========================
+   Simulation modal refs
+   ========================= */
+const simModalEl   = document.getElementById('simModal');
+const simFrameEl   = document.getElementById('simFrame');
+const simTitleEl   = document.getElementById('simTitle');
+const simCloseBtn  = document.getElementById('simCloseBtn');
+let simLastSrc = 'EarthMagneticField.html';
+
+function openSimModal(src, title){
+  try{
+    simLastSrc = (src || 'EarthMagneticField.html');
+    if (simTitleEl) simTitleEl.textContent = title || 'Εφαρμογή - Γεωμαγνητικό Πεδίο';
+    if (simFrameEl) simFrameEl.src = simLastSrc;
+    if (simModalEl){
+      simModalEl.style.display = 'flex';
+      simModalEl.setAttribute('aria-hidden','false');
+    }
+  }catch(e){}
+}
+
+function closeSimModal(){
+  try{
+    if (simModalEl){
+      simModalEl.style.display = 'none';
+      simModalEl.setAttribute('aria-hidden','true');
+    }
+    if (simFrameEl){
+      // stop rendering to save resources
+      simFrameEl.src = 'about:blank';
+    }
+  }catch(e){}
+}
+
+if (simCloseBtn){
+  simCloseBtn.addEventListener('click', closeSimModal, { passive:true });
+}
+if (simModalEl){
+  simModalEl.addEventListener('click', function(ev){
+    if (ev.target === simModalEl) closeSimModal();
+  });
+}
+window.addEventListener('keydown', function(ev){
+  if (ev.key === 'Escape'){
+    if (simModalEl && simModalEl.style.display === 'flex') closeSimModal();
+  }
+});
+
+
+
+/* =========================
+   Runtime state
+   ========================= */
+const lessonRuntime = {
+  view: 'home',
+  lessonId: null,
+  stepIndex: 0,
+  lives: 3,
+  stepCtx: null,
+  selectedIndex: null,
+  fillValue: '',
+  orderList: null,
+  canNext: false,
+  repeatMode: false
+};
+
+function courseCompleted(id){
+  return !!courseState.completed?.[id];
+}
+
+function findLessonById(id){
+  for (const u of LESSONS){
+    for (const l of (u.lessons || [])){
+      if (l.id === id) return { unit:u.unit, lesson:l };
+    }
+  }
+  return null;
+}
+
+function currentLesson(){
+  return findLessonById(lessonRuntime.lessonId)?.lesson || null;
+}
+function stepCount(){
+  return currentLesson()?.steps?.length || 0;
+}
+function stepData(){
+  const les = currentLesson();
+  return les?.steps?.[lessonRuntime.stepIndex] || null;
+}
+
+/* =========================
+   Text normalization (Greek-friendly)
+   ========================= */
+function stripDiacritics(s){
+  return (s ?? '')
+    .toString()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+function normalizeText(s){
+  return stripDiacritics(s).toLowerCase().trim();
+}
+
+/* =========================
+   UI helpers
+   ========================= */
+function renderHearts(){
+  const full = lessonRuntime.lives;
+  let s = '';
+  for (let i=0;i<3;i++) s += (i < full) ? '❤' : '♡';
+  duoHeartsEl.textContent = s;
+}
+
+function setFeedback(kind, text){
+  duoFeedbackEl.style.display = '';
+  duoFeedbackEl.className = 'duoFeedback ' + (kind || '');
+  duoFeedbackEl.textContent = text;
+}
+function clearFeedback(){
+  duoFeedbackEl.style.display = 'none';
+  duoFeedbackEl.className = 'duoFeedback';
+  duoFeedbackEl.textContent = '';
+}
+function setProgress(step, total){
+  const p = total <= 0 ? 0 : Math.round((step / total) * 100);
+  duoProgFillEl.style.width = p + '%';
+  duoProgTxtEl.textContent = `${step}/${total}`;
+}
+
+function enterHome(){
+  lessonRuntime.view = 'home';
+  lessonHomeEl.style.display = '';
+  lessonPlayerEl.style.display = 'none';
+}
+function enterPlayer(){
+  lessonHomeEl.style.display = 'none';
+  lessonPlayerEl.style.display = '';
+}
+
+function resetLessonRuntime(){
+  lessonRuntime.stepIndex = 0;
+  lessonRuntime.lives = 3;
+  lessonRuntime.stepCtx = null;
+  lessonRuntime.selectedIndex = null;
+  lessonRuntime.fillValue = '';
+  lessonRuntime.orderList = null;
+  lessonRuntime.canNext = false;
+  clearFeedback();
+  renderHearts();
+}
+
+/* =========================
+   XP logic (NO XP on repeat)
+   ========================= */
+function awardXp(x){
+  const delta = Number(x || 0);
+  if (!delta) return;
+
+  courseState.xp = Number(courseState.xp || 0) + delta;
+
+  if (!courseState.lessonXp || typeof courseState.lessonXp !== 'object'){
+    courseState.lessonXp = {};
+  }
+  const lid = lessonRuntime.lessonId || '';
+  if (lid){
+    courseState.lessonXp[lid] = Number(courseState.lessonXp[lid] || 0) + delta;
+  }
+
+  duoXpEl.textContent = String(courseState.xp);
+  saveCourseState();
+
+  try{
+    const lt  = (findLessonById(lid)?.lesson?.title) || '';
+    const done = !!(courseState.completed && courseState.completed[lid]);
+    const lessonXpNow = lid ? Number(courseState.lessonXp[lid] || 0) : undefined;
+
+    if (typeof ggXpEarned === 'function'){
+      ggXpEarned(lid, lt, delta, lessonXpNow, Number(courseState.xp || 0), done);
+    }
+  }catch(e){}
+}
+
+function maybeAwardXp(x){
+  if (lessonRuntime.repeatMode) return false;
+  awardXp(x);
+  return true;
+}
+
+/* =========================
+   Home renderer
+   ========================= */
+function renderHome(){
+  enterHome();
+
+  duoXpEl.textContent = String(courseState.xp || 0);
+
+  const completedMap = courseState.completed || {};
+  const lessonXpMap  = courseState.lessonXp  || {};
+
+  let totalLessons = 0;
+  for (const unit of LESSONS) totalLessons += (unit.lessons?.length || 0);
+  const totalDone = Object.keys(completedMap).length;
+
+  const lessonIndexMap = new Map();
+  (function buildLessonIndexMap(){
+    let n = 0;
+    for (const u of LESSONS){
+      for (const l of (u.lessons || [])){
+        n++;
+        lessonIndexMap.set(l.id, n);
+      }
+    }
+  })();
+
+  let html = `
+    <div class="duoHomeHeader">
+      <div>
+        <div class="t">Μαθήματα</div>
+        <div class="s">Ολοκληρωμένα: ${totalDone} / ${totalLessons}</div>
+      </div>
+      <div class="s">Σύνολο XP: <b>${courseState.xp || 0}</b></div>
+    </div>
+  `;
+
+  for (const unit of LESSONS){
+    html += `<div class="duoUnit">
+      <div class="duoUnitHead">${unit.unit}</div>
+      <div class="duoLessonGrid">
+    `;
+
+    for (const les of (unit.lessons || [])){
+      const done = !!completedMap[les.id];
+      const lx   = Number(lessonXpMap[les.id] || 0);
+      const idx  = lessonIndexMap.get(les.id) || 0;
+      const label = idx ? `Μάθημα ${idx}` : 'Μάθημα';
+
+      html += `
+        <button class="duoLessonBtn ${done ? 'done' : ''}" data-lesson="${les.id}">
+          <div class="h">${les.title}</div>
+          <div class="p">${label} • ${les.blurb || ''}</div>
+          <div class="tag">${done ? '✅ Ολοκληρώθηκε' : '≈ 1–2′'} • XP: <b>${lx}</b></div>
+        </button>
+      `;
+    }
+
+    html += `</div></div>`;
+  }
+
+  lessonHomeEl.innerHTML = html;
+
+  lessonHomeEl.querySelectorAll('.duoLessonBtn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.getAttribute('data-lesson');
+      startLesson(id);
+    }, { passive:true });
+  });
+}
+
+/* =========================
+   Step rendering
+   ========================= */
+function renderStep(){
+  const les = currentLesson();
+  const st  = stepData();
+  if (!les || !st) return;
+
+  clearFeedback();
+  duoNextBtn.style.display = 'none';
+  duoCheckBtn.style.display = '';
+  duoHintBtn.style.display = '';
+  lessonRuntime.canNext = false;
+
+  duoLessonTitleEl.textContent = les.title;
+  duoXpEl.textContent = String(courseState.xp || 0);
+
+  setProgress(lessonRuntime.stepIndex + 1, stepCount());
+  renderHearts();
+
+  lessonRuntime.selectedIndex = null;
+  lessonRuntime.fillValue = '';
+  lessonRuntime.orderList = null;
+  lessonRuntime.stepCtx = null;
+
+  duoPromptEl.textContent = st.prompt || st.title || '—';
+  duoBodyEl.innerHTML = '';
+
+  if (st.type === 'info'){
+    duoBodyEl.innerHTML = `<div class="mP" style="margin:0; font-weight:900; color: rgba(0,0,0,.70)">${st.text || ''}</div>`;
+    duoCheckBtn.style.display = 'none';
+    duoHintBtn.style.display = 'none';
+    duoNextBtn.style.display = '';
+    duoNextBtn.textContent = 'Συνέχεια';
+    lessonRuntime.canNext = true;
+    return;
+  }
+
+
+  if (st.type === 'sim'){
+    const label = st.openLabel || 'Άνοιγμα Εφαρμογής';
+
+    duoBodyEl.innerHTML = `
+      <div class="mP" style="margin:0; font-weight:900; color: rgba(0,0,0,.70)">${st.text || ''}</div>
+      <div class="simRow">
+        <button class="btn primary" id="openSimBtn" type="button">${label}</button>
+</div>
+    `;
+
+    duoCheckBtn.style.display = 'none';
+    duoHintBtn.style.display = 'none';
+    duoNextBtn.style.display = '';
+    duoNextBtn.textContent = 'Συνέχεια';
+    lessonRuntime.canNext = true;
+
+    const b1 = duoBodyEl.querySelector('#openSimBtn');
+    if (b1){
+      b1.addEventListener('click', () => {
+        try{ if (typeof playAppClick === 'function') playAppClick(); }catch(e){}
+        openSimModal(st.src || 'EarthMagneticField.html', st.modalTitle || 'Εφαρμογή - Γεωμαγνητικό Πεδίο');
+      }, { passive:true });
+    }
+    return;
+  }
+
+  if (st.type === 'mcq'){
+    const wrap = document.createElement('div');
+    wrap.className = 'duoChoices';
+    st.choices.forEach((c, idx) => {
+      const b = document.createElement('button');
+      b.className = 'duoChoice';
+      b.textContent = c;
+      b.addEventListener('click', () => {
+        lessonRuntime.selectedIndex = idx;
+        wrap.querySelectorAll('.duoChoice').forEach(x => x.classList.remove('selected'));
+        b.classList.add('selected');
+        clearFeedback();
+      });
+      wrap.appendChild(b);
+    });
+    duoBodyEl.appendChild(wrap);
+    return;
+  }
+
+  if (st.type === 'tf'){
+    const wrap = document.createElement('div');
+    wrap.className = 'duoChoices';
+    ['Σωστό','Λάθος'].forEach((label, idx) => {
+      const b = document.createElement('button');
+      b.className = 'duoChoice';
+      b.textContent = label;
+      b.addEventListener('click', () => {
+        lessonRuntime.selectedIndex = idx; // 0 => true, 1 => false
+        wrap.querySelectorAll('.duoChoice').forEach(x => x.classList.remove('selected'));
+        b.classList.add('selected');
+        clearFeedback();
+      });
+      wrap.appendChild(b);
+    });
+    duoBodyEl.appendChild(wrap);
+    return;
+  }
+
+  if (st.type === 'fill'){
+    const row = document.createElement('div');
+    row.className = 'duoFillRow';
+
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.placeholder = 'Γράψε την απάντηση…';
+    inp.addEventListener('input', () => {
+      lessonRuntime.fillValue = inp.value || '';
+      clearFeedback();
+    });
+
+    row.appendChild(inp);
+    duoBodyEl.appendChild(row);
+
+    const note = document.createElement('div');
+    note.className = 'mP';
+    note.style.margin = '0';
+    note.style.color = 'rgba(0,0,0,.55)';
+    note.style.fontWeight = '900';
+    note.textContent = 'Tip: γράψε σύντομα (π.χ. “νότιος”).';
+    duoBodyEl.appendChild(note);
+    return;
+  }
+
+  if (st.type === 'fill2'){
+    const row = document.createElement('div');
+    row.className = 'duoFillRow';
+
+    const inp1 = document.createElement('input');
+    inp1.type = 'text';
+    inp1.placeholder = '1ο κενό…';
+    const inp2 = document.createElement('input');
+    inp2.type = 'text';
+    inp2.placeholder = '2ο κενό…';
+
+    inp1.addEventListener('input', clearFeedback);
+    inp2.addEventListener('input', clearFeedback);
+
+    row.appendChild(inp1);
+    row.appendChild(inp2);
+    duoBodyEl.appendChild(row);
+
+    lessonRuntime.stepCtx = { inp1, inp2 };
+    return;
+  }
+
+  if (st.type === 'order'){
+    const list = st.items.slice();
+    lessonRuntime.orderList = list;
+
+    const box = document.createElement('div');
+    box.className = 'duoOrder';
+
+    function draw(){
+      box.innerHTML = '';
+      list.forEach((txt, i) => {
+        const it = document.createElement('div');
+        it.className = 'duoOrderItem';
+
+        const left = document.createElement('div');
+        left.textContent = txt;
+
+        const btns = document.createElement('div');
+        btns.className = 'duoOrderBtns';
+
+        const up = document.createElement('button');
+        up.className = 'duoMiniBtn';
+        up.textContent = '↑';
+        up.disabled = (i === 0);
+        up.addEventListener('click', () => {
+          if (i<=0) return;
+          const t = list[i-1]; list[i-1]=list[i]; list[i]=t;
+          clearFeedback();
+          draw();
+        });
+
+        const dn = document.createElement('button');
+        dn.className = 'duoMiniBtn';
+        dn.textContent = '↓';
+        dn.disabled = (i === list.length - 1);
+        dn.addEventListener('click', () => {
+          if (i>=list.length-1) return;
+          const t = list[i+1]; list[i+1]=list[i]; list[i]=t;
+          clearFeedback();
+          draw();
+        });
+
+        btns.appendChild(up);
+        btns.appendChild(dn);
+
+        it.appendChild(left);
+        it.appendChild(btns);
+        box.appendChild(it);
+      });
+    }
+
+    draw();
+    duoBodyEl.appendChild(box);
+
+    const note = document.createElement('div');
+    note.className = 'mP';
+    note.style.margin = '0';
+    note.style.color = 'rgba(0,0,0,.55)';
+    note.style.fontWeight = '900';
+    note.textContent = 'Χρησιμοποίησε ↑ ↓ για να αλλάξεις σειρά.';
+    duoBodyEl.appendChild(note);
+    return;
+  }
+}
+
+/* =========================
+   Check logic
+   ========================= */
+function failOneLife(){
+  lessonRuntime.lives = Math.max(0, lessonRuntime.lives - 1);
+  renderHearts();
+
+  if (lessonRuntime.lives <= 0){
+    setFeedback('bad', 'Τέλος καρδιών 💔  Ξεκίνα το μάθημα από την αρχή.');
+    duoCheckBtn.style.display = 'none';
+    duoHintBtn.style.display = 'none';
+    duoNextBtn.style.display = '';
+    duoNextBtn.textContent = 'Επανάληψη';
+    lessonRuntime.canNext = true;
+  }
+}
+
+function checkFillAnswer(st){
+  const user = normalizeText(lessonRuntime.fillValue);
+
+  // allow: 'a|b|c' alternatives OR 'a;b' meaning "user contains all"
+  const rawTarget = (st.answer || '').toString().trim();
+  if (!rawTarget) return false;
+
+  // multi-required words
+  if (rawTarget.includes(';')){
+    const parts = rawTarget.split(';').map(x => normalizeText(x));
+    return parts.every(p => user.includes(p));
+  }
+
+  // alternatives
+  const alts = rawTarget.split('|').map(x => normalizeText(x)).filter(Boolean);
+  return alts.some(a => user === a);
+}
+
+function checkFill2(st){
+  const inp1 = lessonRuntime.stepCtx?.inp1;
+  const inp2 = lessonRuntime.stepCtx?.inp2;
+  const a1 = normalizeText(inp1?.value || '');
+  const a2 = normalizeText(inp2?.value || '');
+
+  const t1raw = (st.answers?.[0] || '').toString();
+  const t2raw = (st.answers?.[1] || '').toString();
+
+  const t1alts = t1raw.split('|').map(normalizeText).filter(Boolean);
+  const t2alts = t2raw.split('|').map(normalizeText).filter(Boolean);
+
+  const ok1 = t1alts.length ? t1alts.includes(a1) : false;
+  const ok2 = t2alts.length ? t2alts.includes(a2) : false;
+  return ok1 && ok2;
+}
+
+function markLessonComplete(){
+  if (!courseState.completed) courseState.completed = {};
+  courseState.completed[lessonRuntime.lessonId] = true;
+  saveCourseState();
+  try{ if (typeof ggXpEmitState === 'function') ggXpEmitState(); }catch(e){}
+}
+
+function advance(){
+  const les = currentLesson();
+  if (!les) return;
+
+  if (lessonRuntime.lives <= 0){
+    resetLessonRuntime();
+    renderStep();
+    return;
+  }
+
+  if (lessonRuntime.stepIndex < les.steps.length - 1){
+    lessonRuntime.stepIndex++;
+    renderStep();
+    return;
+  }
+
+  // finished lesson
+  markLessonComplete();
+
+  if (!lessonRuntime.repeatMode){
+    awardXp(20);
+    setFeedback('ok', 'Μάθημα ολοκληρώθηκε! +20 XP ✅');
+  } else {
+    setFeedback('ok', 'Μάθημα ολοκληρώθηκε ξανά ✅ (χωρίς XP — είναι ήδη ολοκληρωμένο)');
+  }
+
+  duoCheckBtn.style.display = 'none';
+  duoHintBtn.style.display = 'none';
+  duoNextBtn.style.display = '';
+  duoNextBtn.textContent = 'Πίσω στα μαθήματα';
+  lessonRuntime.canNext = true;
+}
+
+function checkCurrentStep(){
+  const st = stepData();
+  if (!st) return false;
+
+  if (lessonRuntime.lives <= 0) return false;
+
+  if (st.type === 'info') return true;
+
+  if (st.type === 'mcq'){
+    if (lessonRuntime.selectedIndex == null){
+      setFeedback('hint', 'Διάλεξε μία απάντηση πρώτα.');
+      return false;
+    }
+
+    const ok = (lessonRuntime.selectedIndex === st.answer);
+    const choicesEls = duoBodyEl.querySelectorAll('.duoChoice');
+
+    choicesEls.forEach((el, idx) => {
+      el.classList.remove('correct','wrong');
+      if (idx === st.answer) el.classList.add('correct');
+      if (idx === lessonRuntime.selectedIndex && !ok) el.classList.add('wrong');
+    });
+
+    if (ok){
+      const got = maybeAwardXp(5);
+      const msg = st.explain || 'Σωστό!';
+      setFeedback('ok', got ? (msg + ' +5 XP ✅') : (msg + ' ✅'));
+
+      duoNextBtn.style.display = '';
+      duoCheckBtn.style.display = 'none';
+      lessonRuntime.canNext = true;
+      return true;
+    } else {
+      failOneLife();
+      if (lessonRuntime.lives > 0) setFeedback('bad', 'Όχι ακόμη. Δοκίμασε ξανά.');
+      return false;
+    }
+  }
+
+  if (st.type === 'tf'){
+    if (lessonRuntime.selectedIndex == null){
+      setFeedback('hint', 'Διάλεξε Σωστό ή Λάθος.');
+      return false;
+    }
+
+    const userBool = (lessonRuntime.selectedIndex === 0);
+    const ok = (userBool === !!st.answer);
+
+    const choicesEls = duoBodyEl.querySelectorAll('.duoChoice');
+    choicesEls.forEach((el, idx) => {
+      el.classList.remove('correct','wrong');
+      const idxBool = (idx === 0);
+      if (idxBool === !!st.answer) el.classList.add('correct');
+      if (idx === lessonRuntime.selectedIndex && !ok) el.classList.add('wrong');
+    });
+
+    if (ok){
+      const got = maybeAwardXp(5);
+      setFeedback('ok', got ? 'Σωστό! +5 XP ✅' : 'Σωστό! ✅');
+
+      duoNextBtn.style.display = '';
+      duoCheckBtn.style.display = 'none';
+      lessonRuntime.canNext = true;
+      return true;
+    } else {
+      failOneLife();
+      if (lessonRuntime.lives > 0) setFeedback('bad', 'Λάθος. Θυμήσου το μάθημα.');
+      return false;
+    }
+  }
+
+  if (st.type === 'fill'){
+    const ok = checkFillAnswer(st);
+    if (ok){
+      const got = maybeAwardXp(5);
+      setFeedback('ok', got ? 'Σωστό! +5 XP ✅' : 'Σωστό! ✅');
+
+      duoNextBtn.style.display = '';
+      duoCheckBtn.style.display = 'none';
+      lessonRuntime.canNext = true;
+      return true;
+    } else {
+      failOneLife();
+      if (lessonRuntime.lives > 0) setFeedback('bad', 'Όχι ακόμη. Πρόσεξε τη λέξη/έννοια.');
+      return false;
+    }
+  }
+
+  if (st.type === 'fill2'){
+    const ok = checkFill2(st);
+    if (ok){
+      const got = maybeAwardXp(5);
+      setFeedback('ok', got ? 'Σωστό! +5 XP ✅' : 'Σωστό! ✅');
+
+      duoNextBtn.style.display = '';
+      duoCheckBtn.style.display = 'none';
+      lessonRuntime.canNext = true;
+      return true;
+    } else {
+      failOneLife();
+      if (lessonRuntime.lives > 0) setFeedback('bad', 'Όχι ακόμη. Δοκίμασε ξανά.');
+      return false;
+    }
+  }
+
+  if (st.type === 'order'){
+    const list = lessonRuntime.orderList || [];
+    const ok = list.every((txt, i) => {
+      const idxWanted = st.answerOrder[i];
+      return txt === st.items[idxWanted];
+    });
+
+    if (ok){
+      const got = maybeAwardXp(5);
+      setFeedback('ok', got ? 'Σωστή σειρά! +5 XP ✅' : 'Σωστή σειρά! ✅');
+
+      duoNextBtn.style.display = '';
+      duoCheckBtn.style.display = 'none';
+      lessonRuntime.canNext = true;
+      return true;
+    } else {
+      failOneLife();
+      if (lessonRuntime.lives > 0) setFeedback('bad', 'Η σειρά δεν είναι σωστή ακόμη. Δοκίμασε ξανά.');
+      return false;
+    }
+  }
+
+  return false;
+}
+
+/* =========================
+   Start lesson
+   ========================= */
+function startLesson(id){
+  const found = findLessonById(id);
+  if (!found) return;
+
+  lessonRuntime.lessonId = id;
+  lessonRuntime.repeatMode = courseCompleted(id); // ✅ already completed => NO XP
+
+  resetLessonRuntime();
+  enterPlayer();
+  renderStep();
+}
+
+/* =========================
+   Buttons
+   ========================= */
+/* =========================
+   Buttons
+   ========================= */
+duoCheckBtn.addEventListener('click', () => {
+  playAppClick();
+  checkCurrentStep();
+});
+
+duoNextBtn.addEventListener('click', () => {
+  if (!lessonRuntime.canNext) return;   // αν δεν επιτρέπεται, μην παίζει
+  playAppClick();
+
+  const txt = duoNextBtn.textContent || '';
+  if (txt.includes('Πίσω στα μαθήματα')){
+    renderHome();
+    return;
+  }
+  advance();
+});
+
+duoHintBtn.addEventListener('click', () => {
+  playAppClick();
+
+  const st = stepData();
+  if (!st) return;
+
+  if (st.hint){
+    setFeedback('hint', 'Υπόδειξη: ' + st.hint);
+  } else {
+    setFeedback('hint', 'Υπόδειξη: Ξαναδιάβασε την κάρτα του μαθήματος.');
+  }
+});
+
+duoBackBtn.addEventListener('click', () => {
+  playAppClick();
+
+  const les = currentLesson();
+  if (!les) { renderHome(); return; }
+
+  if (lessonRuntime.stepIndex <= 0){
+    renderHome();
+    return;
+  }
+
+  lessonRuntime.stepIndex = Math.max(0, lessonRuntime.stepIndex - 1);
+  renderStep();
+});
+
+
+
+
+/* =========================
+   GG-XP Bridge (to parent)
+   ========================= */
+var GG_XP_APP_ID = 'GeoMagneticLesson.html';        // άλλαξέ το αν θες
+var GG_XP_APP_TITLE = 'Γεωμαγνητικό Πεδίο';
+
+function ggXpSafePost(msg){
+  try{
+    if (window.parent && window.parent !== window){
+      window.parent.postMessage(msg, '*');
+    }
+  }catch(e){}
+}
+
+function ggXpFlattenLessons(){
+  var out = [];
+  try{
+    for (const unit of (LESSONS || [])){
+      for (const les of (unit.lessons || [])){
+        out.push({
+          id: les.id,
+          title: les.title,
+          completed: !!(courseState.completed && courseState.completed[les.id])
+        });
+      }
+    }
+  }catch(e){}
+  return out;
+}
+
+function ggXpGetState(){
+  var totalXp = Number(courseState?.xp || 0);
+  var lessons = ggXpFlattenLessons().map(function(L){
+    var lx = Number((courseState.lessonXp && courseState.lessonXp[L.id]) || 0);
+    return {
+      id: L.id,
+      title: L.title,
+      xp: lx,
+      completed: L.completed
+    };
+  });
+  return { totalXp: totalXp, lessons: lessons };
+}
+
+function ggXpEmitState(){
+  var st = ggXpGetState();
+  ggXpSafePost({
+    source: 'GG-XP',
+    type: 'XP_STATE',
+    appId: GG_XP_APP_ID,
+    appTitle: GG_XP_APP_TITLE,
+    totalXp: Number(st.totalXp || 0),
+    lessons: st.lessons || [],
+    timestamp: Date.now()
+  });
+}
+
+// called when XP is earned
+function ggXpEarned(lessonId, lessonTitle, delta, lessonXp, totalXp, completed){
+  ggXpSafePost({
+    source: 'GG-XP',
+    type: 'XP_EARNED',
+    appId: GG_XP_APP_ID,
+    appTitle: GG_XP_APP_TITLE,
+    lessonId: lessonId || '',
+    lessonTitle: lessonTitle || '',
+    delta: Number(delta || 0),
+    lessonXp: (typeof lessonXp === 'number') ? Number(lessonXp) : undefined,
+    totalXp: (typeof totalXp === 'number') ? Number(totalXp) : undefined,
+    completed: (typeof completed === 'boolean') ? completed : undefined,
+    timestamp: Date.now()
+  });
+
+  // also send full state
+  ggXpEmitState();
+}
+
+// respond to parent requests
+window.addEventListener('message', function(ev){
+  var d = ev.data;
+  if (!d || d.source !== 'GG-XP') return;
+  if (d.type === 'REQUEST_STATE'){
+    ggXpEmitState();
+  }
+});
+
+// expose
+window.ggXpEmitState = ggXpEmitState;
+window.ggXpEarned = ggXpEarned;
+
+/* =========================
+   INIT: first screen = HOME
+   ========================= */
+renderHearts();
+renderHome();
+setTimeout(ggXpEmitState, 150);
+
+
+/* ...ο κώδικάς σου... */
+
+/* =========================
+   SFX: AppClick.mp3
+   ========================= */
+const APP_CLICK_URL = './AppClick.m4a';   // άλλαξέ το path αν χρειάζεται
+const appClickSfx = new Audio(APP_CLICK_URL);
+appClickSfx.preload = 'auto';
+appClickSfx.playsInline = true;
+
+function playAppClick(){
+  try{
+    appClickSfx.pause();
+    appClickSfx.currentTime = 0;
+    const p = appClickSfx.play();
+    if (p && typeof p.catch === 'function') p.catch(()=>{});
+  }catch(e){}
+}
+
+</script>
+</body>
+</html>

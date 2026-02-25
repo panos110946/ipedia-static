@@ -1,0 +1,3353 @@
+<!doctype html>
+<html lang="el">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <title>iPedia Interactive Books — Διαδραστικά βιβλία και εφαρμογές</title>
+  <meta name="description" content="iPedia Interactive Books — σύγχρονος εκδοτικός οίκος διαδραστικών Multi‑touch eBooks για Apple Books και Google Play." />
+  <style>
+    :root{
+      --accent:#FF7E79;
+      --ink:#625C5C;
+      --bg:#0b0b0f;
+      --card:rgba(255,255,255,.08);
+      --card2:rgba(255,255,255,.12);
+      --stroke:rgba(255,255,255,.14);
+      --shadow: 0 24px 80px rgba(0,0,0,.45);
+      --radius: 22px;
+      --radius2: 28px;
+      --maxw: 1160px;
+      --blur: 18px;
+      --ui: clamp(14px, 1.2vw, 16px);
+      --anchorPad: 18px;
+      --h1: clamp(32px, 4.2vw, 56px);
+      --h2: clamp(22px, 2.6vw, 34px);
+      --h3: clamp(16px, 1.4vw, 18px);
+      --lead: clamp(15px, 1.25vw, 18px);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+
+/* Anchor offset for fixed topbar (prevents section titles from being hidden under the UI) */
+html{
+  scroll-padding-top: calc(var(--topbarH, 64px) + var(--anchorPad, 18px));
+}
+:where(section[id], main[id]){
+  scroll-margin-top: calc(var(--topbarH, 64px) + var(--anchorPad, 18px));
+}
+    body{
+      margin:0;
+      font: 500 var(--ui)/1.55 ui-sans-serif, system-ui, -apple-system, "SF Pro Display", "SF Pro Text", Segoe UI, Roboto, Helvetica, Arial;
+      color: rgba(255,255,255,.92);
+      background: linear-gradient(180deg, #07070b 0%, #0b0b0f 55%, #0c0a10 100%);
+      overflow-x:hidden;
+    }
+    a{color:inherit}
+    .wrap{max-width:var(--maxw); margin:0 auto; padding: 0 18px}
+    .skip{
+      position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden;
+    }
+    .skip:focus{left:18px; top:18px; width:auto; height:auto; padding:10px 12px; border-radius:12px; background:#111; z-index:9999}
+
+    /* Topbar */
+    .topbar{
+      position:fixed; top:0; left:0; right:0; z-index:1000;
+      backdrop-filter: blur(var(--blur));
+      -webkit-backdrop-filter: blur(var(--blur));
+      background: linear-gradient(180deg, rgba(10,10,14,.78), rgba(10,10,14,.42));
+      border-bottom: 1px solid rgba(255,255,255,.10);
+    }
+    .topbarSpacer{height:64px}
+    .topbar .inner{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 12px 0;
+      gap: 14px;
+    }
+    .brand{
+      display:flex; align-items:center; gap: 12px; text-decoration:none;
+      min-width: 220px;
+    }
+    .logo{
+      width:38px; height:38px; border-radius:14px;
+      /* Stretch the logo image to fully fill the square */
+      background: url('ipediaNw.png') center/cover no-repeat;
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow: 0 10px 30px rgba(255,126,121,.14);
+      position:relative;
+      overflow:hidden;
+    }
+    .logo img{width:100%; height:100%; object-fit:cover; display:block}
+    .logo::before{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        radial-gradient(18px 18px at 30% 30%, rgba(255,255,255,.25), transparent 70%),
+        radial-gradient(26px 26px at 70% 70%, rgba(255,126,121,.22), transparent 70%),
+        linear-gradient(135deg, rgba(255,126,121,.10), rgba(120,170,255,.08));
+      opacity:.35;
+      pointer-events:none;
+    }
+    .logo:after{
+      content:"";
+      position:absolute; inset:-8px;
+      background: radial-gradient(circle at 20% 20%, rgba(255,126,121,.20), transparent 55%);
+      filter: blur(14px);
+      z-index:-1;
+    }
+    .brand b{letter-spacing:.2px}
+    .brand small{display:block; opacity:.72; font-weight:600; margin-top:1px}
+
+    nav{
+      display:flex; gap: 14px; align-items:center; flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    nav a{
+      text-decoration:none;
+      padding: 8px 10px;
+      border-radius: 12px;
+      color: rgba(255,255,255,.86);
+      border:1px solid transparent;
+      transition: transform .12s ease, background .15s ease, border-color .15s ease;
+      font-weight:700;
+      letter-spacing:.1px;
+      white-space:nowrap;
+    }
+    nav a:hover{
+      background: rgba(255,255,255,.06);
+      border-color: rgba(255,255,255,.10);
+      transform: translateY(-1px);
+    }
+    .cta{
+      padding: 10px 12px !important;
+      background: linear-gradient(135deg, rgba(255,126,121,.30), rgba(120,170,255,.18));
+      border: 1px solid rgba(255,126,121,.35) !important;
+      box-shadow: 0 18px 50px rgba(255,126,121,.14);
+    }
+    .menuBtn{
+      display:none;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.05);
+      border-radius: 14px;
+      padding: 10px 12px;
+      color: rgba(255,255,255,.92);
+      font-weight:800;
+      cursor:pointer;
+    }
+    
+    /* Drawer hidden by default (only used on small screens) */
+    .drawer{display:none}
+@media (max-width: 920px){
+      nav{display:none}
+      .menuBtn{display:inline-flex; align-items:center; gap:10px}
+      .drawer{
+        display:none;
+        position:fixed; inset: calc(var(--topbarH, 58px) + 8px) 14px auto 14px;
+        background: rgba(10,10,14,.92);
+        border:1px solid rgba(255,255,255,.12);
+        border-radius: 22px;
+        backdrop-filter: blur(var(--blur));
+        -webkit-backdrop-filter: blur(var(--blur));
+        box-shadow: var(--shadow);
+        padding: 12px;
+      }
+      .drawer a{display:block; padding: 12px 12px; border-radius: 14px; text-decoration:none !important}
+      .drawer a + a{margin-top:6px}
+      .drawer .cta{margin-top:10px}
+      .drawer.show{display:block}
+    }
+
+/* Helpers */
+    .pill{
+      display:inline-flex; align-items:center; gap:10px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      color: rgba(255,255,255,.90);
+      font-weight:800;
+      letter-spacing:.15px;
+    }
+    .pill .dot{
+      width:8px; height:8px; border-radius:999px; background: var(--accent);
+      box-shadow: 0 0 0 6px rgba(255,126,121,.18);
+    }
+    .grid{
+      display:grid;
+      gap: 16px;
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(var(--blur));
+      -webkit-backdrop-filter: blur(var(--blur));
+      position:relative;
+      overflow:hidden;
+    }
+    .card:before{
+      content:"";
+      position:absolute; inset:-1px;
+      background: radial-gradient(600px 220px at 20% 0%, rgba(255,126,121,.14), transparent 60%),
+                  radial-gradient(520px 240px at 85% 10%, rgba(120,170,255,.12), transparent 60%);
+      pointer-events:none;
+    }
+    .card > *{position:relative}
+    .section{
+      padding: 70px 0;
+    }
+    /* Section backgrounds */
+    .section, .hero{
+      position: relative;
+      isolation: isolate;
+    }
+    .section::before, .hero::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      z-index:-1;
+      pointer-events:none;
+      background: var(--section-bg, transparent);
+    }
+    /* Align gradients with section blocks */
+    .hero{ --section-bg:
+        radial-gradient(1100px 520px at 15% 10%, rgba(255,126,121,.28), transparent 65%),
+        radial-gradient(900px 640px at 85% 18%, rgba(120,170,255,.20), transparent 62%),
+        radial-gradient(900px 700px at 55% 95%, rgba(122,255,208,.10), transparent 62%);
+    }
+    #about{ --section-bg:
+        radial-gradient(900px 520px at 18% 15%, rgba(255,126,121,.16), transparent 60%),
+        radial-gradient(900px 520px at 85% 65%, rgba(120,170,255,.12), transparent 62%),
+        linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,0));
+    }
+    #play-structure{ --section-bg:
+        radial-gradient(900px 540px at 78% 20%, rgba(255,126,121,.14), transparent 62%),
+        radial-gradient(900px 540px at 20% 85%, rgba(120,170,255,.14), transparent 62%),
+        linear-gradient(180deg, rgba(0,0,0,0), rgba(255,255,255,.02));
+    }
+    #content{ --section-bg:
+        radial-gradient(980px 520px at 20% 22%, rgba(122,255,208,.10), transparent 62%),
+        radial-gradient(980px 520px at 85% 70%, rgba(255,126,121,.12), transparent 62%);
+    }
+    
+    #sketchfab{ --section-bg:
+        radial-gradient(980px 520px at 78% 18%, rgba(255,126,121,.16), transparent 64%),
+        radial-gradient(760px 460px at 18% 28%, rgba(120,170,255,.14), transparent 62%),
+        radial-gradient(920px 560px at 40% 88%, rgba(122,255,208,.06), transparent 68%);
+    }
+
+    .sfGrid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+    @media (max-width: 980px){
+      .sfGrid{ grid-template-columns: 1fr; }
+    }
+    .sfCard{ padding: 14px; }
+    .sfEmbedWrap{
+      border-radius: 18px;
+      overflow:hidden;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.18);
+    }
+    .sfEmbed{
+      width:100%;
+      aspect-ratio: 16 / 9;
+      border:0;
+      display:block;
+    }
+    .sfMeta{ padding-top: 12px; }
+    .sfMeta h3{ margin: 0 0 8px; font-size: 18px; }
+    .sfMeta p{ margin: 0 0 12px; color: rgba(255,255,255,.82); }
+    .sfActions{ display:flex; flex-wrap:wrap; gap: 10px; }
+    .sfNote{ margin-top: 14px; color: rgba(255,255,255,.72); font-size: 14px; }
+#applebooks{ --section-bg:
+        radial-gradient(980px 520px at 60% 10%, rgba(120,170,255,.18), transparent 64%),
+        radial-gradient(980px 520px at 15% 88%, rgba(255,126,121,.10), transparent 64%);
+    }
+    #youtube{ --section-bg:
+        radial-gradient(980px 520px at 18% 18%, rgba(255,0,0,.10), transparent 60%),
+        radial-gradient(980px 520px at 85% 70%, rgba(255,126,121,.12), transparent 62%);
+    }
+    #ministry{ --section-bg:
+        radial-gradient(980px 520px at 18% 22%, rgba(255,126,121,.14), transparent 62%),
+        radial-gradient(980px 520px at 85% 75%, rgba(120,170,255,.12), transparent 62%),
+        linear-gradient(180deg, rgba(255,255,255,.01), rgba(0,0,0,0));
+    }
+    #contact{ --section-bg:
+        radial-gradient(980px 520px at 25% 15%, rgba(122,255,208,.08), transparent 62%),
+        radial-gradient(980px 520px at 85% 80%, rgba(255,126,121,.10), transparent 62%);
+    }
+
+    #now{ --section-bg:
+        radial-gradient(980px 520px at 18% 22%, rgba(255,126,121,.12), transparent 62%),
+        radial-gradient(980px 520px at 85% 78%, rgba(120,170,255,.12), transparent 62%),
+        radial-gradient(860px 520px at 55% 40%, rgba(122,255,208,.06), transparent 70%);
+    }
+
+    /* “Τι δουλεύουμε τώρα” — compact but noticeable */
+    .nowSection{ padding: 52px 0; }
+    @media (max-width: 720px){ .nowSection{ padding: 44px 0; } }
+
+    .nowCard{ padding: 18px; }
+    .nowCard::after{
+      content:"";
+      position:absolute; inset:-1px;
+      border-radius: var(--radius2);
+      background: linear-gradient(135deg, rgba(255,126,121,.22), rgba(120,170,255,.16), rgba(122,255,208,.10));
+      opacity:.45;
+      pointer-events:none;
+      mask: linear-gradient(#000, #000) content-box, linear-gradient(#000, #000);
+      -webkit-mask: linear-gradient(#000, #000) content-box, linear-gradient(#000, #000);
+      mask-composite: xor;
+      -webkit-mask-composite: xor;
+      padding:1px;
+    }
+
+    .nowHead{
+      display:flex; align-items:center; justify-content:space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap:wrap;
+    }
+    .nowLive{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      color: rgba(255,255,255,.78);
+      font-weight: 850;
+      letter-spacing: .15px;
+      white-space:nowrap;
+    }
+    .nowPulse{
+      width:8px; height:8px; border-radius:999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 0 rgba(255,126,121,.28);
+      animation: softPulse 1.8s ease-in-out infinite;
+    }
+    @keyframes softPulse{
+      0%{ box-shadow: 0 0 0 0 rgba(255,126,121,.30); }
+      70%{ box-shadow: 0 0 0 8px rgba(255,126,121,.00); }
+      100%{ box-shadow: 0 0 0 0 rgba(255,126,121,.00); }
+    }
+
+    .nowGrid{
+      display:grid;
+      /* Panels should sit UNDER the description even on large screens */
+      grid-template-columns: 1fr;
+      gap: 14px;
+      align-items:start;
+    }
+    .nowGrid > *{ min-width:0; }
+
+    .nowLead{
+      margin: 0 0 12px;
+      color: rgba(255,255,255,.82);
+      font-weight: 760;
+    }
+    .nowActions{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px; }
+
+    .nowStack{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .nowItem{
+      padding: 12px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.16);
+      box-shadow: 0 16px 50px rgba(0,0,0,.20);
+    }
+    .nowItem b{ display:block; font-weight: 950; letter-spacing:.1px; margin-bottom: 4px; }
+    .nowItem span{ color: rgba(255,255,255,.76); font-weight: 740; }
+
+    .section h2{
+      margin: 0 0 12px;
+      font-size: var(--h2);
+      letter-spacing: .2px;
+    }
+    .section p.lead{
+      margin: 0;
+      font-size: var(--lead);
+      color: rgba(255,255,255,.80);
+      max-width: none;
+      width: 100%;
+      }
+    /* Make the two Ministry lead paragraphs span the same width as the section */
+    #ministry p.lead{ max-width: none; }
+
+    .muted{color: rgba(255,255,255,.72)}
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      text-decoration:none;
+      font-weight:900;
+      letter-spacing:.12px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      transition: transform .12s ease, background .15s ease, border-color .15s ease;
+      cursor:pointer;
+      user-select:none;
+    }
+    .btn:hover{transform: translateY(-1px); background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.20)}
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(255,126,121,.36), rgba(120,170,255,.18));
+      border-color: rgba(255,126,121,.35);
+      box-shadow: 0 18px 50px rgba(255,126,121,.14);
+    }
+    .btn.primary:hover{border-color: rgba(255,126,121,.55)}
+    .btn.ghost{background: transparent}
+    .kpi{
+      display:flex; gap: 12px; flex-wrap:wrap; align-items:center;
+      margin-top: 16px;
+    }
+    .kpi .chip{
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      font-weight:800;
+      color: rgba(255,255,255,.86);
+    }
+
+    
+    .chip.chip-has-ico{ display:inline-flex; align-items:center; gap:10px; }
+    .chip-ico{
+      width:18px; height:18px; flex:0 0 18px;
+      object-fit:contain;
+      /* icons8 links are black by default — invert for dark glass chips */
+      filter: invert(1) brightness(1.2);
+      opacity:.92;
+    }
+    .chip-ico.chip-ico-apple{
+      filter: none !important;
+      opacity: .95;
+    }
+
+/* Hero */
+    .hero{
+      padding: 44px 0 12px;
+    }
+    .heroGrid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 16px;
+      align-items:stretch;
+    }
+    /* Allow grid items (including timeline) to shrink on window resize */
+    .heroGrid > *{ min-width: 0; }
+    @media (max-width: 980px){
+      .heroGrid{grid-template-columns:1fr}
+    }
+    .hero h1{
+      margin: 14px 0 10px;
+      font-size: var(--h1);
+      line-height:1.05;
+      letter-spacing:-.6px;
+    }
+    .hero .sub{
+      font-size: var(--lead);
+      color: rgba(255,255,255,.78);
+      max-width: none;
+      width: 100%;
+      margin: 0 0 16px;
+    }
+    .hero .actions{display:flex; gap: 10px; flex-wrap:wrap; margin-top: 14px}
+    .heroCard{
+      padding: 22px;
+    }
+
+    /* Interactive device mock */
+    .device{
+      padding: 18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height: 380px;
+    }
+    .phone{
+      width: min(340px, 100%);
+      aspect-ratio: 9 / 18.5;
+      border-radius: 34px;
+      background: rgba(10,10,14,.65);
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow: 0 30px 100px rgba(0,0,0,.55);
+      position:relative;
+      overflow:hidden;
+    }
+    .phone:before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(260px 260px at 20% 20%, rgba(255,126,121,.22), transparent 60%),
+        radial-gradient(260px 240px at 80% 35%, rgba(120,170,255,.18), transparent 62%),
+        radial-gradient(260px 260px at 50% 92%, rgba(122,255,208,.10), transparent 62%);
+      filter: blur(0px);
+    }
+    .phone .top{
+      height: 34px; display:flex; align-items:center; justify-content:center;
+      color: rgba(255,255,255,.65); font-weight:900;
+      position:relative; z-index:1;
+    }
+    .phone .screen{
+      position:absolute; inset: 34px 12px 12px 12px;
+      border-radius: 26px;
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.10);
+      overflow:hidden;
+      z-index:1;
+    }
+    .dock{
+      position:absolute; left: 10px; right: 10px; bottom: 10px;
+      display:grid; grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      padding: 10px;
+      border-radius: 20px;
+      background: rgba(0,0,0,.22);
+      border: 1px solid rgba(255,255,255,.10);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+          z-index: 10;
+    }
+    .appIcon{
+      border-radius: 14px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.10);
+      height: 44px;
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer;
+      transition: transform .12s ease, border-color .15s ease, background .15s ease;
+      position:relative;
+    }
+    .appIcon:hover{transform: translateY(-1px)}
+    .appIcon.active{
+      border-color: rgba(255,126,121,.55);
+      background: rgba(255,126,121,.14);
+      box-shadow: 0 18px 40px rgba(255,126,121,.12);
+    }
+    .appIcon svg{width: 22px; height:22px; opacity:.95}
+    .screenContent{
+      padding: 16px;
+      padding-bottom: 92px;
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+      height: 100%;
+    }
+    .screenTitle{
+      display:flex; align-items:center; gap:10px;
+      font-weight: 950;
+      letter-spacing: .1px;
+    }
+    .screenTitle .badge{
+      font-size: 12px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.06);
+      opacity:.9;
+    }
+    .screenBox{
+      flex:1;
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.10);
+      padding: 12px;
+      display:flex; flex-direction:column; gap: 10px;
+      justify-content:center;
+      color: rgba(255,255,255,.90);
+      position: relative;
+      overflow: hidden;
+    }
+    .screenBox b{color: rgba(255,255,255,.95)}
+
+    .shotBg{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      transform: scale(1.02);
+      filter: saturate(1.06) contrast(1.05);
+          pointer-events: none;
+    }
+    .shotShade{
+      position:absolute;
+      inset:0;
+      background: linear-gradient(180deg, rgba(0,0,0,.62) 0%, rgba(0,0,0,.12) 55%, rgba(0,0,0,.56) 100%);
+          pointer-events: none;
+    }
+    .shotOverlay{
+      position:relative;
+      z-index: 2;
+      height: 100%;
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-end;
+      gap: 10px;
+      padding: 10px;
+          pointer-events: none;
+    }
+    .shotCopy{
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.28);
+      border-radius: 16px;
+      padding: 10px 10px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .shotCopy .muted{color: rgba(255,255,255,.80)}
+    .shotOverlay .mini{justify-content:flex-start; margin-top: 0}
+
+    /* Feature grid */
+    .featuresGrid{
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    @media (max-width: 980px){
+      .featuresGrid{grid-template-columns: repeat(2, minmax(0, 1fr))}
+    }
+    @media (max-width: 640px){
+      .featuresGrid{grid-template-columns: 1fr}
+    }
+    .feature{
+      padding: 18px;
+      min-height: 170px;
+    }
+    .feature .icon{
+      width: 42px; height: 42px;
+      border-radius: 16px;
+      display:flex; align-items:center; justify-content:center;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      box-shadow: 0 18px 50px rgba(0,0,0,.35);
+      margin-bottom: 10px;
+    }
+    .feature h3{margin: 0 0 6px; font-size: 18px; letter-spacing:.2px}
+    .feature p{margin:0; color: rgba(255,255,255,.78)}
+.featureActions{
+  margin-top: 12px;
+  display:flex;
+  gap: 10px;
+  flex-wrap:wrap;
+}
+.featureActions .btn{
+  padding: 10px 12px;
+  border-radius: 14px;
+  font-size: 13px;
+}
+.btn.is-playing{
+  border-color: rgba(255,126,121,.55);
+  box-shadow: 0 18px 50px rgba(255,126,121,.12);
+}
+
+    /* Apple Books grid */
+    .tabs{
+      display:flex; gap: 8px; flex-wrap:wrap; margin-top: 10px;
+    }
+    .tab{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.05);
+      padding: 10px 12px;
+      border-radius: 999px;
+      font-weight: 900;
+      cursor:pointer;
+      color: rgba(255,255,255,.86);
+      transition: transform .12s ease, background .15s ease, border-color .15s ease;
+    }
+    .tab:hover{transform: translateY(-1px); background: rgba(255,255,255,.07)}
+    .tab.active{
+      border-color: rgba(255,126,121,.55);
+      background: rgba(255,126,121,.14);
+    }
+    .booksGrid{
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-top: 16px;
+    }
+    @media (max-width: 980px){
+      .booksGrid{grid-template-columns: repeat(2, minmax(0, 1fr))}
+    }
+    @media (max-width: 640px){
+      .booksGrid{grid-template-columns: 1fr}
+    }
+    .book{
+      padding: 16px;
+      display:grid;
+      grid-template-columns: 92px 1fr;
+      gap: 14px;
+      align-items:start;
+    }
+    .cover{
+      width: 92px; height: 128px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.12);
+      background:
+        radial-gradient(40px 40px at 30% 25%, rgba(255,255,255,.18), transparent 70%),
+        radial-gradient(80px 80px at 70% 80%, rgba(255,126,121,.22), transparent 70%),
+        linear-gradient(135deg, rgba(255,255,255,.08), rgba(0,0,0,.20));
+      box-shadow: 0 16px 60px rgba(0,0,0,.55);
+      overflow:hidden;
+    }
+    .cover img{width:100%; height:100%; object-fit:cover; display:block}
+    .book h3{margin:0 0 4px; font-size: 16px}
+    .book .meta{font-size: 12px; opacity:.78; font-weight:800}
+    .book .price{margin-top: 4px; font-size: 25px; font-weight: 900; letter-spacing:.02em; color: #D6D6D6}
+    .book p{margin: 8px 0 12px; color: rgba(255,255,255,.76); font-size: 13px; line-height:1.45}
+    .book .links{display:flex; gap:8px; flex-wrap:wrap}
+
+
+        /* Book card expand (Apple Books description) */
+    .booksGrid{ overflow: visible; }
+
+    /* Column-only push-down layout:
+       Cards are positioned by JS into fixed columns. When a card expands, only the
+       cards *below it in the same column* are pushed down (cards next to it are not affected). */
+    .booksGrid.masonry{ display:block; position:relative; }
+    .booksGrid.masonry .book{ position:absolute; }
+
+    .book.is-open{ z-index: 6; overflow: visible; }
+
+    /* In-flow expand (creates real space inside the card) */
+    .book .bookExpand{
+      display:none;
+      margin-top: 12px;
+      grid-column: 1 / -1;
+    }
+    .book.is-open .bookExpand{ display:block; }
+
+    .bookExpandInner{
+      margin-top: 0;
+      padding: 14px 14px 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,.11), rgba(0,0,0,.20));
+      box-shadow: 0 18px 70px rgba(0,0,0,.28);
+      backdrop-filter: blur(var(--blur));
+      -webkit-backdrop-filter: blur(var(--blur));
+      animation: fadeUp .16s ease both;
+    }
+    .bookExpandTitle{
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .02em;
+      opacity: .88;
+      margin: 0 0 8px;
+    }
+    .bookFull{
+      color: rgba(255,255,255,.80);
+      font-size: 13px;
+      line-height: 1.55;
+      max-height: min(60vh, 520px);
+      overflow: auto;
+      padding-right: 6px;
+    }
+    .bookFull p{margin: 0 0 10px}
+    .bookFull ul, .bookFull ol{margin: 0 0 10px 18px; padding:0}
+    .bookFull li{margin: 0 0 6px}
+    .bookFull a{color: var(--accent); text-decoration: none; font-weight: 800}
+    .bookFull a:hover{text-decoration: underline}
+
+    @keyframes fadeUp{
+      from{opacity:0; transform: translateY(-6px)}
+      to{opacity:1; transform: translateY(0)}
+    }
+
+
+
+    /* Ministry / Services */
+    .servicesGrid{
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-top: 16px;
+    }
+    @media (max-width: 980px){
+      .servicesGrid{grid-template-columns: repeat(2, minmax(0, 1fr))}
+    }
+    @media (max-width: 640px){
+      .servicesGrid{grid-template-columns: 1fr}
+    }
+
+    .split{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      align-items:stretch;
+    }
+    @media (max-width: 980px){ .split{grid-template-columns: 1fr} }
+    .pad{padding: 20px}
+    .list{
+      margin: 12px 0 0;
+      padding:0;
+      list-style:none;
+    }
+    .list li{
+      display:flex; gap: 10px;
+      padding: 10px 0;
+      border-top: 1px solid rgba(255,255,255,.10);
+      color: rgba(255,255,255,.80);
+    }
+    .list li:first-child{border-top:0}
+    .check{
+      width: 22px; height:22px; border-radius: 9px;
+      display:flex; align-items:center; justify-content:center;
+      border:1px solid rgba(255,126,121,.40);
+      background: rgba(255,126,121,.14);
+      flex: 0 0 auto;
+      margin-top:1px;
+    }
+
+    /* Contact */
+    .formWrap{padding: 22px}
+    form{
+      display:grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .row2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 720px){ .row2{grid-template-columns:1fr} }
+    .field{
+      position:relative;
+    }
+    .input, select, textarea{
+      width:100%;
+      padding: 26px 16px 14px;
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.20);
+      color: rgba(255,255,255,.92);
+      outline:none;
+      font-weight:800;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+      transition: border-color .15s ease, transform .12s ease, background .15s ease, box-shadow .15s ease;
+    }
+    textarea{min-height: 110px; resize: vertical; font-weight:750}
+    .input:focus, select:focus, textarea:focus{
+      border-color: rgba(255,126,121,.55);
+      box-shadow: 0 0 0 6px rgba(255,126,121,.12);
+      background: rgba(0,0,0,.26);
+    }
+    label{
+      position:absolute;
+      left: 16px;
+      top: 10px;
+      font-size: 12px;
+      font-weight: 950;
+      opacity: .82;
+      letter-spacing: .2px;
+      pointer-events:none;
+      transform-origin: left top;
+      transition: transform .12s ease, opacity .12s ease;
+    }
+    .input::placeholder, textarea::placeholder{color: transparent}
+    /* Float the label higher so it never overlaps typed text (Chrome/Opera/Safari/Firefox) */
+    .field:has(.input:not(:placeholder-shown)) label,
+    .field:has(textarea:not(:placeholder-shown)) label,
+    .field > .input:not(:placeholder-shown) + label,
+    .field > textarea:not(:placeholder-shown) + label,
+    .field:focus-within label{
+      transform: translateY(-10px) scale(.88);
+      opacity: .78;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.28);
+      border: 1px solid rgba(255,255,255,.12);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    /* Selects don't support :placeholder-shown, so keep the label "floated" and
+       increase top padding to avoid overlap with the placeholder option text. */
+    .field:has(select) select{
+      padding: 26px 16px 14px;
+    }
+    .field:has(select) label{
+      transform: translateY(-12px) scale(.86);
+      opacity: .80;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.28);
+      border: 1px solid rgba(255,255,255,.12);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+    .help{
+      font-size: 12px;
+      color: rgba(255,255,255,.72);
+      margin-top: 8px;
+    }
+    .notice{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      border-radius: 18px;
+      padding: 12px 12px;
+      color: rgba(255,255,255,.78);
+      font-size: 13px;
+    }
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%) translateY(20px);
+      opacity: 0;
+      background: rgba(10,10,14,.92);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius: 16px;
+      padding: 12px 14px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(var(--blur));
+      -webkit-backdrop-filter: blur(var(--blur));
+      transition: opacity .18s ease, transform .18s ease;
+      z-index: 999;
+      max-width: min(760px, calc(100% - 24px));
+      color: rgba(255,255,255,.88);
+      font-weight: 850;
+    }
+    .toast.show{opacity:1; transform: translateX(-50%) translateY(0)}
+    .toast .ok{color: var(--accent)}
+    .footer{
+      padding: 34px 0 44px;
+      border-top:1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.22));
+    }
+    .footGrid{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items:center;
+    }
+    @media (max-width: 720px){ .footGrid{grid-template-columns: 1fr} }
+    .social{
+      display:flex; gap: 10px; flex-wrap:wrap; justify-content:flex-end;
+    }
+    @media (max-width: 720px){ .social{justify-content:flex-start} }
+    .social a{
+      width: 42px; height: 42px;
+      border-radius: 16px;
+      border:1px solid rgba(255,126,121,.30);
+      background: rgba(255,126,121,.10);
+      display:flex; align-items:center; justify-content:center;
+      text-decoration:none;
+      transition: transform .12s ease, background .15s ease, border-color .15s ease;
+    }
+    .social a:hover{transform: translateY(-1px); background: rgba(255,126,121,.16); border-color: rgba(255,126,121,.55)}
+    .social svg{width: 20px; height:20px}
+
+    /* Reveal anim */
+    .reveal{
+      opacity:0;
+      transform: translateY(10px);
+      transition: opacity .55s ease, transform .55s ease;
+    }
+    .reveal.in{
+      opacity:1;
+      transform: translateY(0);
+    }
+
+    /* Tiny underline link */
+    .u{
+      color: rgba(255,255,255,.92);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255,126,121,.42);
+      padding-bottom: 1px;
+    }
+    .u:hover{border-bottom-color: rgba(255,126,121,.70)}
+  
+    /* Iframe modal (Δείγμα) */
+    html.modal-open{overflow:hidden}
+    body.modal-open{overflow:hidden}
+    .modalRoot{position:fixed; inset:0; z-index:10000; display:none; align-items:center; justify-content:center; padding: max(16px, env(safe-area-inset-top)) 12px max(16px, env(safe-area-inset-bottom))}
+    .modalRoot[aria-hidden="false"]{display:flex}
+    .modalBackdrop{position:absolute; inset:0; background:rgba(8,10,20,.62); backdrop-filter: blur(12px)}
+    .modalDialog{
+      position:relative;
+      width:min(1100px, calc(100% - 24px));
+      margin: 0; max-height: calc(100vh - 32px); display:flex; flex-direction:column;
+      border-radius:22px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.08);
+      box-shadow: 0 24px 70px rgba(0,0,0,.45);
+      overflow:hidden;
+    }
+    .modalHead{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 12px 10px; background:rgba(255,255,255,.06)}
+    .modalTitle{font-weight:900; letter-spacing:.2px}
+    .modalBody{background:#fff; flex:1}
+    .modalBody iframe{width:100%; height:min(72vh, 760px); border:0; display:block; background:#fff}
+    .modalClose{white-space:nowrap}
+    @media (max-width:640px){
+      .modalDialog{width:calc(100% - 16px); margin: 0}
+      .modalBody iframe{height:calc(100vh - 120px)}
+    }
+
+
+
+        /* ---------------------------------
+       iPedia Timeline (2011–2026) — Reveal
+       (Year bar with tap buttons)
+       --------------------------------- */
+    .timelineWrap{ margin-top: 16px; width:100%; max-width:100%; min-width:0; }
+    .timelineWrap.timelineOutside{ grid-column: 1 / -1; margin-top: 0; }
+    .timelineToggle{
+      width: 100%;
+      justify-content: space-between;
+    }
+    .timelineToggle .tlHint{ opacity: .78; font-weight: 900; }
+
+    .timelinePanel{
+      margin-top: 12px;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      padding: 18px;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: linear-gradient(180deg, rgba(255,255,255,.11), rgba(0,0,0,.20));
+      box-shadow: 0 18px 70px rgba(0,0,0,.28);
+      backdrop-filter: blur(var(--blur));
+      -webkit-backdrop-filter: blur(var(--blur));
+      display: none;
+      animation: fadeUp .16s ease both;
+    }
+    .timelinePanel.open{ display:block; }
+
+    .timelinePanelHeader{
+      display:flex; align-items:flex-start; justify-content:space-between; gap: 10px;
+      margin: 0 0 10px;
+    }
+    .timelinePanelHeader b{ letter-spacing:.15px; }
+
+    .timelinePanelNote{
+      margin: 0;
+      color: rgba(255,255,255,.72);
+      font-size: 13px;
+      font-weight: 800;
+      max-width: 70ch;
+    }
+
+    /* Year bar */
+    .tlBar{
+      position: relative;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      margin-top: 14px;
+      padding: 10px 10px 12px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.06);
+      box-shadow: 0 14px 50px rgba(0,0,0,.22);
+      backdrop-filter: blur(var(--blur));
+      -webkit-backdrop-filter: blur(var(--blur));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+    }
+    .tlBar::-webkit-scrollbar{ display:none; }
+
+    .tlBar::before{
+      content:"";
+      position:absolute;
+      left: 14px;
+      right: 14px;
+      bottom: 10px;
+      height: 2px;
+      border-radius: 2px;
+      background: rgba(255,255,255,.16);
+      box-shadow: 0 0 0 1px rgba(0,0,0,.18) inset;
+      pointer-events:none;
+    }
+
+    .tlYearBtn{
+      position: relative;
+      z-index: 1;
+      flex: 0 0 auto;
+
+      /* user request: no borders */
+      border: 0;
+      outline: none;
+
+      background: transparent;
+      color: rgba(255,255,255,.78);
+      font-weight: 950;
+      font-size: 12px;
+      letter-spacing: .35px;
+      padding: 6px 10px 18px;
+      border-radius: 999px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+
+      scroll-snap-align: center;
+      transition: transform .12s ease, background .12s ease, color .12s ease;
+    }
+
+    .tlYearBtn::after{
+      content:"";
+      position:absolute;
+      left: 50%;
+      bottom: 6px;
+      width: 8px;
+      height: 8px;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: rgba(255,255,255,.34);
+      box-shadow: 0 0 0 6px rgba(0,0,0,.16);
+    }
+
+    .tlYearBtn:hover{
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.92);
+      transform: translateY(-1px);
+    }
+    .tlYearBtn:active{ transform: translateY(0px) scale(.98); }
+
+    .tlYearBtn.is-active{
+      background: rgba(255,126,121,.16);
+      color: rgba(255,255,255,.96);
+    }
+    .tlYearBtn.is-active::after{
+      background: var(--accent);
+      box-shadow: 0 0 0 6px rgba(255,126,121,.20), 0 10px 28px rgba(255,126,121,.30);
+    }
+
+    .tlYearBtn:focus-visible{
+      box-shadow: 0 0 0 3px rgba(255,126,121,.26);
+    }
+
+    /* Selected year description */
+    .tlDetails{
+      margin-top: 14px;
+      min-width: 0;
+      padding: 14px 14px 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      box-shadow: 0 18px 60px rgba(0,0,0,.22);
+      animation: fadeUp .12s ease both;
+    }
+    .tlDetailsHead{
+      display:flex; align-items:center; gap: 10px;
+      margin: 0 0 10px;
+    }
+    .tlBadge{
+      font-size: 11px;
+      font-weight: 950;
+      letter-spacing: .38px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.68);
+    }
+    .tlSelectedYear{
+      font-weight: 980;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      color: rgba(255,255,255,.95);
+    }
+    .tlSelectedText{
+      color: rgba(255,255,255,.84);
+      font-weight: 760;
+      line-height: 1.55;
+    }
+    .tlSelectedText b{ color: rgba(255,255,255,.95); font-weight: 950; }
+
+    @media (max-width: 720px){
+      .tlBar{ justify-content: flex-start; }
+    }
+    @media (max-width: 560px){
+      .timelinePanel{ padding: 16px; }
+      .tlYearBtn{ padding: 6px 9px 18px; font-size: 12px; }
+    }
+</style>
+
+  <!-- =============================
+       SEO + Social previews (Google / OpenGraph / Twitter)
+       NOTE: Replace https://YOUR-DOMAIN.gr/ with your real domain (HTTPS).
+       ============================= -->
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+  <meta name="googlebot" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+  <meta name="theme-color" content="#0b0b0f" />
+  <link rel="icon" href="ipediaNw.png" />
+  <link rel="apple-touch-icon" href="ipediaNw.png" />
+  <link rel="canonical" href="https://YOUR-DOMAIN.gr/" />
+
+  <meta property="og:locale" content="el_GR" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="iPedia Interactive Books" />
+  <meta property="og:title" content="iPedia Interactive Books — Διαδραστικά βιβλία και εφαρμογές" />
+  <meta property="og:description" content="iPedia Interactive Books — σύγχρονος εκδοτικός οίκος διαδραστικών Multi‑touch eBooks για Apple Books και Google Play." />
+  <meta property="og:url" content="https://YOUR-DOMAIN.gr/" />
+  <meta property="og:image" content="https://YOUR-DOMAIN.gr/ipediaNw.png" />
+  <meta property="og:image:alt" content="iPedia Interactive Books" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="iPedia Interactive Books — Διαδραστικά βιβλία και εφαρμογές" />
+  <meta name="twitter:description" content="iPedia Interactive Books — σύγχρονος εκδοτικός οίκος διαδραστικών Multi‑touch eBooks για Apple Books και Google Play." />
+  <meta name="twitter:image" content="https://YOUR-DOMAIN.gr/ipediaNw.png" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "name": "iPedia Interactive Books",
+        "url": "https://YOUR-DOMAIN.gr/",
+        "logo": "https://YOUR-DOMAIN.gr/ipediaNw.png",
+        "sameAs": [
+          "https://www.facebook.com/ipediaforall/",
+          "https://www.tiktok.com/@ipediaebooks?_r=1&_t=ZN-93y4rR3vLMc",
+          "https://www.youtube.com/@iPediainteractivebooks",
+          "https://x.com/iPediaEbooks",
+          "https://www.instagram.com/ipediainteractivebooks?igsh=am5rNHZ2YnJ2Zjhy&utm_source=qr"
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "name": "iPedia Interactive Books",
+        "url": "https://YOUR-DOMAIN.gr/",
+        "inLanguage": "el-GR"
+      }
+    ]
+  }
+  </script>
+
+  <!-- Performance hints (safe) -->
+  <link rel="preconnect" href="https://img.icons8.com" crossorigin />
+  <link rel="preconnect" href="https://sketchfab.com" crossorigin />
+  <link rel="preconnect" href="https://www.youtube.com" crossorigin />
+  <link rel="preconnect" href="https://i.ytimg.com" crossorigin />
+  <link rel="preconnect" href="https://itunes.apple.com" crossorigin />
+
+</head>
+<body>
+<a class="skip" href="#main">Πήγαινε στο περιεχόμενο</a>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="inner">
+      <a class="brand" href="#top" aria-label="iPedia Interactive Books">
+        <span class="logo" aria-hidden="true"></span>
+        <span>
+          <b>iPedia</b>
+          <small>Διαδραστικά βιβλία και εφαρμογές</small>
+        </span>
+      </a>
+
+      <button class="menuBtn" id="menuBtn" type="button" aria-expanded="false" aria-controls="drawer">
+        ☰ Μενού
+      </button>
+
+      <nav aria-label="Κύρια πλοήγηση">
+        <a href="#top">Για εμάς</a>
+        <a href="#play-structure">Play Store</a>
+        <a href="#content">Περιεχόμενο</a>
+        <a href="#sketchfab">3D Αποθετήριο</a>
+        <a href="#applebooks">Apple Books</a>
+        <a href="#youtube">YouTube</a>
+        <a href="#ministry">Σχολικά βιβλία & Συνεργασίες</a>
+        <a class="cta" href="#contact">Επικοινωνία</a>
+      </nav>
+    </div>
+  </div>
+
+  <div class="drawer" id="drawer" aria-label="Μενού κινητού">
+    <a href="#top">Για εμάς</a>
+    <a href="#play-structure">Δομή Play Store</a>
+    <a href="#content">Περιεχόμενο</a>
+    <a href="#sketchfab">3D Αποθετήριο</a>
+    <a href="#applebooks">Apple Books</a>
+        <a href="#youtube">YouTube</a>
+    <a href="#ministry">Σχολικά βιβλία & Συνεργασίες</a>
+    <a href="#book-conversion">Μετατροπή βιβλίου</a>
+    <a class="cta" href="#contact">Επικοινωνία</a>
+  </div>
+</header>
+<div class="topbarSpacer" aria-hidden="true"></div>
+
+<main id="main">
+  <!-- HERO -->
+  <section class="hero" id="top">
+
+    <div class="wrap heroGrid">
+      <div class="card heroCard reveal">
+        <span class="pill"><span class="dot"></span> Multi‑touch eBooks • Interactive eBooks</span>
+        <h1>Διαδραστικά βιβλία που κάνουν τη Φυσική να «ζωντανεύει».</h1>
+        <p class="sub">
+          Οι Εκδόσεις <b>iPedia</b> είναι ένας σύγχρονος εκδοτικός οίκος με βασικό προσανατολισμό την εκπαίδευση.
+          Δημιουργούμε <b>διαδραστικά ηλεκτρονικά βιβλία</b> (Multi‑touch / Interactive eBooks) όπου πρωταγωνιστούν
+          οι διαδραστικές εφαρμογές, τα 3D μοντέλα, τα έξυπνα τεστ και η παιγνιώδης πρόοδος (XP). Στο Apple Books θα βρείτε το παραδοσιακό διαδραστικό βιβλίο: εντυπωσιακό, όμορφο, με αποκριτικό σχεδιασμό που τα «σπάει». Στο Google Play Store σχεδιάσαμε μια σύνθεση του παραδοσιακού διαδραστικού βιβλίου με επιλεγμένες δυνατότητες που προσφέρει το Android. Και ναι. Το καταφέραμε. Πετύχαμε μοναδικές εμπειρίες ανάγνωσης τόσο σε ταμπλετ όσο και σε έξυπνο τηλέφωνο. 
+        </p>
+
+        <div class="actions">
+          <a class="btn primary" href="#applebooks">Δες τα βιβλία στο Apple Books</a>
+          <a class="btn" href="#play-structure">Δες τη δομή στο Play Store</a>
+        </div>
+
+        <div class="kpi">
+          <span class="chip chip-has-ico"><img class="chip-ico chip-ico-apple" src="https://img.icons8.com/?size=100&id=j9d7OPcLgjc3&format=png&color=FF9500" alt="Apple Books" loading="lazy" decoding="async">Apple Books</span>
+          <span class="chip chip-has-ico"><img class="chip-ico" src="https://img.icons8.com/?size=100&id=Qn4GH3u6CYo5&format=png&color=000000" alt="Google Play" loading="lazy" decoding="async">Android</span>
+          <span class="chip">🧪 Έξυπνα Τεστ</span>
+          <span class="chip">🏆 XP & Κατάταξη</span>
+          <span class="chip">🧊 3D εφαρμογές</span>
+          <span class="chip">🔍 Διαδραστικές εφαρμογές</span>
+          <span class="chip">🤔 Δοκιμασίες / Προκλήσεις</span>
+          <span class="chip">✏️ Ερωτήσεις Ανάπτυξης</span>
+          <span class="chip">🔬 Πειράματα</span>
+          <span class="chip">🎙️ Αφηγήσεις</span>
+          <span class="chip">📈 Στατιστικά</span>
+          <span class="chip">📱 Συμβατότητα με Smartphone</span>
+          <span class="chip">📈 Συμβατότητα με Tablet</span>
+        </div>
+
+        <p class="help" style="margin-top:14px">
+          <b>Σημαντικό:</b> Εργαζόμαστε εντατικά να διαθέσουμε όλα τα διαδραστικά μας βιβλία στο Google Play Store. Συνδεθείτε μαζί μας μέσω της φόρμας επικονωνίας ή τα μέσα κοινωνικής δίκτυωσης για να μαθαίνετε όλα τα τελευταία νέα μας.
+        </p>
+
+        
+      </div>
+
+      <div class="card device reveal" aria-label="Mockup βασικών δυνατοτήτων (Play Store)">
+        <div class="phone" role="img" aria-label="Mock κινητού με εικονίδια δυνατοτήτων">
+          <div class="top">Προβολή σε έξυπνο τηλέφωνο</div>
+          <div class="screen">
+            <div class="screenContent">
+              <div class="screenTitle">
+                <span id="featTitle">Γλωσσάρι</span>
+                <span class="badge" id="featBadge">Έννοιες & όροι</span>
+              </div>
+              <div class="screenBox" id="featBody">
+        <img class="shotBg" src="glossari.png" alt="Γλωσσάρι — iPedia Reader" loading="lazy">
+        <div class="shotShade" aria-hidden="true"></div>
+        <div class="shotOverlay">
+          <div class="shotCopy">
+            <div><b>Βρες άμεσα</b> έννοιες, ορισμούς και βασικούς όρους.</div>
+        <div class="muted">Ιδανικό για επανάληψη πριν από τεστ ή άσκηση.</div>
+          </div>
+</div></div>
+              <div class="dock" id="dock" aria-label="Εικονίδια δυνατοτήτων">
+                <button class="appIcon active" data-feat="glossary" aria-label="Γλωσσάρι" type="button"></button>
+                <button class="appIcon" data-feat="bookmarks" aria-label="Σελιδοδείκτες" type="button"></button>
+                <button class="appIcon" data-feat="notes" aria-label="Σημειώσεις" type="button"></button>
+                <button class="appIcon" data-feat="results" aria-label="Αποτελέσματα τεστ" type="button"></button>
+                <button class="appIcon" data-feat="xp" aria-label="Κερδισμένη XP" type="button"></button>
+                <button class="appIcon" data-feat="leaderboard" aria-label="Πίνακας Κατάταξης" type="button"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="timelineWrap reveal timelineOutside">
+          <button class="btn timelineToggle js-timeline-toggle" type="button" aria-expanded="false" aria-controls="ipediaTimeline">
+            📅 Χρονολόγιο iPedia (2011–2026)
+            <span class="tlHint">Άνοιγμα</span>
+          </button>
+
+          <div class="timelinePanel" id="ipediaTimeline" aria-hidden="true">
+            <div class="timelinePanelHeader">
+              <b>Η πορεία μας ανά έτος</b>
+              <span class="pill" aria-hidden="true" style="padding:8px 10px; font-size:12px"><span class="dot"></span> iPedia</span>
+            </div>
+            <p class="timelinePanelNote">Μια σύντομη ματιά στα βασικά σημεία εξέλιξης της iPedia — από το 2011 έως το 2026.</p>
+
+            <div class="tlBar" role="tablist" aria-label="Χρονολόγιο iPedia (ανά έτος)">
+              <button class="tlYearBtn is-active" type="button" data-year="2011" role="tab" aria-selected="true">2011</button>
+              <button class="tlYearBtn" type="button" data-year="2012" role="tab" aria-selected="false">2012</button>
+              <button class="tlYearBtn" type="button" data-year="2013" role="tab" aria-selected="false">2013</button>
+              <button class="tlYearBtn" type="button" data-year="2014" role="tab" aria-selected="false">2014</button>
+              <button class="tlYearBtn" type="button" data-year="2015" role="tab" aria-selected="false">2015</button>
+              <button class="tlYearBtn" type="button" data-year="2016" role="tab" aria-selected="false">2016</button>
+              <button class="tlYearBtn" type="button" data-year="2017" role="tab" aria-selected="false">2017</button>
+              <button class="tlYearBtn" type="button" data-year="2018" role="tab" aria-selected="false">2018</button>
+              <button class="tlYearBtn" type="button" data-year="2019" role="tab" aria-selected="false">2019</button>
+              <button class="tlYearBtn" type="button" data-year="2020" role="tab" aria-selected="false">2020</button>
+              <button class="tlYearBtn" type="button" data-year="2021" role="tab" aria-selected="false">2021</button>
+              <button class="tlYearBtn" type="button" data-year="2022" role="tab" aria-selected="false">2022</button>
+              <button class="tlYearBtn" type="button" data-year="2023" role="tab" aria-selected="false">2023</button>
+              <button class="tlYearBtn" type="button" data-year="2024" role="tab" aria-selected="false">2024</button>
+              <button class="tlYearBtn" type="button" data-year="2025" role="tab" aria-selected="false">2025</button>
+              <button class="tlYearBtn" type="button" data-year="2026" role="tab" aria-selected="false">2026</button>
+            </div>
+
+            <div class="tlDetails" id="tlDetails" role="region" aria-label="Περιγραφή επιλεγμένου έτους">
+              <div class="tlDetailsHead">
+                <span class="tlBadge">Επιλεγμένο έτος</span>
+                <span class="tlSelectedYear">2011</span>
+              </div>
+              <div class="tlSelectedText"><b>Η αρχή.</b> Γεννιέται η ιδέα της iPedia ως εκπαιδευτικό εγχείρημα με στόχο υλικό που είναι ξεκάθαρο, όμορφο και πρακτικό.</div>
+            </div>
+
+            <div class="tlEvents" hidden>
+              <div class="tlEvent" data-year="2011"><b>Η αρχή</b><br> Γεννιέται η ιδέα της iPedia ως εκπαιδευτικό εγχείρημα με στόχο τη δημιουργία διαδραστικών ηλεκτρονικών βιβλίων που θα είναι ξεκάθαρα, όμορφα και πρακτικά. Βασική σκέψη: τα ψηφιακά εργαλεία (ψηφιακή μετάβαση της εκπαίδευσης) είναι προς όφελος του μαθητή.</div>
+
+              <div class="tlEvent" data-year="2012"><b>Το πρώτο εγχείρημα</b><br> Εκδίδεται το πρώτο εγχείρημα της iPedia που αφορά των Φυσική της Γ Γυμνασίου. Περιλαμβάνει παρουσιάσεις, βιντεοασκήσεις, εικόνες, διαδραστικό γλωσσάρι κλπ</div>
+
+              <div class="tlEvent" data-year="2013"><b>Νέα προσέγγιση</b><br> Αποφασίζεται η δημιουργία ενός βιβλίου για τον Παρθενώνα. Έτσι, ξεκινά η ανάπτυξη μιας ολοκληρωμένης τρισδιάστατης ψηφιακής αναπαράστασης του ναού πάνω στην οποία θα βασιστεί το βιβλίο.</div>
+
+              <div class="tlEvent" data-year="2014"><b>Ο Παρθενώνας σε 3D</b><br> Εκδίδουμε το βιβλίο: Ο Παρθενώνας στις τρεις διαστάσεις. Το βιβλίο αυτό αποτελεί έναυσμα για την προσθήκη περισσότερων διαδραστικών στοιχείων στα βιβλία μας. </div>
+
+              <div class="tlEvent" data-year="2015"><b>Η προσέγγιση της παγκόσμιας αγοράς</b><br> Εκδίδεται η αγγλική έκδοση του διαδραστικού βιβλίου του Παρθενώνα. Παράλληλα, εκδίδονται Εισαγωγή στην Θερμοδυναμική και Οι νόμοι των Αερίων που περιλαμβάνουν νέες και μοναδικές διαδραστικές εμπειρίες. Ιδρύεται το κανάλι της iPedia στο YouTube.</div>
+
+              <div class="tlEvent" data-year="2016"><b>Επιβράβευση της προσέγγισης μας</b><br> Εκδίδεται το βιβλίο Κινηματική Α Λυκείου και τοποθετείται στα Νέα και Αξιοσημείωτα βιβλια στο Apple Books. Παράλληλα, μέλη της Αυστραλιανής επιτροπής για την επιστροφή των Γλυπτών του Παρθενώνα δείχνουν ενδιαφέρον για το εγχείρημα του βιβλίου του Παρθενώνα και συμβάλουν έμπρακτα στην προώθηση και διάδοση του βιβλίου.</div>
+
+              <div class="tlEvent" data-year="2017"><b>Μελέτη και διευρεύνηση</b><br> Χρονιά διαβάσματος και έρευνας. Αυτοματοποίηση, περιεχόμενο, νέες αγορές. Πρώτες σκέψεις να διαθέσουμε τα βιβλία μας στο οικοσύστημα της Google και το Android.</div>
+
+              <div class="tlEvent" data-year="2018"><b>Νέα βιβλία στην Α Λυκείου</b><br> Έκδοση των βιβλίων Τράπεζα θεμάτων και Δυναμική Α Λυκείου. Η μη υποστήριξη των βιβλίων μας στο Google Play Store προβληματίζει. Εξερευνούνται εναλλακτικές.</div>
+
+              <div class="tlEvent" data-year="2019"><b>Χρονιά επιδημίας</b><br> Χρόνος για μελέτη, έρευνας και ενημέρωσης των βιβλίων μας. Ενισχύεται η παρουσία της iPedia με περισσότερα εκπαιδευτικά βίντεο στο YouTube.</div>
+
+              <div class="tlEvent" data-year="2020"><b>Η αναπάντεχη ώθηση</b><br> Κατά την διάρκεια της επιδημίας οι πωλήσεις εκτοξεύονται και στο Top 10 της κατηγορίας Σχολικά Βιβλία του Apple Books φιγουράρουν 5 τίλτοι μας. Εκδίδονται τα διαδραστικά βιβλία Ηλεκτρομαγνητισμός Γ Λυκείου και Οριζόντια Βολή. Το κανάλι μας στο YouΤube φτάνει τους 4000 συνδρομητές!</div>
+
+              <div class="tlEvent" data-year="2021"><b>Ενημερώσεις</b><br> Στόχος: άψογη λειτουργία σε κινητό και tablet, με responsive σχεδίαση και σταθερότητα. Η Google συνεχίζει να αγνοεί την λεννοιτα του διαδραστικού βιβλίου. Ανεβάουμε στην Amazon μια ψηφιακά «φτωχή» έκδοση του βιβλίου του Παρθενώνα καθώς υποστηρίζεται μόνο εικόνα, βίντεο και ήχος.</div>
+
+              <div class="tlEvent" data-year="2022"><b>Εμπλουτισμός</b><br> Μεγαλώνει η συλλογή εφαρμογών/μοντέλων και η ποικιλία δραστηριοτήτων. Ξεκινά η συγγραφή του διαδραστικού βιβλίο Ενέργεια Α Λυκείου. Οι συνδρομητές στο κανάλι μας στο YouTube φτάνουν τους 5500!</div>
+
+              <div class="tlEvent" data-year="2023"><b>Νέα προγράμματα σπουδών</b><br> Δημοσιεύονται τα νέα προγράμματα σπουδών από το Υπουργείο Παιδείας. Ξεκινά ένας νέος κύκλος ενημερώσεων των βιβλίων μας ώστε να εναρμονιστούν στα νέα προγράμματα.</div>
+
+              <div class="tlEvent" data-year="2024"><b>Νέα σειρά βοηθημάτων στο Γυμνάσιο.</b> Εκδίδεται μια νέα σειρά διαδραστικών βιβλίων για τη Φυσική του Γυμνασίου με το ίδιο ύφος και σχεδίαση. Περιλαμβάνονται πια προσομοιώσεις, πειράματα, έξυπνα τεστ κλπ</div>
+
+              <div class="tlEvent" data-year="2025"><b>Ενιαίο οικοσύστημα</b><br> Περιεχόμενο, 3D εφαρμογές και δοκιμασίες δένουν σε μια ομοιόμορφη εμπειρία ανάγνωσης. Έναρξη σχεδιάσμου του διαδραστικού βιβλίου - εφαρμογή για το Android. (Google, δεν μπορούμε να σε περιμένουμε άλλο!)</div>
+
+              <div class="tlEvent" data-year="2026"><b>Σήμερα</b><br> Ολόκληρώθηκε η δομή του βιβλίου που θα διαθέτουμε στο Google Play store. Πραγματοποιείται η δημιουργία και η ανάπτυξη του περιεχομένου του διαδραστικού βιβλίου Ηλεκτρομαγνητισμός Γυμνασίου που θα διατεθεί σύντομα στο Play Store. Παράλληλα, εστιάζουμε σε μετατροπή περιεχομένου σε interactive, βελτιώσεις και νέες κυκλοφορίες σε Apple & Android. Συνδρομητές στο YouTube: 7500!</div>
+            </div>
+
+</div>
+        </div>
+
+
+    </div>
+  </section>
+
+  <!-- ΤΙ ΔΟΥΛΕΥΟΥΜΕ ΤΩΡΑ -->
+  <section class="section nowSection" id="now">
+    <div class="wrap">
+      <div class="card nowCard reveal">
+        <div class="nowHead">
+          <span class="pill"><span class="dot"></span> Τι δουλεύουμε τώρα</span>
+          <span class="nowLive"><span class="nowPulse" aria-hidden="true"></span> Σε εξέλιξη</span>
+        </div>
+
+        <div class="nowGrid">
+          <div>
+            <p class="nowLead">
+              Λίγα πράγματα που τρέχουν αυτή την περίοδο στην iPedia — μικρές βελτιώσεις, νέες κυκλοφορίες και περισσότερη διαδραστικότητα.
+            </p>
+
+            <div class="nowStack" aria-label="Τρέχοντα έργα">
+            <div class="nowItem">
+              <b><span class="chip chip-has-ico"><img class="chip-ico" src="https://img.icons8.com/?size=100&id=Qn4GH3u6CYo5&format=png&color=000000" alt="Google Play" loading="lazy" decoding="async"></span> Android βιβλίο: Ηλεκτρομαγνητισμός Γυμνασίου</b>
+              <span>Ολοκλήρωση περιεχομένου & σταθερότητα σε κινητό/τάμπλετ (Play Store). Στείλτε μας ένα μήνυμα μέσω της φόρμας επικονωνίας για να σας ενημερώσουμε για το πότε θα είναι διαθέσιμη για κατέβασμα.</span>
+            </div>
+            <div class="nowItem">
+              <b>🧊 Νέες 3D εφαρμογές</b>
+              <span>Περισσότερα μοντέλα, προσομοιώσεις και διαδραστικά πειράματα.</span>
+            </div>
+            <div class="nowItem">
+              <b>📚 Ενημέρωση υλικού</b>
+              <span>Παράλληλα ενημερώνεται το κεφάλαιο Ηλεκτρομαγνητισμός του βιβλίου Φυσική Γ Γυμνασίου του Apple Books.</span>
+            </div>
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="section" id="about">
+    <div class="wrap">
+      <div class="grid" style="gap:14px">
+        <div class="reveal">
+          <h2>Γιατί «Interactive» βιβλίο;</h2>
+   
+
+        <div class="grid featuresGrid">
+          <div class="card feature reveal">
+            <div class="icon" aria-hidden="true">⚡</div>
+            <h3>Μάθηση με δράση</h3>
+            <p>Ο μαθητής πειραματίζεται, αλλάζει παραμέτρους, βλέπει άμεσα αποτέλεσμα, κατανοεί βαθύτερα.</p>
+          </div>
+          <div class="card feature reveal">
+            <div class="icon" aria-hidden="true">🧠</div>
+            <h3>Επανάληψη που «κολλάει»</h3>
+            <p>Τεστ, περιλήψεις, ερωτήσεις ανάπτυξης και κλιμακωτές δοκιμασίες, με άμεση ανατροφοδότηση.</p>
+          </div>
+          <div class="card feature reveal">
+            <div class="icon" aria-hidden="true">🎯</div>
+            <h3>Πρόοδος που φαίνεται</h3>
+            <p>XP, επίπεδα, ορόσημα και κατάταξη: κίνητρο χωρίς άγχος, με στόχους και επιβράβευση.</p>
+          </div>     
+        </div>
+<br>
+        <div class="card pad reveal">
+          <div class="split">
+            <div>
+              <h3 style="margin:0 0 10px; font-size: 18px">Πού διατίθενται τα βιβλία;</h3>
+              <ul class="list">
+                <li>
+                  <span class="check" aria-hidden="true">✓</span>
+                  <span><b>Apple Books</b>: η παραδοσιακή εμπειρία Multi‑touch ebook.</span>
+                </li>
+                <li>
+                  <span class="check" aria-hidden="true">✓</span>
+                  <span><b>Google Play / Android</b>: διαδραστικά βιβλία με στοιχεία εφαρμογών, με κοινή δομή/δυνατότητες.</span>
+                </li>
+                <li>
+                  <span class="check" aria-hidden="true">✓</span>
+                  <span>Στόχος μας: να διαθέσουμε σταδιακά <b>όλα</b> τα βιβλία και στο Play Store.</span>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 style="margin:0 0 10px; font-size: 18px">Τι κερδίζει ο αναγνώστης;</h3>
+              <ul class="list">
+                <li><span class="check" aria-hidden="true">✓</span><span>Βαθύτερη κατανόηση των εννοιών.</span></li>
+                <li><span class="check" aria-hidden="true">✓</span><span>Ενεργή συμμετοχή αντί για παθητική ανάγνωση.</span></li>
+                <li><span class="check" aria-hidden="true">✓</span><span>Μελέτη «σε κομμάτια»: αλληλεπίδραση, δοκμασίες/προκλήσεις, τεστ.</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </section>
+
+  <!-- PLAY STORE STRUCTURE -->
+  <section class="section" id="play-structure">
+    <div class="wrap">
+      <div class="reveal">
+        <h2>Play Store — βασική δομή & δυνατότητες</h2>
+        <p class="lead">
+          Τα βιβλία που διατίθενται στο Google Play έχουν κοινή «ραχοκοκαλιά»,
+          ώστε ο χρήστης να νιώθει οικεία από το πρώτο λεπτό.
+          Παρακάτω παρουσιάζονται οι βασικές κάρτες/λειτουργίες που συναντάς μέσα στην εφαρμογή‑βιβλίο.
+        </p>
+      </div>
+
+      <div class="grid featuresGrid" style="margin-top:16px">
+        <div class="card feature reveal">
+          <div class="icon" aria-hidden="true">📚</div>
+          <h3>Γλωσσάρι</h3>
+          <p>Όροι, έννοιες και σύντομες επεξηγήσεις μέσα σε δευτερόλεπτα, από όπου κι αν βρίσκεσαι στο βιβλίο.</p>
+        </div>
+        <div class="card feature reveal">
+          <div class="icon" aria-hidden="true">🔖</div>
+          <h3>Σελιδοδείκτες</h3>
+          <p>Αποθήκευσε σημεία μέσα στο βιβλίο. Γρήγορη επιστροφή με ένα tap.</p>
+        </div>
+        <div class="card feature reveal">
+          <div class="icon" aria-hidden="true">📝</div>
+          <h3>Σημειώσεις</h3>
+          <p>Κράτησε προσωπικές σημειώσεις πάνω σε κομμάτια κειμένου. Το βιβλίο γίνεται «δικό σου».</p>
+        </div>
+        <div class="card feature reveal">
+          <div class="icon" aria-hidden="true">📈</div>
+          <h3>Αποτελέσματα τεστ</h3>
+          <p>Ιστορικό επιδόσεων, γραφήματα προόδου και εικόνα της βελτίωσης σου με τον χρόνο.</p>
+        </div>
+        <div class="card feature reveal">
+          <div class="icon" aria-hidden="true">🏆</div>
+          <h3>Κερδισμένη XP</h3>
+          <p>Συνολική εμπειρία, επίπεδα και ορόσημα. Ανάλυση κερδισμένης XP ανά ενότητα/δοκιμασία.</p>
+        </div>
+        <div class="card feature reveal">
+          <div class="icon" aria-hidden="true">🏅</div>
+          <h3>Πίνακας Κατάταξης</h3>
+          <p>Δες το TOP 10 και τη θέση σου. Ένα επιπλέον κίνητρο για συνέπεια στη μελέτη.</p>
+        </div>
+      </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section class="section" id="content">
+    <div class="wrap">
+      <div class="reveal">
+        <h2>Τι περιεχόμενο θα βρεις στα βιβλία μας</h2>
+        <p class="lead">
+          Ο στόχος μας είναι να «δέσουμε» θεωρία, παραδείγματα και εξάσκηση μέσα σε ένα ενιαίο οικοσύστημα.
+          Τα παρακάτω στοιχεία συνδυάζονται ώστε ο μαθητής να κατανοεί βαθύτερα και να χτίζει αυτοπεποίθηση.
+        </p>
+      </div>
+
+      <div class="grid featuresGrid" style="margin-top:16px">
+        <div class="card feature reveal">
+          <div class="icon" aria-hidden="true">🧊</div>
+          <h3>3D εφαρμογές</h3>
+          <p>Τρισδιάστατα μοντέλα και εφαρμογές (π.χ. κυκλώματα, γεννήτριες, ανεμογεννήτριες) για «μάθηση με αλληλεπίδραση».</p>
+        <div class="featureActions">
+            <button class="btn primary js-open-iframe" type="button"
+                    data-iframe-src="EarthMagneticField.html"
+                    data-iframe-title="Το Γεωμαγνητικό Πεδίο">
+              Δείγμα
+            </button>
+          </div>
+        </div>
+        <div class="card feature reveal">
+          <div class="icon" aria-hidden="true">🧪</div>
+          <h3>Έξυπνα Τεστ</h3>
+          <p>Έλεγξε αμέσως την επίδοση σου. Το αποτέλεσμα εμφανίζεται άμεσα!</p>
+        </div>
+        <div class="card feature reveal">
+          <div class="icon" aria-hidden="true">🧾</div>
+          <h3>Ερωτήσεις πολλαπλής επιλογής</h3>
+          <p>Συμπλήρωση κενών & ερωτήσεις Σωστού / Λάθους. Ιδανικά πριν το διαγώνισμα.</p>
+        </div>
+        <div class="card feature reveal">
+          <div class="icon" aria-hidden="true">🗣️</div>
+          <h3>Ερωτήσεις ανάπτυξης</h3>
+          <p>Ενίσχυση επιχειρηματολογίας και κατανόησης εννοιών με δομημένη απάντηση και κριτήρια.</p>
+        <div class="featureActions">
+            <button class="btn primary js-open-iframe" type="button"
+                    data-iframe-src="MiniRevealQuestion.html"
+                    data-iframe-title="Ερωτήσεις ανάπτυξης — Δείγμα">
+              Δείγμα
+            </button>
+          </div>
+        </div>
+        <div class="card feature reveal">
+          <div class="icon" aria-hidden="true">🧩</div>
+          <h3>Δοκιμασίες / Προκλήσεις</h3>
+          <p>Μικρά στοχευμένα «mini‑μαθήματα» στην ουσία της ύλης που κρατούν ενεργή την προσοχή.</p>
+        <div class="featureActions">
+            <button class="btn primary js-open-iframe" type="button"
+                    data-iframe-src="EMEffectLesson.html"
+                    data-iframe-title="Δοκιμασίες / Προκλήσεις — Δείγμα">
+              Δείγμα
+            </button>
+          </div>
+        </div>
+        <div class="card feature reveal">
+          <div class="icon" aria-hidden="true">🎙️</div>
+          <h3>Αφηγήσεις</h3>
+          <p>Υψηλής ποιότητας ηχητικές περιγραφές για τους ακουστικούς μαθητές.</p>
+        <div class="featureActions">
+            <button class="btn primary js-play-audio" type="button"
+                    data-audio-src="GeoMagneticNar.mp3"
+                    aria-label="Αναπαραγωγή αφήγησης (GeoMagneticNar.mp3)">
+              Δείγμα
+            </button>
+          </div>
+        </div>
+  <div class="card feature reveal">
+          <div class="icon" aria-hidden="true">🎙️</div>
+          <h3> Προσομοιώσεις / Πειράματα</h3>
+          <p>Προσομοιώσεις φαινομένων με "pro" δυνατότητες και συνοδευτικές πειραματικές διαδικασίες.<br> <strong>Θυμίσου:</strong> η φυσική είναι η επιστήμη της παρατήρησης!</p>
+        </div>
+
+        <div class="card feature reveal">
+          <div class="icon" aria-hidden="true">👁️</div>
+          <h3>Επίδειξη εφαρμογής</h3>
+          <p>
+            Άνοιξε ένα ζωντανό demo και <b>πάτησε το κουμπί «Ξενάγηση»</b> μέσα στην εφαρμογή.
+          </p>
+          <div class="featureActions">
+            <button class="btn primary js-open-iframe" type="button"
+                    data-iframe-src="EmAppDemo.html"
+                    data-iframe-title="Επίδειξη εφαρμογής — EmAppDemo">
+              Επίδειξη εφαρμογής
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="notice reveal" style="margin-top:14px">
+        Το διαδραστικό βιβλίο Ηλεκτρομαγνητισμός Γυμνασίου θα είναι διαθέσιμο σύντομα στο Play Store. Εγγράψου στο newsletter μας για να λάβεις τη σχετική ενημέρωση. Είναι σημαντικό να γνωρίζεις ότι με την αγορά οποιουδήποτε βιβλίου μας από το Google Play Store αποκτάς και όλες τις μελλοντικές αναβαθμίσεις και ενημερώσεις του χωρίς καμία επιπλέον χρέωση. Δεν υπάρχουν συνδρομές, κρυφές χρεώσεις ή περιορισμοί πρόσβασης. Το βιβλίο αυτό είναι δικό σου — για πάντα.
+      </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- SKETCHFAB -->
+  <section class="section" id="sketchfab">
+    <div class="wrap">
+      <div class="reveal">
+        <h2>Ψηφιακό αποθετήριο τρισδιάστατων μοντέλων</h2>
+        <p class="lead">
+          Φιλοξενούμε πάνω από <strong>300 τρισδιάστατα μοντέλα</strong> στο ψηφιακό μας αποθετήριο, ως συνοδευτικό υλικό των διαδραστικών βιβλίων μας.
+          Μπορείς να τα περιστρέψεις, να κάνεις zoom και να τα ανοίξεις σε πλήρη οθόνη.
+        </p>
+</div>
+
+      <div class="sfGrid" id="sfGrid"></div>
+
+      <p class="sfNote reveal">
+        <strong>Tip:</strong> Πάνω στα μοντέλα υπάρχουν αριθμοί· πάτα πάνω τους για να δεις τον σχολιασμό.
+      </p>
+
+      <div class="reveal" style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap">
+        <a class="btn primary" href="https://sketchfab.com/iPedia/models" target="_blank" rel="noopener">
+          Άνοιγμα αποθετηρίου
+        </a>
+      </div>
+
+
+    </div>
+  </section>
+
+
+  <!-- APPLE BOOKS -->
+  <section class="section" id="applebooks">
+    <div class="wrap">
+      <noscript>
+        <div class="notice" style="margin-top:14px">
+          <b>Σημείωση:</b> Για να εμφανιστούν αυτόματα εξώφυλλα/περιγραφές Apple Books χρειάζεται JavaScript.
+          Μπορείς πάντα να ανοίξεις τους τίτλους απευθείας από το Apple Books.
+        </div>
+      </noscript>
+
+      <div class="reveal">
+        <h2>Διαθέσιμα διαδραστικά βιβλία στο Apple Books</h2>
+        <p class="lead">
+          Παρακάτω μπορείτε να εξερευνήσετε τα διαδραστικά βιβλία μας στο Apple Books. Αν διαθέτετε Apple συσκευή (iPhone, iPad, Mac) διατίθεται για σας δείγμα σε καθε τίτλο. Επισκεφθείτε την σελίδα του βιβλίου για να το προμηθευτείτε εντελώς δωρεάν! 
+        </p>
+        <div class="tabs" role="tablist" aria-label="Φίλτρα βιβλίων">
+          <button class="tab active" data-filter="all" type="button" role="tab" aria-selected="true">Όλα</button>
+          <button class="tab" data-filter="gymnasium" type="button" role="tab" aria-selected="false">Γυμνάσιο</button>
+          <button class="tab" data-filter="lyceum" type="button" role="tab" aria-selected="false">Λύκειο</button>
+          <button class="tab" data-filter="other" type="button" role="tab" aria-selected="false">Άλλα</button>
+        </div>
+      </div>
+
+      <div class="grid booksGrid" id="booksGrid" aria-live="polite" style="margin-top:16px">
+        <!-- filled by JS -->
+      </div>
+
+      <div class="notice reveal" style="margin-top:14px">
+        Είναι σημαντικό να γνωρίζεις ότι με την αγορά οποιουδήποτε βιβλίου μας από το Apple Books αποκτάς και όλες τις μελλοντικές αναβαθμίσεις και ενημερώσεις του χωρίς καμία επιπλέον χρέωση. Δεν υπάρχουν συνδρομές, κρυφές χρεώσεις ή περιορισμοί πρόσβασης. Το βιβλίο αυτό είναι δικό σου — για πάντα.
+      </div>
+    </div>
+  </section>
+
+  
+  <!-- YOUTUBE -->
+  <section class="section" id="youtube">
+    <div class="wrap">
+      <div class="reveal">
+        <h2>Η iPedia στο YouTube</h2>
+        <p class="lead">
+          Δες βίντεο από τα διαδραστικά μας βιβλία/βοηθήματα (περισσότερα από 250!). Η θεματολογία τους ξεκινά από την Α΄ Γυμνασίου και φτάνει μέχρι και τη Γ΄ Λυκείου.
+          Το κανάλι <b>iPedia (@iPediainteractivebooks)</b> είναι αφιερωμένο στην εκπαίδευση και στα διαδραστικά βοηθήματα της iPedia. Έχουμε χιλιάδες συνδρομητές. Γίνε και εσύ ένας από εμάς.
+        </p>
+      </div>
+
+      <div class="card pad reveal" style="margin-top:16px">
+        <div class="split">
+          <div>
+            <h3 style="margin:0 0 10px; font-size: 18px">Τι θα βρεις στο κανάλι μας</h3>
+            <ul class="list">
+              <li><span class="check" aria-hidden="true">✓</span><span> Βίντεο θεωρίας.</span></li>
+              <li><span class="check" aria-hidden="true">✓</span><span> Βίντεο-ασκήσεις από διάφορες ενότητες της Φυσικής (Γυμνάσιο & Λύκειο). </span></li>
+              <li><span class="check" aria-hidden="true">✓</span><span>Λίστες αναπαραγωγής οργανωμένες ανά διαδραστικό βιβλίο.</span></li>
+            </ul>
+
+            <div class="actions" style="margin-top:12px">
+              <a class="btn primary" href="https://www.youtube.com/@iPediainteractivebooks?sub_confirmation=1" target="_blank" rel="noopener">Εγγραφή</a>
+              <a class="btn" href="https://www.youtube.com/@iPediainteractivebooks/videos" target="_blank" rel="noopener">Δες τα βίντεο</a>
+              <a class="btn ghost" href="https://www.youtube.com/@iPediainteractivebooks/playlists" target="_blank" rel="noopener">Λίστες αναπαραγωγής</a>
+            </div>
+
+            <p class="help" style="margin-top:10px">
+              <strong>Tip για εκπαιδευτικούς:</strong> χρησιμοποίησε τα βίντεος ως «ανάθεση» για εργασία στο σπίτι ζητώντας από τους μαθητές να καθαρογράψουν την άσκηση του βίντεο στο τετράδιο τους.
+            </p>
+          </div>
+
+          <div>
+             
+            </p>
+            <div class="card" style="border-radius:22px; overflow:hidden; border:1px solid rgba(255,255,255,.12)">
+              <div style="position:relative; width:100%; aspect-ratio: 16/9; background: rgba(0,0,0,.22)">
+                <iframe title="iPedia YouTube video"
+                  style="position:absolute; inset:0; width:100%; height:100%; border:0"
+                  src="https://www.youtube.com/embed/3U1OYGQietY?si=UPxJedYFkxZiO-Nu"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen></iframe>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+    <!-- MINISTRY / PUBLIC INITIATIVE -->
+  <section class="section" id="ministry">
+    <div class="wrap">
+      <div class="reveal">
+        <h2>Προς μια νέα εποχή: διαδραστικά σχολικά βιβλία & μετατροπή περιεχομένου</h2>
+        <p class="lead">
+          Τα τελευταία χρόνια, το Υπουργείο Παιδείας έχει ενισχύσει τον επίσημο ψηφιακό χώρο διάθεσης σχολικών βιβλίων
+          (ebooks.edu.gr), με βιβλία σε ψηφιακές μορφές (pdf/html) και εμπλουτισμένα/διαδραστικά βιβλία.
+          Αυτό αλλάζει σταδιακά το τοπίο και ανοίγει νέες δυνατότητες για τη δημόσια και την ιδιωτική εκπαιδευτική κοινότητα.
+        </p>
+      </div>
+
+      <div class="card pad reveal" style="margin-top:16px">
+        <div class="split">
+          <div>
+            <h3 style="margin:0 0 10px; font-size: 18px">Τι αλλάζει για την εκπαιδευτική κοινότητα</h3>
+            <ul class="list">
+              <li><span class="check" aria-hidden="true">✓</span><span>Η διαδραστική μορφή ανεβάζει τον «πήχη» προσδοκιών σε μαθητές και εκπαιδευτικούς.</span></li>
+              <li><span class="check" aria-hidden="true">✓</span><span>Η ποιότητα πλέον κρίνεται στην πράξη: ροές μάθησης, εφαρμογές, ανατροφοδότηση, αξιοπιστία.</span></li>
+              <li><span class="check" aria-hidden="true">✓</span><span>Δημιουργούνται ευκαιρίες για συνεργασίες και συμπληρωματικό διαδραστικό υλικό στην ιδιωτική εκπαίδευση.</span></li>
+            </ul>
+          </div>
+          <div>
+            <h3 style="margin:0 0 10px; font-size: 18px">Η θέση μας</h3>
+            <p class="muted" style="margin:0">
+              Υποστηρίζουμε την εξέλιξη προς διαδραστικό υλικό, αλλά πιστεύουμε ότι η πραγματική αναβάθμιση
+              απαιτεί: σχεδίαση εμπειρίας, αξιόπιστες εφαρμογές, υψηλή αισθητική και μετρήσιμη μαθησιακή αξία.
+              Εκεί ακριβώς επενδύουμε.
+            </p>
+            <div class="actions" style="margin-top:12px">
+              <a class="btn primary" href="#book-conversion">Μετατροπή βιβλίου σε interactive</a>
+              <a class="btn" href="#contact">Μίλησε με την ομάδα</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal" style="margin-top:22px">
+        <h2 id="book-conversion">Αναλαμβάνουμε τη μετατροπή οποιουδήποτε βιβλίου σε διαδραστικό</h2>
+        <p class="lead">
+          Αν είσαι εκπαιδευτικός/συγγραφέας ή εκδοτικός φορέας και θέλεις να μετατρέψεις τα βιβλία σου σε διαδραστικά,
+          η ομάδα της iPedia μπορεί να αναλάβει όλη τη διαδικασία: από τη σχεδίαση έως την κυκλοφορία σε Apple Books και Android.
+        </p>
+      </div>
+
+      <div class="grid servicesGrid">
+        <div class="card pad reveal">
+          <h3 style="margin:0 0 10px; font-size: 18px">1) Σχεδίαση & Παιδαγωγική</h3>
+          <ul class="list">
+            <li><span class="check" aria-hidden="true">✓</span><span>Δομή κεφαλαίων, στόχοι, ροή μάθησης</span></li>
+            <li><span class="check" aria-hidden="true">✓</span><span>Επιλογή αλληλεπιδράσεων και δραστηριοτήτων</span></li>
+            <li><span class="check" aria-hidden="true">✓</span><span>Σενάρια χρήσης στην τάξη</span></li>
+          </ul>
+        </div>
+        <div class="card pad reveal">
+          <h3 style="margin:0 0 10px; font-size: 18px">2) Ανάπτυξη εφαρμογών</h3>
+          <ul class="list">
+            <li><span class="check" aria-hidden="true">✓</span><span>3D αναπαραστάσεις / προσομοιώσεις / πειράματα</span></li>
+            <li><span class="check" aria-hidden="true">✓</span><span>Τεστ, περιλήψεις, κλιμακωτές δοκιμασίες</span></li>
+            <li><span class="check" aria-hidden="true">✓</span><span>Σύστημα προόδου (XP), στατιστικά, UI/UX</span></li>
+          </ul>
+        </div>
+        <div class="card pad reveal">
+          <h3 style="margin:0 0 10px; font-size: 18px">3) Έκδοση & Διάθεση</h3>
+          <ul class="list">
+            <li><span class="check" aria-hidden="true">✓</span><span>Apple Books - Multi‑touch eBook</span></li>
+            <li><span class="check" aria-hidden="true">✓</span><span>Android app‑book (Google Play)</span></li>
+            <li><span class="check" aria-hidden="true">✓</span><span>Stand-alone app (να την διαθέσετε όπου εσείς θέλετε.)</span></li>
+  <li><span class="check" aria-hidden="true">✓</span><span>Έλεγχος & υποστήριξη</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="notice reveal" style="margin-top:14px">
+        Έχεις ήδη βιβλίο (pdf/word/pages κλπ) ή υλικό; Στείλε μας μήνυμα από τη φόρμας επικονωνίας και θα σου προτείνουμε πλάνο μετατροπής.
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  
+
+  <!-- CONTACT -->
+  <section class="section" id="contact">
+    <div class="wrap">
+      <div class="reveal">
+        <h2>Επικοινωνία & Newsletter</h2>
+        <p class="lead">
+          Άφησε τα στοιχεία σου για να σου στέλνουμε ενημερώσεις (νέες εκδόσεις, δείγματα, εκπαιδευτικές ιδέες, μετατροπή βιβλίου κλπ).        
+        </p>
+      </div>
+<br>
+      <div class="card formWrap reveal">
+        <form id="contactForm" novalidate>
+          <div class="row2">
+            <div class="field">
+              <input class="input" id="name" name="name" type="text" placeholder=" " required minlength="2" autocomplete="name" />
+              <label for="name">Ονοματεπώνυμο *</label>
+            </div>
+            <div class="field">
+              <input class="input" id="email" name="email" type="email" placeholder=" " required autocomplete="email" />
+              <label for="email">Email *</label>
+            </div>
+          </div>
+
+          <div class="row2">
+            <div class="field">
+              <select id="country" name="country" required aria-label="Χώρα">
+                <option value="" selected disabled>Επίλεξε χώρα…</option>
+              </select>
+              <label for="country"></label>
+            </div>
+            <div class="field">
+              <select id="role" name="role" required aria-label="Ιδιότητα">
+                <option value="" selected disabled>Επίλεξε ιδιότητα…</option>
+                <option>Μαθητής</option>
+			<option>Γονέας</option>
+			<option>Εκπαιδευτικός</option>
+                <option>Φροντιστήριο</option>
+                <option>Δημόσιο Σχολείο</option>
+                <option>Ιδιωτικό Σχολείο</option>
+                <option>Οργανισμός</option>
+                <option>Μουσείο</option>
+                <option>Άλλο</option>
+              </select>
+              <label for="role"> </label>
+            </div>
+          
+          <div class="field">
+            <input class="input" id="city" name="city" type="text" placeholder=" " autocomplete="address-level2" />
+            <label for="city">Πόλη</label>
+          </div>
+
+</div>
+
+          <div class="field">
+            <textarea id="message" name="message" placeholder=" "></textarea>
+            <label for="message">Μήνυμα (προαιρετικό)</label>
+          </div>
+
+          <div class="notice">
+            <b>Σημαντικό:</b> Χρησιμοποιούμε τα στοιχεία μόνο για ενημερώσεις της iPedia.
+            Μπορείς να ζητήσεις διαγραφή/απεγγραφή οποιαδήποτε στιγμή.
+          </div>
+
+          <div class="row2" style="align-items:center">
+            <button class="btn primary" type="submit" data-no-sfx="1">Εγγραφή / Αποστολή</button>
+     
+          </div>
+
+
+        </form>
+      </div>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap footGrid">
+    <div>
+      <b>iPedia Interactive Books</b><br>
+      <span class="muted">Διαδραστικά βιβλία και εφαρμογές.</span><br>
+      <span class="muted">© <span id="year"></span> • Όλα τα δικαιώματα διατηρούνται.</span>
+    </div>
+    <div class="social" aria-label="Social media (footer)">
+      <a href="https://www.facebook.com/ipediaforall/" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M14 8.6V7.2c0-.7.4-1.2 1.3-1.2h1.2V3h-2c-2.3 0-3.7 1.4-3.7 3.8v1.8H9v3h1.6V21H14v-9.4h2.4l.4-3H14Z" fill="currentColor"/></svg>
+      </a>
+      <a href="https://www.tiktok.com/@ipediaebooks?_r=1&_t=ZN-93y4rR3vLMc" target="_blank" rel="noopener" aria-label="TikTok" title="TikTok">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M16.6 6.2a5.2 5.2 0 0 1-2.7-2.9V16a4.8 4.8 0 1 1-4-4.7v2.6a2.2 2.2 0 1 0 1.4 2.1V2.8h2.6c.2 1 .8 2 1.5 2.7.7.7 1.7 1.2 2.7 1.4v2.5Z" fill="currentColor"/></svg>
+      </a>
+      <a href="https://www.youtube.com/@iPediainteractivebooks" target="_blank" rel="noopener" aria-label="YouTube" title="YouTube">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M21.5 7.8a2.8 2.8 0 0 0-2-2C17.8 5.3 12 5.3 12 5.3s-5.8 0-7.5.5a2.8 2.8 0 0 0-2 2A29 29 0 0 0 2 12a29 29 0 0 0 .5 4.2 2.8 2.8 0 0 0 2 2c1.7.5 7.5.5 7.5.5s5.8 0 7.5-.5a2.8 2.8 0 0 0 2-2A29 29 0 0 0 22 12a29 29 0 0 0-.5-4.2ZM10.3 14.9V9.1L15.6 12l-5.3 2.9Z" fill="currentColor"/></svg>
+      </a>
+      <a href="https://x.com/iPediaEbooks" target="_blank" rel="noopener" aria-label="X" title="X">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M18.3 2H21l-6.3 7.2L22 22h-6.8l-5.3-7.6L3.3 22H1l6.8-7.8L2 2h6.9l4.8 6.9L18.3 2Zm-1.2 18h1.6L8 3.9H6.3l10.8 16.1Z" fill="currentColor"/></svg>
+      </a>
+      <a href="https://www.instagram.com/ipediainteractivebooks?igsh=am5rNHZ2YnJ2Zjhy&utm_source=qr" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M7.8 2h8.4A5.8 5.8 0 0 1 22 7.8v8.4A5.8 5.8 0 0 1 16.2 22H7.8A5.8 5.8 0 0 1 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2Zm8.3 2.2H7.9A3.7 3.7 0 0 0 4.2 8v8.1A3.7 3.7 0 0 0 7.9 19.8h8.1A3.7 3.7 0 0 0 19.8 16V8a3.7 3.7 0 0 0-3.7-3.8ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 2.2a2.8 2.8 0 1 0 0 5.6 2.8 2.8 0 0 0 0-5.6Zm6.4-.9a1.2 1.2 0 1 1 0 2.3 1.2 1.2 0 0 1 0-2.3Z" fill="currentColor"/></svg>
+      </a>
+    </div>
+  </div>
+</footer>
+
+
+  <!-- Iframe modal (for Δείγμα button) -->
+  <div class="modalRoot" id="iframeModal" aria-hidden="true">
+    <div class="modalBackdrop" data-iframe-close></div>
+
+    <div class="modalDialog" role="dialog" aria-modal="true" aria-labelledby="iframeModalTitle">
+      <div class="modalHead">
+        <div class="modalTitle" id="iframeModalTitle">Δείγμα</div>
+        <button class="btn modalClose" type="button" data-iframe-close>✕ Κλείσιμο</button>
+      </div>
+
+      <div class="modalBody">
+        <iframe id="iframeModalFrame" title="Δείγμα εφαρμογής" loading="lazy"></iframe>
+      </div>
+    </div>
+  </div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- SFX (place these files next to this HTML): WebSiteClick.mp3, tick.m4a, FormCompletion.mp3 -->
+<audio id="sfxClick" src="WebSiteClick.mp3" preload="auto" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none" aria-hidden="true"></audio>
+<audio id="sfxTick"  src="tick.m4a"        preload="auto" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none" aria-hidden="true"></audio>
+<audio id="sfxForm"  src="FormCompletion.mp3" preload="auto" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none" aria-hidden="true"></audio>
+
+<script>
+  // -----------------------------
+  // Fixed topbar spacer sync
+  // -----------------------------
+  const topbar = document.querySelector('header.topbar');
+  const topbarSpacer = document.querySelector('.topbarSpacer');
+  function syncTopbar(){
+    if(!topbar) return;
+    const h = topbar.offsetHeight || 64;
+    document.documentElement.style.setProperty('--topbarH', h + 'px');
+    if(topbarSpacer) topbarSpacer.style.height = h + 'px';
+  }
+  window.addEventListener('resize', syncTopbar);
+  window.addEventListener('orientationchange', syncTopbar);
+  requestAnimationFrame(syncTopbar);
+
+
+  // -----------------------------
+  // Mobile menu
+  // -----------------------------
+  const menuBtn = document.getElementById('menuBtn');
+  const drawer = document.getElementById('drawer');
+  function closeDrawer(){
+    if(drawer) drawer.classList.remove('show');
+    if(menuBtn) menuBtn.setAttribute('aria-expanded','false');
+  }
+  if(menuBtn && drawer) menuBtn.addEventListener('click', ()=>{
+    const open = drawer.classList.toggle('show');
+    menuBtn.setAttribute('aria-expanded', String(open));
+  });
+  if(drawer){
+    // Close the drawer when a link inside it is activated
+    drawer.addEventListener('click', (e)=>{
+      const t = e.target;
+      const link = (t && t.closest) ? t.closest('a[href]') : null;
+      if(link) closeDrawer();
+    }, true);
+  }
+  // Close on Escape
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape' && drawer && drawer.classList.contains('show')) closeDrawer();
+  }, true);
+
+  // -----------------------------
+  // Anchor scrolling with topbar offset (keeps section titles below the fixed UI)
+  // -----------------------------
+  function getAnchorPad(){
+    const v = getComputedStyle(document.documentElement).getPropertyValue('--anchorPad');
+    const n = parseFloat(v);
+    return Number.isFinite(n) ? n : 18;
+  }
+  function scrollToAnchor(targetEl, smooth){
+    if(!targetEl) return;
+    const topH = (topbar && topbar.offsetHeight) ? topbar.offsetHeight : 64;
+    const pad = getAnchorPad();
+    const y = targetEl.getBoundingClientRect().top + window.pageYOffset - topH - pad;
+    window.scrollTo({ top: Math.max(0, y), behavior: smooth ? 'smooth' : 'auto' });
+  }
+  // Intercept internal hash links and apply precise offset
+  document.addEventListener('click', (e)=>{
+    const a = e.target && e.target.closest ? e.target.closest('a[href^="#"]') : null;
+    if(!a) return;
+    const href = a.getAttribute('href') || '';
+    if(href === '#' || href.length < 2) return;
+    // Ignore if the element opted out
+    if(a.hasAttribute('data-no-anchor-offset')) return;
+
+    const id = decodeURIComponent(href.slice(1));
+    const el = document.getElementById(id);
+    if(!el) return;
+
+    e.preventDefault();
+    closeDrawer();
+    syncTopbar();
+    scrollToAnchor(el, true);
+    // Update URL hash without the browser's default jump
+    history.pushState(null, '', '#' + encodeURIComponent(id));
+  }, true);
+
+  // If the page loads with a hash, re-apply offset after the topbar height is known
+  window.addEventListener('load', ()=>{
+    if(!location.hash) return;
+    const id = decodeURIComponent(location.hash.slice(1));
+    const el = id ? document.getElementById(id) : null;
+    if(!el) return;
+    syncTopbar();
+    // Next frame, after layout settles
+    requestAnimationFrame(()=> scrollToAnchor(el, false));
+  });
+
+
+  // -----------------------------
+  // SFX (site clicks + dock ticks + form completion)
+  // -----------------------------
+  const SFX_FILES = {
+    click: "WebSiteClick.mp3",   // όλα τα κουμπιά/links εκτός dock & φόρμας
+    tick:  "tick.m4a",           // dock mock buttons (Feature dock)
+    form:  "FormCompletion.mp3"  // επιτυχής αποστολή φόρμας
+  };
+
+  const sfx = {
+    clickEl: document.getElementById('sfxClick'),
+    tickEl:  document.getElementById('sfxTick'),
+    formEl:  document.getElementById('sfxForm')
+  };
+
+  // Build absolute URLs (avoids base/relative quirks)
+  const sfxUrl = {
+    click: new URL(SFX_FILES.click, document.baseURI).href,
+    tick:  new URL(SFX_FILES.tick,  document.baseURI).href,
+    form:  new URL(SFX_FILES.form,  document.baseURI).href
+  };
+
+  // Keep <audio> elements aligned with the resolved URLs (also works on file://)
+  if(sfx.clickEl) sfx.clickEl.src = sfxUrl.click;
+  if(sfx.tickEl)  sfx.tickEl.src  = sfxUrl.tick;
+  if(sfx.formEl)  sfx.formEl.src  = sfxUrl.form;
+
+  // Optional WebAudio (more reliable/low-latency). Falls back to <audio> if blocked.
+  let _ctx = null;
+  let _buf = { click: null, tick: null, form: null };
+  let _loading = { click: false, tick: false, form: false };
+
+  function getCtx(){
+    if(_ctx) return _ctx;
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if(!Ctx) return null;
+    _ctx = new Ctx();
+    return _ctx;
+  }
+
+  async function loadBuffer(kind){
+    if(_buf[kind] || _loading[kind]) return;
+    _loading[kind] = true;
+    const ctx = getCtx();
+    if(!ctx) { _loading[kind] = false; return; }
+
+    // Αν τρέχεις το site ως file://, το fetch προς τοπικά αρχεία μπλοκάρεται (Safari/Chrome).
+    // Σε αυτή την περίπτωση χρησιμοποιούμε μόνο <audio> fallback.
+    if (location.protocol === 'file:'){
+      _buf[kind] = null;
+      _loading[kind] = false;
+      return;
+    }
+
+    try{
+      const res = await fetch(sfxUrl[kind], { cache: 'force-cache' });
+      if(!res.ok) throw new Error("HTTP " + res.status);
+      const arr = await res.arrayBuffer();
+      // slice() prevents some Safari decode edge cases with detached buffers
+      _buf[kind] = await ctx.decodeAudioData(arr.slice(0));
+    }catch(_){
+      _buf[kind] = null; // fetch may fail on file:// or due to CORS; we'll fallback to <audio>
+    }finally{
+      _loading[kind] = false;
+    }
+  }
+
+  function playViaWebAudio(kind, vol=1){
+    const ctx = getCtx();
+    if(!ctx || !_buf[kind]) return false;
+    try{
+      const g = ctx.createGain();
+      g.gain.value = Math.max(0, Math.min(1, Number(vol) || 1));
+      const src = ctx.createBufferSource();
+      src.buffer = _buf[kind];
+      src.connect(g);
+      g.connect(ctx.destination);
+      src.start(0);
+      return true;
+    }catch(_){
+      return false;
+    }
+  }
+
+  function playViaAudioEl(el, vol=1){
+    if(!el) return;
+    try{
+      // Clone gives a fresh playback head without touching currentTime (avoids some Safari/WebView quirks)
+      const a = el.cloneNode(true);
+      a.volume = Math.max(0, Math.min(1, Number(vol) || 1));
+
+      // keep it off-screen (like the originals)
+      a.style.position = 'absolute';
+      a.style.left = '-9999px';
+      a.style.width = '1px';
+      a.style.height = '1px';
+      a.style.opacity = '0';
+      a.style.pointerEvents = 'none';
+      a.setAttribute('aria-hidden','true');
+
+      document.body.appendChild(a);
+      const p = a.play();
+      if(p && typeof p.catch === 'function') p.catch(()=>{});
+      setTimeout(()=>{ try{ a.remove(); }catch(_){} }, 4000);
+    }catch(_){}
+  }
+
+  function playSfx(kindOrEl, vol=1){
+    const kind = (kindOrEl === 'click' || kindOrEl === 'tick' || kindOrEl === 'form') ? kindOrEl : null;
+    if(kind){
+      if(playViaWebAudio(kind, vol)) return;
+      const el = (kind === 'click') ? sfx.clickEl : (kind === 'tick' ? sfx.tickEl : sfx.formEl);
+      playViaAudioEl(el, vol);
+      return;
+    }
+    playViaAudioEl(kindOrEl, vol);
+  }
+
+  let _sfxPrimed = false;
+  async function primeSfx(){
+    if(_sfxPrimed) return;
+    _sfxPrimed = true;
+
+    const ctx = getCtx();
+    try{ if(ctx && ctx.state === 'suspended') await ctx.resume(); }catch(_){}
+
+    // Unlock HTMLAudioElement (best-effort)
+    [sfx.clickEl, sfx.tickEl, sfx.formEl].forEach(el=>{
+      if(!el) return;
+      try{
+        if(el.load) el.load();
+        const prev = el.volume;
+        el.volume = 0;
+        const p = el.play();
+        if(p && typeof p.then === 'function'){
+          p.then(()=>{ try{ el.pause(); }catch(_){} el.volume = prev; }).catch(()=>{ el.volume = prev; });
+        }else{
+          try{ el.pause(); }catch(_){}
+          el.volume = prev;
+        }
+      }catch(_){}
+    });
+
+    // Start loading WebAudio buffers (non-blocking; ok if it fails)
+    loadBuffer('click');
+    loadBuffer('tick');
+    loadBuffer('form');
+  }
+
+  // Prime ASAP on actual user gesture
+  window.addEventListener('pointerdown', primeSfx, {capture:true});
+  window.addEventListener('touchstart', primeSfx, {capture:true});
+  window.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter' || e.key === ' ') primeSfx();
+  }, true);
+
+  function isButtonLike(el){
+    if(!el) return false;
+    if(el.hasAttribute('data-no-sfx')) return false;
+    if(el.tagName === 'BUTTON') return true;
+    if(el.tagName === 'A' && el.getAttribute('href')) return true;
+    if(el.tagName === 'INPUT' && (el.type === 'button' || el.type === 'submit')) return true;
+    if(el.getAttribute('role') === 'button') return true;
+
+    const cls = el.classList;
+    if(cls && (cls.contains('btn') || cls.contains('cta') || cls.contains('menuBtn') || cls.contains('tab') || cls.contains('appIcon'))) return true;
+
+    return false;
+  }
+
+  function isDockIcon(el){
+    return !!(el && el.closest && el.closest('#dock .appIcon'));
+  }
+
+  function isContactSubmit(el){
+    if(!el || !el.closest) return false;
+    // handled in submit handler (valid => FormCompletion, invalid => WebSiteClick)
+    return !!el.closest('#contactForm button[type="submit"], #contactForm input[type="submit"]');
+  }
+
+  function closestSafe(target, selector){
+    if(!target) return null;
+    const el = (target.nodeType === 3) ? target.parentElement : target;
+    if(!el) return null;
+    return (el.closest) ? el.closest(selector) : null;
+  }
+
+  // Play SFX on "button-like" interactions (pointerdown beats navigation)
+  document.addEventListener('pointerdown', (e)=>{
+    const el = closestSafe(e.target, 'button, a[href], [role="button"], input[type="button"], input[type="submit"], .btn, .cta, .menuBtn, .tab, .appIcon');
+    if(!isButtonLike(el)) return;
+
+    // submit button sound is decided on submit (to avoid double sounds)
+    if(isContactSubmit(el)) return;
+
+    playSfx(isDockIcon(el) ? 'tick' : 'click', 1);
+  }, true);
+
+  // Keyboard activation (Enter/Space)
+  document.addEventListener('keydown', (e)=>{
+    if(!(e.key === 'Enter' || e.key === ' ')) return;
+    const el = closestSafe(e.target, 'button, a[href], [role="button"], input[type="button"], input[type="submit"], .btn, .cta, .menuBtn, .tab, .appIcon');
+    if(!isButtonLike(el)) return;
+    if(isContactSubmit(el)) return;
+
+    playSfx(isDockIcon(el) ? 'tick' : 'click', 1);
+  }, true);
+
+  // Keep legacy handles for existing calls (playSfx(sfx.formEl...))
+  sfx.click = sfx.clickEl;
+  sfx.tick  = sfx.tickEl;
+  sfx.form  = sfx.formEl;
+
+  // -----------------------------
+  // Sketchfab: 4 τυχαία από 10 δημοφιλή μοντέλα
+  // -----------------------------
+  (function(){
+    const grid = document.getElementById('sfGrid');
+    if(!grid) return;
+
+    const MODELS = [
+      { id: "f7f69a08ac7641aa91a041ea80473b78", title: "Η/Μ Γ Λυκείου | Μαγνητικό πεδίο αγωγού", desc: "Μαγνητικό πεδίο σε σημείο Α από δύο ευθύγραμμους αγωγούς με διαφορετικά ρεύματα." },
+      { id: "6667737b6b364227b61ffd755e1068e9", title: "iPedia | Το ηλιακό μας σύστημα", desc: "3D αναπαράσταση του ηλιακού μας συστήματος για εξερεύνηση πλανητών και τροχιών." },
+      { id: "49e6be54fca04acdafb4689a485059c3", title: "Το άτομο του μαγνησίου (Mg)", desc: "Το άτομο του Mg με τα ηλεκτρόνια κατανεμημένα σε στοιβάδες/τροχιές." },
+      { id: "1f7668ec5aff428582f21b856bc29809", title: "Ο ναός της Αθηνάς Νίκης (Ακρόπολη)", desc: "3D μοντέλο του ναού της Αθηνάς Νίκης — ιδανικό για μελέτη πριν από επίσκεψη στον χώρο." },
+
+      { id: "d279ed50f18242e18b02719e1279c003", title: "Δυναμό αυτοκινήτου", desc: "Η απεικόνιση του δυναμό (alternator) ενός αυτοκινήτου." },
+      { id: "ec877eaf6a9048d8aea4de796df770a1", title: "Το πρίσμα", desc: "Στρέψε ένα πρίσμα" },
+      { id: "b7439d4e6409484f984e9b9e54049c6b", title: "Ανατομία ματιού", desc: "Τα βασικά μέρη του ματιού." },
+      { id: "c2cd3c28f44b4af1a67ead3cb0619882", title: "Δυναμό ποδηλάτου", desc: "Μαγνήτης/πηνία και παραγωγή ηλεκτρικής ενέργειας με περιστροφή." },
+      { id: "e53fcf0558e34979bfd68571f64f0236", title: "Διάταξη δύναμης Laplace", desc: "Ρευματοφόρος αγωγός σε μαγνητικό πεδίο: κίνηση λόγω ηλεκτρομαγνητικής δύναμης (Laplace)." },
+      { id: "5980d78b5b644d8f9d3bd51cb49d6972", title: "Γεννήτρια Faraday", desc: "Η κλασική γεννήτρια που χρησιμοποίησε ο Faraday στα πειράματα του." }
+    ];
+
+    // Fisher–Yates shuffle
+    for(let i = MODELS.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = MODELS[i];
+      MODELS[i] = MODELS[j];
+      MODELS[j] = tmp;
+    }
+
+    const pick = MODELS.slice(0, 4);
+
+    grid.innerHTML = pick.map(m => `
+      <article class="card sfCard reveal">
+        <div class="sfEmbedWrap" aria-label="${m.title} (Sketchfab)">
+          <iframe
+            class="sfEmbed"
+            title="${m.title} — iPedia"
+            src="https://sketchfab.com/models/${m.id}/embed?autostart=0&ui_infos=0"
+            loading="lazy"
+            allow="autoplay; fullscreen; xr-spatial-tracking"
+            allowfullscreen
+            mozallowfullscreen="true"
+            webkitallowfullscreen="true"></iframe>
+        </div>
+        <div class="sfMeta">
+          <h3>${m.title}</h3>
+          <p>${m.desc}</p>
+        </div>
+      </article>
+    `).join('');
+  })();
+
+
+// -----------------------------
+// Reveal on scroll
+  // -----------------------------
+  const io = new IntersectionObserver((entries)=>{
+    for(const ent of entries){
+      if(ent.isIntersecting){
+        ent.target.classList.add('in');
+        io.unobserve(ent.target);
+      }
+    }
+  }, {threshold: .12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+  // -----------------------------
+  // Feature dock mock
+  // -----------------------------
+  const ICONS = {
+    glossary: `📚`,
+    notes: `📝`,
+    results: `📈`,
+    xp: `🏆`,
+    leaderboard: `🏅`,
+    bookmarks: `🔖`
+  };
+
+  const FEATS = {
+    glossary: {
+      title: "Γλωσσάρι",
+      badge: "Έννοιες & όροι",
+      body: `
+        <img class="shotBg" src="glossari.png" alt="Γλωσσάρι — iPedia Reader" loading="lazy">
+        <div class="shotShade" aria-hidden="true"></div>
+        <div class="shotOverlay">
+          <div class="shotCopy">
+            <div><b>Άμεση πρόσβαση</b> σε βασικούς όρους, έννοιες και ορισμούς.</div>
+        <div class="muted">Σχεδιασμένο για γρήγορη επανάληψη και «ξεμπλοκάρισμα» αποριών.</div>
+          </div>
+</div>`
+    },
+    bookmarks: {
+      title: "Σελιδοδείκτες",
+      badge: "Γρήγορη εύρεση",
+      body: `
+        <img class="shotBg" src="bookmark.png" alt="Σελιδοδείκτες — iPedia Reader" loading="lazy">
+        <div class="shotShade" aria-hidden="true"></div>
+        <div class="shotOverlay">
+          <div class="shotCopy">
+            <div><b>Αποθήκευσε</b> σημεία και ενότητες για να επιστρέφεις με 1 tap.</div>
+        <div class="muted">Ιδανικό όταν θέλεις να κρατήσεις «to‑study» λίστα.</div>
+          </div>
+</div>`
+    },
+    notes: {
+      title: "Σημειώσεις",
+      badge: "Απορίες και ερωτήσεις",
+      body: `
+        <img class="shotBg" src="notes.png" alt="Σημειώσεις — iPedia Reader" loading="lazy">
+        <div class="shotShade" aria-hidden="true"></div>
+        <div class="shotOverlay">
+          <div class="shotCopy">
+            <div><b>Κράτα σημειώσεις</b> πάνω σε επιλεγμένα κομμάτια κειμένου.</div>
+        <div class="muted">Το διάβασμα γίνεται προσωπικό και πιο αποτελεσματικό.</div>
+          </div>
+</div>`
+    },
+    results: {
+      title: "Αποτελέσματα τεστ",
+      badge: "Στατιστικά",
+      body: `
+        <img class="shotBg" src="testresults.png" alt="Αποτελέσματα τεστ — iPedia Reader" loading="lazy">
+        <div class="shotShade" aria-hidden="true"></div>
+        <div class="shotOverlay">
+          <div class="shotCopy">
+            <div><b>Ιστορικό επιδόσεων</b> και γραφήματα για να βλέπεις βελτίωση.</div>
+        <div class="muted">Χρήσιμο για στοχευμένη επανάληψη.</div>
+          </div>
+</div>`
+    },
+    xp: {
+      title: "Κέρδισε XP",
+      badge: "Επίπεδα & ορόσημα",
+      body: `
+        <img class="shotBg" src="xp.png" alt="Κερδισμένη XP — iPedia Reader" loading="lazy">
+        <div class="shotShade" aria-hidden="true"></div>
+        <div class="shotOverlay">
+          <div class="shotCopy">
+            <div><b>Συνολική εμπειρία</b>, επίπεδο και ορόσημα — με ανάλυση ανά ενότητα.</div>
+        <div class="muted">Επιβράβευση συνέπειας και ολοκλήρωσης.</div>
+          </div>
+</div>`
+    },
+    leaderboard: {
+      title: "Κατάταξη",
+      badge: "Εϊσαι στο TOP 10;",
+      body: `
+        <img class="shotBg" src="leaderboard.png" alt="Πίνακας κατάταξης — iPedia Reader" loading="lazy">
+        <div class="shotShade" aria-hidden="true"></div>
+        <div class="shotOverlay">
+          <div class="shotCopy">
+            <div><b>Δες την κατάταξη</b> και τη θέση σου, χωρίς να χάνεις το δικό σου ρυθμό.</div>
+        <div class="muted">Ένα επιπλέον κίνητρο — το παιχνίδι είναι η συνέπεια.</div>
+          </div>
+</div>`
+    }
+  };
+
+  // Fill dock icons
+  document.querySelectorAll('#dock .appIcon').forEach(btn=>{
+    const key = btn.dataset.feat;
+    btn.innerHTML = ICONS[key] || '•';
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('#dock .appIcon').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const f = FEATS[key];
+      document.getElementById('featTitle').textContent = f.title;
+      document.getElementById('featBadge').textContent = f.badge;
+      document.getElementById('featBody').innerHTML = f.body;
+    });
+  });
+
+  // -----------------------------
+  // Apple Books catalog (via iTunes lookup)
+  // -----------------------------
+  const BOOKS = [
+    // Gymnasium
+    {id: 6465691356, cat:"gymnasium", url:"https://books.apple.com/gr/book/%CF%86%CF%85%CF%83%CE%B9%CE%BA%CE%AE-a-%CE%B3%CF%85%CE%BC%CE%BD%CE%B1%CF%83%CE%AF%CE%BF%CF%85/id6465691356"},
+    {id: 672672178,  cat:"gymnasium", url:"https://books.apple.com/gr/book/%CF%86%CF%85%CF%83%CE%B9%CE%BA%CE%AE-%CE%B2-%CE%B3%CF%85%CE%BC%CE%BD%CE%B1%CF%83%CE%AF%CE%BF%CF%85/id672672178"},
+    {id: 1584700901, cat:"gymnasium", url:"https://books.apple.com/gr/book/%CF%86%CF%85%CF%83%CE%B9%CE%BA%CE%AE-%CE%B3-%CE%B3%CF%85%CE%BC%CE%BD%CE%B1%CF%83%CE%AF%CE%BF%CF%85/id1584700901"},
+
+    // Lyceum
+    {id: 1039955474, cat:"lyceum", url:"https://books.apple.com/gr/book/%CF%84%CF%85%CF%80%CE%BF%CE%BB%CF%8C%CE%B3%CE%B9%CE%BF-%CF%83%CF%84%CE%B7%CE%BD-%CF%86%CF%85%CF%83%CE%B9%CE%BA%CE%AE-a-%CE%BB%CF%85%CE%BA%CE%B5%CE%AF%CE%BF%CF%85/id1039955474"},
+    {id: 957948940,  cat:"lyceum", url:"https://books.apple.com/gr/book/%CE%B7-%CF%84%CF%81%CE%AC%CF%80%CE%B5%CE%B6%CE%B1-%CE%B8%CE%B5%CE%BC%CE%AC%CF%84%CF%89%CE%BD/id957948940?l=el"},
+    {id: 1289444127, cat:"lyceum", url:"https://books.apple.com/gr/book/%CE%BA%CE%B9%CE%BD%CE%B7%CE%BC%CE%B1%CF%84%CE%B9%CE%BA%CE%AE-%CE%B1-%CE%BB%CF%85%CE%BA%CE%B5%CE%AF%CE%BF%CF%85/id1289444127"},
+    {id: 1289175171, cat:"lyceum", url:"https://books.apple.com/gr/book/%CE%B4%CF%85%CE%BD%CE%B1%CE%BC%CE%B9%CE%BA%CE%AE-a-%CE%BB%CF%85%CE%BA%CE%B5%CE%AF%CE%BF%CF%85/id1289175171"},
+    {id: 1553254271, cat:"lyceum", url:"https://books.apple.com/gr/book/%CE%B7%CE%BB%CE%B5%CE%BA%CF%84%CF%81%CE%BF%CE%BC%CE%B1%CE%B3%CE%BD%CE%B7%CF%84%CE%B9%CF%83%CE%BC%CF%8C%CF%82/id1553254271"},
+    {id: 1500126000, cat:"lyceum", url:"https://books.apple.com/gr/book/%CE%BF%CF%81%CE%B9%CE%B6%CE%BF-%CE%BD%CF%84%CE%B9%CE%B1-%CE%B2%CE%BF%CE%BB%CE%B7/id1500126000"},
+    {id: 1048712551, cat:"lyceum", url:"https://books.apple.com/gr/book/%CE%BF%CE%B9-%CE%BD%CF%8C%CE%BC%CE%BF%CE%B9-%CF%84%CF%89%CE%BD-%CE%B1%CE%B5%CF%81%CE%AF%CF%89%CE%BD/id1048712551"},
+    {id: 1062955686, cat:"lyceum", url:"https://books.apple.com/gr/book/%CE%B5%CE%B9%CF%83%CE%B1%CE%B3%CF%89%CE%B3%CE%AE-%CF%83%CF%84%CE%B7%CE%BD-%CE%B8%CE%B5%CF%81%CE%BC%CE%BF%CE%B4%CF%85%CE%BD%CE%B1%CE%BC%CE%B9%CE%BA%CE%AE/id1062955686"},
+    {id: 6446159540, cat:"lyceum", url:"https://books.apple.com/gr/book/%CE%B5%CE%BD%CE%AD%CF%81%CE%B3%CE%B5%CE%B9%CE%B1-a-%CE%BB%CF%85%CE%BA%CE%B5%CE%AF%CE%BF%CF%85/id6446159540"},
+
+    // Other
+    {id: 888118174,  cat:"other", url:"https://books.apple.com/gr/book/%CE%BF-%CF%80%CE%B1%CF%81%CE%B8%CE%B5%CE%BD%CF%8E%CE%BD%CE%B1%CF%82/id888118174"},
+    {id: 1042471852, cat:"other", url:"https://books.apple.com/gr/book/the-parthenon-in-3d/id1042471852"},
+  ];
+
+// Στα κουμπιά «Δωρεάν δείγμα» χρησιμοποιούμε τα short links (apple.co),
+// χωρίς να πειράζουμε καθόλου το iTunes lookup (metadata/εξώφυλλα/περιγραφές).
+const SAMPLE_LINKS = {
+  1042471852: "https://apple.co/4fkokXv", // Parthenon in 3D
+  888118174:  "https://apple.co/3enqyrf", // Παρθενώνας
+  6465691356: "https://apple.co/3PcyFt5", // Φυσική Α Γυμνασίου
+  672672178:  "https://apple.co/3vccl7h", // Φυσική Β Γυμνασίου
+  1584700901: "https://apple.co/2WWPyk0", // Φυσική Γ Γυμνασίου
+  1289444127: "https://apple.co/32JOYFK", // Κινηματική Α Λυκείου
+  1289175171: "https://apple.co/32HYj0Q", // Δυναμική Α Λυκείου
+  6446159540: "https://apple.co/439iYcl", // Ενέργεια Α Λυκείου
+  1062955686: "https://apple.co/3nbKdhV", // Θερμοδυναμική Β Λυκείου
+  1048712551: "https://apple.co/3tJYF2V", // Νόμοι των αερίων Β Λυκείου
+  1500126000: "https://apple.co/3ncjn9g", // Οριζόντια βολή Β Λυκείου
+  957948940:  "https://apple.co/32DVePF", // Η Τράπεζα Θεμάτων
+  1039955474: "https://apple.co/3vjXfwj", // Τυπολόγιο
+  1553254271: "https://apple.co/3awKpTy"  // Ηλεκτρομαγνητισμός Γ Λυκείου
+};
+
+
+  const booksGrid = document.getElementById('booksGrid');
+
+  function bookSkeleton(){
+    const el = document.createElement('div');
+    el.className = 'card book';
+    el.innerHTML = `
+      <div class="cover"></div>
+      <div>
+        <h3 style="margin:0 0 4px">Φόρτωση…</h3>
+        <div class="meta">Apple Books</div>
+        <p class="muted">Ανάκτηση εξωφύλλου και περιγραφής…</p>
+        <div class="links"><span class="btn" style="pointer-events:none; opacity:.65">Προεπισκόπηση</span></div>
+      </div>`;
+    return el;
+  }
+
+  const skeletons = BOOKS.map(()=>bookSkeleton());
+  skeletons.forEach(s=>booksGrid.appendChild(s));
+
+  async function fetchBook(id){
+    // iTunes Search API / lookup
+    // ⚠️ Το endpoint δεν στέλνει CORS headers, άρα fetch() από browser μπλοκάρεται.
+    // Η Apple προτείνει JSONP με callback=... μέσω <script> tag.
+    const url = `https://itunes.apple.com/lookup?id=${encodeURIComponent(id)}&country=gr&entity=ebook`;
+
+    return await new Promise((resolve, reject) => {
+      const cb = `__ipediaItunesCb_${String(id).replace(/\D/g,'')}_${Math.random().toString(36).slice(2)}`;
+      const s  = document.createElement('script');
+      let done = false;
+
+      function cleanup(){
+        if (done) return;
+        done = true;
+        try{ delete window[cb]; }catch(_){ window[cb] = undefined; }
+        s.remove();
+      }
+
+      window[cb] = (data) => { cleanup(); resolve(data); };
+      s.onerror  = () => { cleanup(); reject(new Error('Lookup failed')); };
+
+      // JSONP: callback=<global function name>
+      s.src = url + `&callback=${encodeURIComponent(cb)}`;
+      document.head.appendChild(s);
+
+      setTimeout(() => {
+        if (done) return;
+        cleanup();
+        reject(new Error('Lookup timeout'));
+      }, 12000);
+    });
+  }
+
+  
+  function escapeHtml(s){
+    return String(s)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;')
+      .replace(/'/g,'&#39;');
+  }
+
+  function htmlToText(html){
+    if(!html) return '';
+    const tmp = document.createElement('div');
+    tmp.innerHTML = String(html);
+    return (tmp.textContent || tmp.innerText || '').replace(/\s+/g,' ').trim();
+  }
+
+  function sanitizeAppleDesc(html){
+    if(!html) return '';
+    const str = String(html);
+    const hasTags = /<\/?[a-z][\s\S]*>/i.test(str);
+    const input = hasTags ? str : `<p>${escapeHtml(str)}</p>`;
+    const doc = new DOMParser().parseFromString(input, 'text/html');
+
+    // Remove obviously dangerous nodes
+    doc.querySelectorAll('script,style,iframe,object,embed,form,button,input,textarea,link,meta').forEach(n=>n.remove());
+
+    const allowed = new Set(['P','BR','UL','OL','LI','B','STRONG','I','EM','A','H3','H4']);
+    const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_ELEMENT, null);
+    const nodes = [];
+    while(walker.nextNode()) nodes.push(walker.currentNode);
+
+    for(const el of nodes){
+      const tag = el.tagName;
+
+      if(!allowed.has(tag)){
+        // unwrap non-allowed tags (keep their text/children)
+        const parent = el.parentNode;
+        while(el.firstChild) parent.insertBefore(el.firstChild, el);
+        parent.removeChild(el);
+        continue;
+      }
+
+      // Strip all attributes except safe href/title on <a>
+      [...el.attributes].forEach(attr=>{
+        const name = attr.name.toLowerCase();
+        if(tag === 'A' && (name === 'href' || name === 'title')) return;
+        el.removeAttribute(attr.name);
+      });
+
+      if(tag === 'A'){
+        const href = el.getAttribute('href') || '';
+        if(!/^https?:\/\//i.test(href)){
+          // Replace unsafe links with plain text
+          el.replaceWith(document.createTextNode(el.textContent || ''));
+        }else{
+          el.setAttribute('target','_blank');
+          el.setAttribute('rel','noopener');
+        }
+      }
+    }
+
+    return doc.body.innerHTML.trim();
+  }
+
+  function clampText(s, max=170){
+    if(!s) return '';
+    const clean = String(s).replace(/\s+/g,' ').trim();
+    return clean.length > max ? clean.slice(0, max-1) + '…' : clean;
+  }
+
+  function renderBookCard(data, meta){
+    const item = (((data && data.results) ? data.results : []) )[0] || {};
+    const title = item.trackName || "Τίτλος";
+    const author = item.artistName || "iPedia";
+    const year = item.releaseDate ? new Date(item.releaseDate).getFullYear() : "";
+    const rawDesc = item.description || item.longDescription || "";
+    const descShort = clampText(htmlToText(rawDesc), 170);
+    const descFull = sanitizeAppleDesc(rawDesc);
+    const img = (item.artworkUrl100 || item.artworkUrl60 || '').replace('100x100bb', '300x300bb');
+    const price = item.formattedPrice || "";
+    const sampleHref = (SAMPLE_LINKS && SAMPLE_LINKS[meta.id]) || meta.url || item.trackViewUrl || '#';
+    const el = document.createElement('div');
+    el.className = 'card book';
+    el.dataset.cat = meta.cat;
+
+    el.innerHTML = `
+      <div class="cover">${img ? `<img alt="Εξώφυλλο: ${escapeHtml(title)}" src="${img}" loading="lazy" />` : ''}</div>
+      <div>
+        <h3>${escapeHtml(title)}</h3>
+        <div class="meta">${escapeHtml(author)}${year ? ` • ${year}` : ''}</div>
+        ${price ? `<div class="price">${escapeHtml(price)}</div>` : '' }
+        <div class="links">
+          <a class="btn primary" href="${sampleHref}" target="_blank" rel="noopener">Δωρεάν δείγμα</a>
+          ${rawDesc ? `<button class="btn js-book-preview" type="button" aria-expanded="false">Περισσότερα</button>` : ''}
+        </div>
+      </div>
+
+      ${rawDesc ? `
+      <div class="bookExpand" aria-hidden="true">
+        <div class="bookExpandInner">
+          <div class="bookExpandTitle">Περιγραφή</div>
+          <div class="bookFull">${descFull || `<p>Δεν υπάρχει διαθέσιμη περιγραφή.</p>`}</div>
+        </div>
+      </div>` : ''}
+    `;
+    return el;
+  }
+
+
+  async function loadBooks(){
+    const results = [];
+    for (let i=0; i<BOOKS.length; i++){
+      const meta = BOOKS[i];
+      try{
+        const data = await fetchBook(meta.id);
+        results.push({data, meta});
+      }catch(err){
+        results.push({data:null, meta, err});
+      }
+    }
+    // Replace skeletons
+    booksGrid.innerHTML = '';
+    for(const r of results){
+      if(r.data){
+        booksGrid.appendChild(renderBookCard(r.data, r.meta));
+      }else{
+        const el = document.createElement('div');
+        el.className = 'card book';
+        el.dataset.cat = r.meta.cat;
+        el.innerHTML = `
+          <div class="cover"></div>
+          <div>
+            <h3>Apple Books (ID: ${r.meta.id})</h3>
+            <div class="meta">Δεν ήταν δυνατή η αυτόματη φόρτωση.</div>
+            <p class="muted">Άνοιξε το βιβλίο από το κουμπί.</p>
+            <div class="links">
+              <a class="btn primary" href="${(SAMPLE_LINKS && SAMPLE_LINKS[r.meta.id]) || r.meta.url}" target="_blank" rel="noopener">Δωρεάν δείγμα</a>
+            </div>
+          </div>`;
+        booksGrid.appendChild(el);
+      }
+    }
+    applyFilter(currentFilter);
+
+    // Fixed-column layout: after rendering & as images load
+    booksGrid.classList.add('masonry');
+    booksGrid.querySelectorAll('img').forEach(img=>{
+      img.addEventListener('load', scheduleBooksLayout, {once:true});
+      img.addEventListener('error', scheduleBooksLayout, {once:true});
+    });
+    scheduleBooksLayout();
+  }
+
+  let currentFilter = 'all';
+
+  function applyFilter(filter){
+    currentFilter = filter;
+    document.querySelectorAll('.tab').forEach(t=>{
+      const active = t.dataset.filter === filter;
+      t.classList.toggle('active', active);
+      t.setAttribute('aria-selected', String(active));
+    });
+    document.querySelectorAll('#booksGrid .book').forEach(card=>{
+      const cat = card.dataset.cat;
+      const show = (filter === 'all') || (cat === filter);
+      card.style.display = show ? '' : 'none';
+    });
+    scheduleBooksLayout();
+  }
+
+  document.querySelectorAll('.tab').forEach(btn=>{
+    btn.addEventListener('click', ()=>applyFilter(btn.dataset.filter));
+  });
+
+
+  // Apple Books card expand/collapse + fixed-column layout
+  // Η επέκταση «σπρώχνει» μόνο τις κάρτες *κάτω* στην ίδια στήλη (όχι τις διπλανές).
+  const BOOK_GAP = 16;
+  let _booksLayoutRAF = 0;
+
+  function booksCols(){
+    const w = window.innerWidth || document.documentElement.clientWidth || 1200;
+    if(w <= 640) return 1;
+    if(w <= 980) return 2;
+    return 3;
+  }
+
+  function scheduleBooksLayout(){
+    if(_booksLayoutRAF) return;
+    _booksLayoutRAF = requestAnimationFrame(()=>{ _booksLayoutRAF = 0; layoutBooks(); });
+  }
+
+  function layoutBooks(){
+    if(!booksGrid) return;
+    booksGrid.classList.add('masonry');
+
+    const gap = BOOK_GAP;
+    const cols = Math.max(1, booksCols());
+    const cw = booksGrid.clientWidth;
+    if(!cw) return;
+
+    const colW = (cw - gap*(cols-1)) / cols;
+    const heights = new Array(cols).fill(0);
+
+    const cards = Array.from(booksGrid.querySelectorAll('.book'))
+      .filter(c => c.style.display !== 'none');
+
+    for(let i=0; i<cards.length; i++){
+      const card = cards[i];
+      const col = i % cols;
+
+      card.style.position = 'absolute';
+      card.style.width = colW + 'px';
+      card.style.left  = (col * (colW + gap)) + 'px';
+      card.style.top   = heights[col] + 'px';
+
+      heights[col] += card.offsetHeight + gap;
+    }
+
+    let maxH = 0;
+    for(const h of heights) if(h > maxH) maxH = h;
+    if(maxH > 0) maxH -= gap; // remove last gap
+    booksGrid.style.height = maxH + 'px';
+  }
+
+  function setBookOpen(card, open){
+    if(!card) return;
+    card.classList.toggle('is-open', !!open);
+
+    const btn = card.querySelector('.js-book-preview');
+    if(btn){
+      btn.setAttribute('aria-expanded', String(!!open));
+      btn.textContent = open ? 'Λιγότερα' : 'Προεπισκόπηση';
+    }
+
+    const expand = card.querySelector('.bookExpand');
+    if(expand) expand.setAttribute('aria-hidden', String(!open));
+
+    // relayout so only the column below gets pushed
+    scheduleBooksLayout();
+  }
+
+  function closeAllBooks(except){
+    booksGrid.querySelectorAll('.book.is-open').forEach(c=>{
+      if(except && c === except) return;
+      setBookOpen(c, false);
+    });
+    scheduleBooksLayout();
+  }
+
+  booksGrid.addEventListener('click', (e)=>{
+    const btn = e.target.closest('.js-book-preview');
+    if(!btn) return;
+
+    const card = btn.closest('.book');
+    if(!card) return;
+
+    const willOpen = !card.classList.contains('is-open');
+    closeAllBooks(card);
+    setBookOpen(card, willOpen);
+  });
+
+  // Click outside closes any open book panel
+  document.addEventListener('click', (e)=>{
+    const openCard = booksGrid.querySelector('.book.is-open');
+    if(!openCard) return;
+    if(e.target.closest('.book.is-open')) return;
+    closeAllBooks();
+  });
+
+  // ESC closes
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape') closeAllBooks();
+  });
+
+  // Resize relayout
+  window.addEventListener('resize', ()=>scheduleBooksLayout());
+
+  loadBooks();
+
+
+  // -----------------------------
+  // Contact / Newsletter form (demo + optional endpoint)
+  // -----------------------------
+const SUBSCRIBE_ENDPOINT = "https://script.google.com/macros/s/AKfycbwNtQyI9X-9bPDP_ps6LmyC8yP1y9AMm9M6IMo4aX_dtxDp-sW8AcLAkMArBwdV8JH7/exec";
+ // Google Apps Script Web App (/exec)
+  const form = document.getElementById('contactForm');
+  const toast = document.getElementById('toast');
+
+  // SFX: Play FormCompletion ONLY when the user clicks the submit button
+  // (no SFX on Enter-submit or any other interaction)
+  const submitBtn = form ? form.querySelector('button[type="submit"], input[type="submit"]') : null;
+  if(submitBtn){
+    submitBtn.addEventListener('click', (e)=>{
+      try{ playSfx('form', 1); }catch(_){ }
+    }, true);
+  }
+
+  // Populate Countries dropdown (all countries list)
+  const countrySelect = document.getElementById('country');
+  const COUNTRIES = ["Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia", "Cameroon", "Canada", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo (Democratic Republic of the)", "Congo (Republic of the)", "Costa Rica", "Cote d'Ivoire", "Croatia", "Cuba", "Cyprus", "Czechia", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kosovo", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Korea", "North Macedonia", "Norway", "Oman", "Pakistan", "Palau", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe", "Palestine"];
+  if(countrySelect && countrySelect.options.length <= 1){
+    const frag = document.createDocumentFragment();
+    for(const c of COUNTRIES){
+      const opt = document.createElement('option');
+      opt.value = c;
+      opt.textContent = c;
+      frag.appendChild(opt);
+    }
+    countrySelect.appendChild(frag);
+  }
+
+  function showToast(html){
+    toast.innerHTML = html;
+    toast.classList.add('show');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(()=>toast.classList.remove('show'), 3600);
+  }
+
+  function validEmail(s){
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(s||'').trim());
+  }
+
+async function submitToSheet_(fd){
+  if(!SUBSCRIBE_ENDPOINT) return {transport:"disabled"};
+
+  // Required meta fields (not visible to visitor)
+  try{
+    if(!fd.get('source')) fd.set('source', 'ipedia-website');
+    if(!fd.get('ts')) fd.set('ts', new Date().toISOString());
+    if(!fd.get('rid')){
+      let rid = '';
+      try{ rid = (crypto && crypto.randomUUID) ? crypto.randomUUID() : ''; }catch(_){}
+      if(!rid) rid = String(Date.now()) + '_' + Math.random().toString(16).slice(2);
+      fd.set('rid', rid);
+    }
+  }catch(_){}
+
+  // Build x-www-form-urlencoded payload
+  const params = new URLSearchParams();
+  try{
+    for(const [k,v] of fd.entries()) params.append(k, String(v));
+  }catch(err){
+    console.warn('submitToSheet_: failed building params', err);
+  }
+
+  // 1) sendBeacon (best effort, no CORS needed, survives page transitions)
+  try{
+    if(navigator && typeof navigator.sendBeacon === 'function'){
+      const blob = new Blob([params.toString()], {type:'application/x-www-form-urlencoded;charset=UTF-8'});
+      const ok = navigator.sendBeacon(SUBSCRIBE_ENDPOINT, blob);
+      if(ok) return {transport:"beacon"};
+    }
+  }catch(err){
+    // ignore and fall through
+  }
+
+  // 2) fetch with no-cors (we can't read the response, but the request is sent)
+  try{
+    await fetch(SUBSCRIBE_ENDPOINT, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},
+      body: params
+    });
+    return {transport:"fetch-no-cors"};
+  }catch(err){
+    // ignore and fall through
+  }
+
+  // 3) Fallback: hidden iframe + ghost form (very compatible, but can be blocked by some privacy settings)
+  try{
+    let sink = document.getElementById('gsheetSink');
+    if(!sink){
+      sink = document.createElement('iframe');
+      sink.id = 'gsheetSink';
+      sink.name = 'gsheetSink';
+      sink.style.display = 'none';
+      sink.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(sink);
+    }
+
+    const ghost = document.createElement('form');
+    ghost.action = SUBSCRIBE_ENDPOINT;
+    ghost.method = 'POST';
+    ghost.target = 'gsheetSink';
+    ghost.style.display = 'none';
+
+    for(const [k,v] of fd.entries()){
+      const inp = document.createElement('input');
+      inp.type = 'hidden';
+      inp.name = k;
+      inp.value = String(v);
+      ghost.appendChild(inp);
+    }
+
+    document.body.appendChild(ghost);
+    ghost.submit();
+
+    // Don't remove too fast (Chromium can abort if removed immediately)
+    setTimeout(()=>{ try{ ghost.remove(); }catch(_){} }, 7000);
+    return {transport:"hidden-form"};
+  }catch(err){
+    console.warn('submitToSheet_ failed', err);
+    return {transport:"failed", error:String(err || '')};
+  }
+}
+
+
+
+
+
+if(form){
+    form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const fd = new FormData(form);
+// Always include these (they won't be visible to the visitor)
+fd.set('source', 'ipedia-website');
+fd.set('ts', new Date().toISOString());
+
+// Build a plain object for validation / UI
+const payload = Object.fromEntries(fd.entries());
+
+// Normalize
+payload.name = (payload.name || '').trim();
+payload.email = (payload.email || '').trim();
+payload.country = (payload.country || '').trim();
+payload.city = (payload.city || '').trim();
+payload.role = (payload.role || '').trim();
+payload.message = (payload.message || '').trim();
+
+
+    if(payload.name.length < 2){
+      showToast('⚠️ Συμπλήρωσε <b>ονοματεπώνυμο</b>.');
+      return;
+    }
+    if(!validEmail(payload.email)){
+      showToast('⚠️ Συμπλήρωσε ένα <b>έγκυρο email</b>.');
+      return;
+    }
+    if(!payload.country){
+      showToast('⚠️ Επίλεξε <b>χώρα</b>.');
+      return;
+    }
+
+    if(!payload.role){
+      showToast('⚠️ Επίλεξε <b>ιδιότητα</b>.');
+      return;
+    }
+
+    // Demo persistence (localStorage) so you can export later.
+    try{
+      const key = "ipedia_newsletter_subs";
+      const arr = JSON.parse(localStorage.getItem(key) || "[]");
+      arr.push(payload);
+      localStorage.setItem(key, JSON.stringify(arr));
+    }catch(_){}
+
+    // Optional backend submit
+    if(SUBSCRIBE_ENDPOINT){
+      try{
+        const _sheetRes = await submitToSheet_(fd);
+        console.info('Sheet submit transport:', _sheetRes && _sheetRes.transport);
+        showToast('✅ <span class="ok">Έτοιμο!</span> Σε ευχαριστούμε — θα λάβεις ενημερώσεις σύντομα.');
+      }catch(err){
+        showToast('⚠️ Αποθηκεύτηκε τοπικά, αλλά απέτυχε η αποστολή στο endpoint. (Δες κονσόλα.)');
+        console.warn(err);
+      }
+    }else{
+      showToast('✅ <span class="ok">Έτοιμο!</span> Η εγγραφή αποθηκεύτηκε τοπικά (demo). Για production, βάλε SUBSCRIBE_ENDPOINT.');
+    }
+
+    form.reset();
+  });
+  }
+
+
+  // Copy button
+  const copyBtn = document.getElementById('copyBtn');
+  if(copyBtn){
+    copyBtn.addEventListener('click', async ()=>{
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const country = document.getElementById('country').value || '';
+    const role = document.getElementById('role').value || '';
+    const city = document.getElementById('city').value.trim() || '';
+    const msg = document.getElementById('message').value.trim();
+
+    const text = `iPedia Contact\nΟνοματεπώνυμο: ${name}\nEmail: ${email}\nΧώρα: ${country}\nΠόλη: ${city}\nΙδιότητα: ${role}\nΜήνυμα: ${msg}`;
+    try{
+      await navigator.clipboard.writeText(text);
+      showToast('📋 Αντιγράφηκαν τα στοιχεία στο clipboard.');
+    }catch(_){
+      showToast('⚠️ Δεν επιτρέπεται αντιγραφή. Δοκίμασε χειροκίνητα.');
+    }
+  });
+  }
+
+
+  // Footer year
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Top gallery lightbox
+  (function(){
+    const lb = document.getElementById('lightbox');
+    const lbImg = document.getElementById('lbImg');
+    const lbCap = document.getElementById('lbCap');
+    const lbTitle = document.getElementById('lbTitle');
+    const closeBtn = document.getElementById('lbClose');
+
+    function close(){
+      lb.classList.remove('show');
+      lb.setAttribute('aria-hidden','true');
+      document.body.style.overflow = '';
+      lbImg.src = '';
+    }
+    function open(full, title, cap){
+      lbImg.src = full;
+      lbTitle.textContent = title || 'EmApp';
+      lbCap.textContent = cap || '';
+      lb.classList.add('show');
+      lb.setAttribute('aria-hidden','false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    document.querySelectorAll('.gItem').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        open(btn.dataset.full, btn.dataset.title, btn.dataset.caption);
+      });
+    });
+
+    if(closeBtn) closeBtn.addEventListener('click', close);
+    if(lb) lb.addEventListener('click', (e)=>{
+      if(e.target === lb) close();
+    });
+    window.addEventListener('keydown', (e)=>{
+      if(e.key === 'Escape' && lb && lb.classList.contains('show')) close();
+    });
+  })();
+
+
+    // --- Iframe modal (Δείγμα) ---
+    (function(){
+      const modal = document.getElementById('iframeModal');
+      const frame = document.getElementById('iframeModalFrame');
+      const titleEl = document.getElementById('iframeModalTitle');
+      if(!modal || !frame || !titleEl) return;
+
+      let lastScrollY = 0;
+
+      function openIframeModal(src, title){
+        if(!src) return;
+        // Keep the user exactly where they are on the page
+        lastScrollY = window.scrollY || window.pageYOffset || 0;
+
+        titleEl.textContent = title || 'Δείγμα';
+        frame.src = src;
+
+        modal.setAttribute('aria-hidden','false');
+        document.documentElement.classList.add('modal-open');
+        document.body.classList.add('modal-open');
+
+        // Safety: some browsers may try to adjust scroll when the overlay appears
+        requestAnimationFrame(()=>{ window.scrollTo(0, lastScrollY); });
+      }
+
+      function closeIframeModal(){
+        modal.setAttribute('aria-hidden','true');
+        frame.src = 'about:blank';
+        document.documentElement.classList.remove('modal-open');
+        document.body.classList.remove('modal-open');
+        requestAnimationFrame(()=>{ window.scrollTo(0, lastScrollY); });
+      }
+
+      // Capture phase to prevent any other click handlers from causing hash jumps
+      document.addEventListener('click', (e)=>{
+        const opener = e.target.closest('.js-open-iframe');
+        if(opener){
+          e.preventDefault();
+          e.stopPropagation();
+          openIframeModal(opener.getAttribute('data-iframe-src'), opener.getAttribute('data-iframe-title'));
+          return;
+        }
+        if(e.target.closest('[data-iframe-close]')){
+          e.preventDefault();
+          e.stopPropagation();
+          closeIframeModal();
+        }
+      }, true);
+
+      document.addEventListener('keydown', (e)=>{
+        if(e.key === 'Escape' && modal.getAttribute('aria-hidden') === 'false') closeIframeModal();
+      });
+
+      // Optional: expose for console use
+      window.openIediaIframeModal = openIframeModal;
+      window.closeIediaIframeModal = closeIframeModal;
+    })();;
+
+
+  // -----------------------------
+  // Audio sample (Αφηγήσεις) — play/pause toggle
+  // -----------------------------
+  (function(){
+    let curAudio = null;
+    let curBtn = null;
+
+    function setBtn(btn, playing){
+      if(!btn) return;
+      btn.classList.toggle('is-playing', !!playing);
+      btn.textContent = playing ? 'Παύση' : 'Δείγμα';
+    }
+
+    function stop(){
+      if(curAudio){
+        try{ curAudio.pause(); curAudio.currentTime = 0; }catch(_){}
+      }
+      setBtn(curBtn, false);
+      curAudio = null;
+      curBtn = null;
+    }
+
+    function ensureAudio(src){
+      if(curAudio) return curAudio;
+      const url = new URL(src, document.baseURI).href;
+      const a = new Audio(url);
+      a.preload = 'auto';
+      a.addEventListener('ended', ()=> stop());
+      curAudio = a;
+      return a;
+    }
+
+    function toggle(btn){
+      const src = btn.getAttribute('data-audio-src') || '';
+      if(!src) return;
+
+      // switching to another narration
+      if(curBtn && btn !== curBtn) stop();
+
+      const a = ensureAudio(src);
+
+      if(btn.classList.contains('is-playing')){
+        try{ a.pause(); }catch(_){}
+        setBtn(btn, false);
+        return;
+      }
+
+      curBtn = btn;
+      setBtn(btn, true);
+
+      try{
+        const p = a.play();
+        if(p && typeof p.catch === 'function'){
+          p.catch(()=>{
+            setBtn(btn, false);
+            try{ showToast('⚠️ Η αναπαραγωγή μπλοκαρίστηκε από το πρόγραμμα περιήγησης. Πάτα ξανά.'); }catch(_){}
+          });
+        }
+      }catch(_){
+        setBtn(btn, false);
+      }
+    }
+
+    document.addEventListener('click', (e)=>{
+      const btn = e.target && e.target.closest ? e.target.closest('.js-play-audio') : null;
+      if(!btn) return;
+      e.preventDefault();
+      e.stopPropagation();
+      toggle(btn);
+    }, true);
+
+    // ESC stops the narration
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === 'Escape' && curAudio) stop();
+    }, true);
+  })();
+
+
+
+  // -----------------------------
+  // Timeline (Για εμάς) — reveal toggle
+  // -----------------------------
+  (function(){
+    const btn = document.querySelector('.js-timeline-toggle');
+    const panel = document.getElementById('ipediaTimeline');
+    if(!btn || !panel) return;
+
+    function setOpen(open){
+      panel.classList.toggle('open', !!open);
+      btn.setAttribute('aria-expanded', String(!!open));
+      panel.setAttribute('aria-hidden', String(!open));
+      const hint = btn.querySelector('.tlHint');
+      if(hint) hint.textContent = open ? 'Κρύψε' : 'Δες';
+    }
+
+    // Year buttons → show description
+    const yearBtns = Array.from(panel.querySelectorAll('.tlYearBtn'));
+    const eventsWrap = panel.querySelector('.tlEvents');
+    const outYear = panel.querySelector('.tlSelectedYear');
+    const outText = panel.querySelector('.tlSelectedText');
+
+    function selectYear(year, scrollBtn){
+      if(outYear) outYear.textContent = String(year || '');
+      const ev = eventsWrap ? eventsWrap.querySelector('.tlEvent[data-year="' + year + '"]') : null;
+      if(outText) outText.innerHTML = ev ? ev.innerHTML : '';
+
+      yearBtns.forEach(b=>{
+        const active = b.dataset.year === String(year);
+        b.classList.toggle('is-active', active);
+        b.setAttribute('aria-selected', String(active));
+        b.tabIndex = active ? 0 : -1;
+      });
+
+      if(scrollBtn){
+        try{ scrollBtn.scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'}); }catch(_){}
+      }
+    }
+
+    yearBtns.forEach(b=>{
+      b.addEventListener('click', ()=>{
+        selectYear(b.dataset.year, b);
+      });
+    });
+
+    // Keyboard (←/→) inside the panel
+    panel.addEventListener('keydown', (e)=>{
+      if(!(e.key === 'ArrowLeft' || e.key === 'ArrowRight')) return;
+      if(!yearBtns.length) return;
+      const i = yearBtns.findIndex(b=> b.classList.contains('is-active'));
+      const cur = i >= 0 ? i : 0;
+      const next = Math.max(0, Math.min(yearBtns.length - 1, cur + (e.key === 'ArrowRight' ? 1 : -1)));
+      const nb = yearBtns[next];
+      if(nb){
+        nb.focus();
+        selectYear(nb.dataset.year, nb);
+      }
+      e.preventDefault();
+    });
+
+    // Init (default first year)
+    if(yearBtns[0]) selectYear(yearBtns[0].dataset.year, null);
+
+    setOpen(false);
+
+    btn.addEventListener('click', ()=>{
+      const willOpen = !panel.classList.contains('open');
+      setOpen(willOpen);
+      if(willOpen){
+        requestAnimationFrame(()=>{
+          try{ panel.scrollIntoView({behavior:'smooth', block:'start'}); }catch(_){}
+          const active = panel.querySelector('.tlYearBtn.is-active');
+          if(active){
+            try{ active.scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'}); }catch(_){}
+          }
+        });
+      }
+    });
+
+
+    // Responsive fix: if the timeline is open and the viewport changes size,
+    // keep the active year visible/centered (prevents "stuck" layout on resize).
+    function onTimelineResize(){
+      if(!panel.classList.contains('open')) return;
+      requestAnimationFrame(()=>{
+        const active = panel.querySelector('.tlYearBtn.is-active');
+        if(active){
+          try{ active.scrollIntoView({behavior:'auto', inline:'center', block:'nearest'}); }catch(_){}
+        }
+      });
+    }
+    window.addEventListener('resize', onTimelineResize, {passive:true});
+    window.addEventListener('orientationchange', onTimelineResize, {passive:true});
+})();
+
+</script>
+
+</body>
+</html>

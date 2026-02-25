@@ -1,0 +1,16 @@
+1 πολύ σημαντικό που πρέπει να κάνεις εσύ
+Στο αρχείο iPediaWebSite.html θα δεις placeholder:
+https://YOUR-DOMAIN.gr/
+https://YOUR-DOMAIN.gr/ipediaNw.png
+
+➡️ Αντικατάστησέ τα με το πραγματικό σου domain (HTTPS), αλλιώς το canonical/preview θα είναι “λάθος” στο Google και στα social.
+
+2. Άνοιξε και τα αρχεία sitemap.xml και robots.txt και άλλαξε το:
+https://YOUR-DOMAIN.gr/ → στο πραγματικό σου domain (π.χ. https://ipedia…/).
+
+3. Άνοιξε Google Search Console → πρόσθεσε domain → verify.
+Ανέβασε:
+- sitemap.xml (ακόμα και για 1 σελίδα)
+- robots.txt που δείχνει στο sitemap
+Submit το sitemap στο Search Console.
+

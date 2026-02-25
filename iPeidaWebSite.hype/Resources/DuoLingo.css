@@ -1,0 +1,327 @@
+
+
+/* =========================
+   ✅ Duolingo-style Lessons UI
+   ========================= */
+.lessonModal{
+  padding: 14px 16px 16px;
+}
+
+.duoHome{
+  display:flex;
+  flex-direction:column;
+  gap: 10px;
+}
+
+.duoHomeHeader{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(0,0,0,.08);
+  background: rgba(255,255,255,.85);
+}
+
+.duoHomeHeader .t{
+  font-weight: 900;
+color: var(--accent);
+  font-size: 13px;
+}
+
+.duoHomeHeader .s{
+  font-size: 12px;
+  color: rgba(0,0,0,.6);
+  font-weight: 800;
+}
+
+.duoUnit{
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 18px;
+  background: rgba(255,255,255,.85);
+  overflow:hidden;
+}
+
+.duoUnitHead{
+  padding: 10px 12px;
+  font-weight: 900;
+color: var(--accent);
+  border-bottom: 1px solid rgba(0,0,0,.06);
+  background: rgba(255,255,255,.75);
+  font-size: 13px;
+}
+
+.duoLessonGrid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+  padding: 10px 12px 12px;
+}
+
+.duoLessonBtn{
+  display:flex;
+  flex-direction:column;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(0,0,0,.10);
+  background: #fff;
+  cursor:pointer;
+  text-align:left;
+  user-select:none;
+}
+
+.duoLessonBtn .h{
+  font-weight: 900;
+  color: var(--ink);
+  font-size: 13px;
+}
+.duoLessonBtn .p{
+  font-size: 12px;
+  color: rgba(0,0,0,.60);
+  line-height: 1.3;
+  font-weight: 700;
+}
+.duoLessonBtn .tag{
+  font-size: 11px;
+  font-weight: 900;
+  color: rgba(0,0,0,.55);
+}
+
+.duoLessonBtn.done{
+  border-color: rgba(52,199,89,.35);
+  background: rgba(52,199,89,.08);
+}
+
+.duoPlayer{
+  display:flex;
+  flex-direction:column;
+  gap: 10px;
+}
+
+.duoTopRow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 16px;
+  border: 1px solid rgba(0,0,0,.08);
+  background: rgba(255,255,255,.85);
+}
+
+.duoMeta{
+  display:flex;
+  align-items:center;
+  gap: 12px;
+}
+
+.duoXp{
+  font-size: 12px;
+  color: rgba(0,0,0,.65);
+  font-weight: 900;
+}
+.duoLbl{ color: rgba(0,0,0,.55); }
+
+.duoHearts{
+  display:flex;
+  gap: 4px;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.duoProg{
+  display:flex;
+  align-items:center;
+  gap: 8px;
+}
+
+.duoProgBar{
+  width: 160px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(0,0,0,.10);
+  overflow:hidden;
+}
+.duoProgBar > i{
+  display:block;
+  height:100%;
+  width:0%;
+  background: var(--accent);
+  border-radius: 999px;
+}
+.duoProgTxt{
+  font-size: 12px;
+  color: rgba(0,0,0,.6);
+  font-weight: 900;
+  min-width: 48px;
+  text-align:right;
+}
+
+.duoCard{
+  border-radius: 18px;
+  border: 1px solid rgba(0,0,0,.08);
+  background: rgba(255,255,255,.92);
+  box-shadow: 0 18px 60px rgba(0,0,0,.10);
+  padding: 12px 12px 12px;
+}
+
+.duoLessonTitle{
+  font-size: 12px;
+  font-weight: 900;
+  color: rgba(0,0,0,.55);
+  margin-bottom: 6px;
+}
+
+.duoPrompt{
+  font-size: 14px;
+  font-weight: 900;
+  color: rgba(0,0,0,.80);
+  margin-bottom: 10px;
+  line-height: 1.25;
+}
+
+.duoBody{
+  display:flex;
+  flex-direction:column;
+  gap: 10px;
+}
+
+.duoChoices{
+  display:flex;
+  flex-direction:column;
+  gap: 10px;
+}
+
+.duoChoice{
+  padding: 10px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(0,0,0,.12);
+  background: #fff;
+  cursor:pointer;
+  font-weight: 900;
+  color: rgba(0,0,0,.75);
+  user-select:none;
+}
+
+.duoChoice.selected{
+  border-color: rgba(10,132,255,.35);
+  background: rgba(10,132,255,.08);
+}
+
+.duoChoice.correct{
+  border-color: rgba(52,199,89,.45);
+  background: rgba(52,199,89,.10);
+}
+
+.duoChoice.wrong{
+  border-color: rgba(255,59,48,.45);
+  background: rgba(255,59,48,.10);
+}
+
+.duoFillRow{
+  display:flex;
+  gap: 10px;
+  align-items:center;
+}
+.duoFillRow input{
+  flex: 1 1 auto;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(0,0,0,.14);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.duoOrder{
+  display:flex;
+  flex-direction:column;
+  gap: 8px;
+}
+.duoOrderItem{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(0,0,0,.12);
+  background: #fff;
+  font-weight: 900;
+  color: rgba(0,0,0,.75);
+}
+.duoOrderBtns{
+  display:flex;
+  gap: 8px;
+}
+.duoMiniBtn{
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,.12);
+  background: rgba(255,255,255,.95);
+  font-weight: 900;
+  cursor:pointer;
+}
+
+.duoFeedback{
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(0,0,0,.10);
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.duoFeedback.ok{
+  border-color: rgba(52,199,89,.35);
+  background: rgba(52,199,89,.10);
+  color: rgba(0,0,0,.78);
+}
+.duoFeedback.bad{
+  border-color: rgba(255,59,48,.35);
+  background: rgba(255,59,48,.10);
+  color: rgba(0,0,0,.78);
+}
+.duoFeedback.hint{
+  border-color: rgba(255,159,10,.35);
+  background: rgba(255,159,10,.10);
+  color: rgba(0,0,0,.78);
+}
+
+.duoActions{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+}
+.duoSpacer{ flex: 1 1 auto; }
+
+/* =========================
+   ✅ Practice Dock
+   ========================= */
+.lessonDock{
+  position:absolute;
+  left: max(10px, env(safe-area-inset-left));
+  right:max(10px, env(safe-area-inset-right));
+  top: calc(max(10px, env(safe-area-inset-top)) + 64px);
+  z-index: 220;
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 18px;
+  background: rgba(255,255,255,.92);
+  border: 1px solid rgba(0,0,0,.10);
+  box-shadow: 0 18px 60px rgba(0,0,0,.14);
+  pointer-events:auto;
+}
+
+.lessonDockTxt{
+  flex: 1 1 auto;
+  font-size: 12px;
+  font-weight: 900;
+  color: rgba(0,0,0,.72);
+  line-height: 1.2;
+}
