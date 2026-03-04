@@ -4449,7 +4449,7 @@ color:#FF7E79
 
     <div class="lb-modal-foot" id="lbFootNote">
       <span class="lb-foot-dot"></span>
-      <span>Προσωρινά λειτουργεί τοπικά (local demo). Στο επόμενο βήμα το συνδέουμε με Firebase.</span>
+      <span></span>
     </div>
   </div>
 </div>
@@ -4641,560 +4641,6 @@ color:#FF7E79
 </div>
 </div>
 </div>
-
-<!-- =========================================================
-     🔥 Firebase (Firestore) — Leaderboard XP
-     1) Συμπλήρωσε το FIREBASE_CONFIG από: Firebase Console → Project settings → Your apps → Web app
-     2) Ενεργοποίησε Anonymous Auth: Authentication → Sign-in method → Anonymous
-     3) Ενεργοποίησε Firestore: Firestore Database → Create database (Production)
-========================================================== -->
-<script>
-  // ΠΡΟΣΟΧΗ: Αν δεις "PASTE_..." στην κονσόλα, πρέπει να κάνεις paste το πραγματικό config.
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyDmu2vTU6Cv6iwUOYanlDfFF-TvSVVS6Tg",
-  authDomain: "ggemlboard.firebaseapp.com",
-  projectId: "ggemlboard",
-  storageBucket: "ggemlboard.firebasestorage.app",
-  messagingSenderId: "807575352026",
-  appId: "1:807575352026:web:aaedbf6f6ecf189cf02be3",
-  measurementId: "G-JWYN9CQZGV"
-};
-</script>
-<script src="https://unpkg.com/firebase@12.9.0/firebase-app-compat.js"></script>
-<script src="https://unpkg.com/firebase@12.9.0/firebase-auth-compat.js"></script>
-<script src="https://unpkg.com/firebase@12.9.0/firebase-firestore-compat.js"></script>
-<script>
-  (function(){
-    try{
-      var cfg = window.FIREBASE_CONFIG || (typeof firebaseConfig !== 'undefined' ? firebaseConfig : null) || {};
-      var missing = (!cfg.apiKey || String(cfg.apiKey).indexOf("PASTE_") === 0);
-      if (missing){
-        console.warn("[Firebase] FIREBASE_CONFIG δεν έχει συμπληρωθεί ακόμη. Το Leaderboard θα μείνει σε demo/local mode.");
-        window.__LB_FIREBASE_ENABLED__ = false;
-        window.__LB_FIREBASE_READY__ = Promise.resolve(false);
-        return;
-      }
-
-      window.__LB_FIREBASE_ENABLED__ = true;
-      // ✅ REST fallback (Android Chrome/Opera/WebView): παρακάμπτει το Firestore WebChannel που σε κάποιες συσκευές «κολλάει»
-      try{
-        // Φτιάχνουμε REST client ακόμη κι αν το Firebase SDK αποτύχει.
-        (function(){
-          var __ua = (navigator && navigator.userAgent) ? navigator.userAgent : '';
-          var __isAndroid = /Android/i.test(__ua);
-
-          var apiKey = (cfg && cfg.apiKey) ? String(cfg.apiKey) : '';
-          var projectId = (cfg && cfg.projectId) ? String(cfg.projectId) : '';
-          if (!apiKey || !projectId) return;
-
-          var LS_KEY = 'gg_lb_rest_token_v2_' + projectId;
-          // cleanup παλιών tokens από προηγούμενα builds/έργα
-          try{ localStorage.removeItem('gg_lb_rest_token_v1'); }catch(e){}
-          function __clearToken(){ try{ localStorage.removeItem(LS_KEY); }catch(e){} }
-          function __apiKeyTag(){ try{ return apiKey ? String(apiKey).slice(-6) : ''; }catch(e){ return ''; } }
-          function __now(){ return Date.now(); }
-          function __lsGet(){
-            try{
-              var raw = localStorage.getItem(LS_KEY);
-              if (!raw) return null;
-              var o = JSON.parse(raw);
-              if (!o || typeof o !== 'object') return null;
-              // ασφάλεια: απόρριψε token άλλου project/apiKey (π.χ. αν έχουν μείνει leftovers σε Opera)
-              try{
-                if (o.projectId && String(o.projectId) !== projectId) return null;
-                if (o.apiKeyTag && String(o.apiKeyTag) !== __apiKeyTag()) return null;
-              }catch(e){}
-              return o;
-            }catch(e){ return null; }
-          }
-          function __lsSet(o){
-            try{
-              if (o && typeof o === 'object'){
-                o.projectId = projectId;
-                o.apiKeyTag = __apiKeyTag();
-              }
-              localStorage.setItem(LS_KEY, JSON.stringify(o));
-            }catch(e){}
-          }
-
-          function __wait(ms){ return new Promise(function(res){ setTimeout(res, ms); }); }
-          function __fetchTimeout(url, opts, ms){
-            ms = Math.max(1500, ms || 12000);
-            var ctrl = null;
-            try{ ctrl = new AbortController(); }catch(e){ ctrl = null; }
-            opts = opts || {};
-            if (ctrl) opts.signal = ctrl.signal;
-
-            var t = setTimeout(function(){ try{ if (ctrl) ctrl.abort(); }catch(e){} }, ms);
-            return fetch(url, opts).finally(function(){ try{ clearTimeout(t); }catch(e){} });
-          }
-
-          function __idSignUpAnon(){
-            var url = 'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + encodeURIComponent(apiKey);
-            return __fetchTimeout(url, {
-              method: 'POST',
-              headers: { 'Content-Type':'application/json' },
-              body: JSON.stringify({ returnSecureToken:true })
-            }, __isAndroid ? 18000 : 12000).then(function(r){
-              if (!r.ok) return r.text().then(function(t){ throw new Error('ID_SIGNUP_' + r.status + ' ' + (t||'')); });
-              return r.json();
-            }).then(function(j){
-              var exp = Math.max(0, parseInt(j.expiresIn||'0',10) || 0);
-              var tok = {
-                uid: j.localId || '',
-                idToken: j.idToken || '',
-                refreshToken: j.refreshToken || '',
-                expiresAt: __now() + (exp * 1000)
-              };
-              __lsSet(tok);
-              try{ window.__LB_UID__ = tok.uid; }catch(e){}
-              return tok;
-            });
-          }
-
-          function __idRefresh(refreshToken){
-            var url = 'https://securetoken.googleapis.com/v1/token?key=' + encodeURIComponent(apiKey);
-            var body = 'grant_type=refresh_token&refresh_token=' + encodeURIComponent(refreshToken || '');
-            return __fetchTimeout(url, {
-              method: 'POST',
-              headers: { 'Content-Type':'application/x-www-form-urlencoded' },
-              body: body
-            }, __isAndroid ? 18000 : 12000).then(function(r){
-              if (!r.ok) return r.text().then(function(t){ throw new Error('ID_REFRESH_' + r.status + ' ' + (t||'')); });
-              return r.json();
-            }).then(function(j){
-              var exp = Math.max(0, parseInt(j.expires_in||'0',10) || 0);
-              var tok = {
-                uid: j.user_id || '',
-                idToken: j.id_token || '',
-                refreshToken: j.refresh_token || refreshToken || '',
-                expiresAt: __now() + (exp * 1000)
-              };
-              __lsSet(tok);
-              try{ window.__LB_UID__ = tok.uid; }catch(e){}
-              return tok;
-            });
-          }
-
-          function getToken(opts){
-            opts = opts || {};
-            if (opts.forceNew){
-              __clearToken();
-            }
-            var cached = __lsGet();
-            if (cached && cached.idToken && cached.expiresAt && (__now() < (cached.expiresAt - 60*1000))){
-              try{ window.__LB_UID__ = cached.uid || window.__LB_UID__ || ''; }catch(e){}
-              return Promise.resolve(cached);
-            }
-            // Αν δεν ζητήθηκε "forceNew", δοκίμασε refresh token
-            if (!opts.forceNew && cached && cached.refreshToken){
-              return __idRefresh(cached.refreshToken).catch(function(){
-                // αν αποτύχει refresh, κάνε νέο anon signUp
-                return __idSignUpAnon();
-              });
-            }
-            return __idSignUpAnon();
-          }
-
-          function __authHeaders(idToken){
-            return { 'Authorization':'Bearer ' + String(idToken||'') };
-          }
-
-          function __isAuthRelatedStatus(st){ return st === 401 || st === 403; }
-
-          function __fsBase(){
-            return 'https://firestore.googleapis.com/v1/projects/' + encodeURIComponent(projectId) + '/databases/(default)/documents';
-          }
-
-          function __fsGetDoc(path, _retry){
-            return getToken().then(function(tok){
-              var url = __fsBase() + '/' + path;
-              return __fetchTimeout(url, {
-                method:'GET',
-                headers: Object.assign({ 'Accept':'application/json' }, __authHeaders(tok.idToken))
-              }, __isAndroid ? 18000 : 12000).then(function(r){
-                if (r.status === 404) return null;
-                if (!r.ok){
-                  // Αν σε κάποια υλοποίηση (π.χ. Opera Android) έχει μείνει «λάθος» token, κάνε 1 re-auth και retry.
-                  if (!_retry && __isAuthRelatedStatus(r.status)){
-                    return getToken({ forceNew:true }).then(function(){
-                      return __fsGetDoc(path, true);
-                    });
-                  }
-                  return r.text().then(function(t){ throw new Error('FS_GET_' + r.status + ' ' + (t||'')); });
-                }
-                return r.json();
-              });
-            });
-          }
-
-          function __fsPatchDoc(path, fields, _retry){
-            return getToken().then(function(tok){
-              var base = __fsBase() + '/' + path;
-              var mask = Object.keys(fields||{}).map(function(k){ return 'updateMask.fieldPaths=' + encodeURIComponent(k); }).join('&');
-              var url = base + (mask ? ('?' + mask) : '');
-              return __fetchTimeout(url, {
-                method:'PATCH',
-                headers: Object.assign({ 'Content-Type':'application/json', 'Accept':'application/json' }, __authHeaders(tok.idToken)),
-                body: JSON.stringify({ fields: fields })
-              }, __isAndroid ? 18000 : 12000).then(function(r){
-                if (!r.ok){
-                  if (!_retry && __isAuthRelatedStatus(r.status)){
-                    return getToken({ forceNew:true }).then(function(){
-                      return __fsPatchDoc(path, fields, true);
-                    });
-                  }
-                  return r.text().then(function(t){ throw new Error('FS_PATCH_' + r.status + ' ' + (t||'')); });
-                }
-                return r.json();
-              });
-            });
-          }
-
-          function __fsRunQuery(structuredQuery, _retry){
-            return getToken().then(function(tok){
-              var url = __fsBase() + ':runQuery';
-              return __fetchTimeout(url, {
-                method:'POST',
-                headers: Object.assign({ 'Content-Type':'application/json', 'Accept':'application/json' }, __authHeaders(tok.idToken)),
-                body: JSON.stringify({ structuredQuery: structuredQuery })
-              }, __isAndroid ? 18000 : 12000).then(function(r){
-                if (!r.ok){
-                  if (!_retry && __isAuthRelatedStatus(r.status)){
-                    return getToken({ forceNew:true }).then(function(){
-                      return __fsRunQuery(structuredQuery, true);
-                    });
-                  }
-                  return r.text().then(function(t){ throw new Error('FS_QUERY_' + r.status + ' ' + (t||'')); });
-                }
-                return r.json();
-              });
-            });
-          }
-
-          function __fsRunAgg(structuredAgg, _retry){
-            return getToken().then(function(tok){
-              var url = __fsBase() + ':runAggregationQuery';
-              return __fetchTimeout(url, {
-                method:'POST',
-                headers: Object.assign({ 'Content-Type':'application/json', 'Accept':'application/json' }, __authHeaders(tok.idToken)),
-                body: JSON.stringify(structuredAgg)
-              }, __isAndroid ? 18000 : 12000).then(function(r){
-                if (!r.ok){
-                  if (!_retry && __isAuthRelatedStatus(r.status)){
-                    return getToken({ forceNew:true }).then(function(){
-                      return __fsRunAgg(structuredAgg, true);
-                    });
-                  }
-                  return r.text().then(function(t){ throw new Error('FS_AGG_' + r.status + ' ' + (t||'')); });
-                }
-                return r.json();
-              });
-            });
-          }
-
-          function __numField(v){ return { integerValue: String(Math.max(0, Math.floor(Number(v||0)))) }; }
-          function __strField(v){ return { stringValue: String(v||'') }; }
-
-          function upsertScore(nick, totalXp){
-            nick = (nick||'').toString().trim();
-            totalXp = Math.max(0, Math.floor(Number(totalXp||0)));
-            return getToken().then(function(tok){
-              var uid = tok.uid || '';
-              if (!uid) throw new Error('REST_NO_UID');
-
-              var path = 'lb_users/' + encodeURIComponent(uid);
-
-              return __fsGetDoc(path).then(function(doc){
-                var curXp = 0;
-                try{
-                  if (doc && doc.fields && doc.fields.xp){
-                    var f = doc.fields.xp;
-                    curXp = Math.floor(Number((f.integerValue!=null?f.integerValue:f.doubleValue)||0));
-                  }
-                }catch(e){ curXp = 0; }
-
-                var newXp = Math.max(curXp, totalXp);
-                var nowMs = __now();
-
-                var fields = {
-                  uid: __strField(uid),
-                  nick: __strField(nick),
-                  xp: __numField(newXp),
-                  updatedAtMs: __numField(nowMs)
-                };
-
-                return __fsPatchDoc(path, fields).then(function(){
-                  try{ window.__LB_UID__ = uid; }catch(e){}
-                  return { uid: uid, nick: nick, xp: newXp, updatedAt: nowMs };
-                });
-              });
-            });
-          }
-
-          function fetchTop(limit){
-            limit = Math.max(5, Math.min(100, Math.floor(limit||20)));
-            var q = {
-              from: [{ collectionId:'lb_users' }],
-              orderBy: [{ field:{ fieldPath:'xp' }, direction:'DESCENDING' }],
-              limit: limit
-            };
-            return __fsRunQuery(q).then(function(arr){
-              var out = [];
-              (arr||[]).forEach(function(item){
-                if (!item || !item.document) return;
-                var d = item.document;
-                var name = String(d.name || '');
-                var uid = name ? name.split('/').pop() : '';
-                var f = d.fields || {};
-                var nick = (f.nick && f.nick.stringValue) ? f.nick.stringValue : '—';
-                var xp = 0;
-                try{
-                  var fx = f.xp || {};
-                  xp = Math.floor(Number((fx.integerValue!=null?fx.integerValue:fx.doubleValue)||0));
-                }catch(e){ xp = 0; }
-                var updatedAt = 0;
-                try{
-                  var fu = f.updatedAtMs || {};
-                  updatedAt = Math.floor(Number((fu.integerValue!=null?fu.integerValue:fu.doubleValue)||0));
-                }catch(e){ updatedAt = 0; }
-                out.push({ uid: uid, nick: nick, xp: Math.max(0,xp), updatedAt: updatedAt });
-              });
-              // σταθερό sort (client-side tie-breaker)
-              out.sort(function(a,b){
-                var dx = (Number(b.xp||0) - Number(a.xp||0));
-                if (dx) return dx;
-                return (Number(b.updatedAt||0) - Number(a.updatedAt||0));
-              });
-              return out.slice(0, limit);
-            });
-          }
-
-          function fetchMyRank(myXp){
-            myXp = Math.max(0, Math.floor(Number(myXp||0)));
-
-            // Προσπάθησε aggregation count (αν δεν υποστηρίζεται, απλά γύρνα null)
-            var body = {
-              structuredAggregationQuery: {
-                structuredQuery: {
-                  from: [{ collectionId:'lb_users' }],
-                  where: {
-                    fieldFilter: {
-                      field: { fieldPath:'xp' },
-                      op: 'GREATER_THAN',
-                      value: { integerValue: String(myXp) }
-                    }
-                  }
-                },
-                aggregations: [{ count:{}, alias:'cnt' }]
-              }
-            };
-
-            return __fsRunAgg(body).then(function(res){
-              var higher = 0;
-              try{
-                var first = (res && res[0] && res[0].result) ? res[0].result : null;
-                var af = first && first.aggregateFields ? first.aggregateFields : null;
-                var c = af && (af.cnt || af.count || af.CNT);
-                if (c && c.integerValue != null) higher = Math.floor(Number(c.integerValue||0));
-                else if (c && c.doubleValue != null) higher = Math.floor(Number(c.doubleValue||0));
-              }catch(e){ higher = 0; }
-              var rank = Math.max(1, higher + 1);
-              return { rank: rank };
-            }).catch(function(){
-              return null;
-            });
-          }
-
-          window.__LB_REST__ = {
-            getToken: getToken,
-            upsertScore: upsertScore,
-            fetchTop: fetchTop,
-            fetchMyRank: fetchMyRank,
-            isAndroid: __isAndroid,
-            projectId: projectId
-          };
-
-          // ✅ Default: σε Android χρησιμοποιούμε REST (για να αποφύγουμε timeouts/hangs του SDK).
-          try{
-            if (typeof window.__LB_USE_REST__ === 'undefined'){
-              window.__LB_USE_REST__ = !!__isAndroid;
-            } else if (__isAndroid){
-              window.__LB_USE_REST__ = true;
-            }
-          }catch(e){}
-
-        })();
-      }catch(e){
-        console.warn('[LB REST] init failed', e);
-      }
-
-
-      if (!window.firebase){
-        console.warn("[Firebase] Firebase SDK δεν φορτώθηκε. Το Leaderboard θα μείνει σε demo/local mode.");
-        window.__LB_FIREBASE_ENABLED__ = false;
-        window.__LB_FIREBASE_READY__ = Promise.resolve(false);
-        return;
-      }
-
-      if (!firebase.apps || !firebase.apps.length){
-        firebase.initializeApp(cfg);
-      }
-
-      var auth = firebase.auth();
-      var db   = firebase.firestore();
-
-      // ✅ Android/WebView fix: Firestore long-polling (μειώνει hangs/timeouts σε ορισμένα Chromium-based browsers)
-      try{
-        var __ua0 = (navigator && navigator.userAgent) ? navigator.userAgent : '';
-        if (/Android/i.test(__ua0) && db && db.settings){
-          db.settings({ experimentalForceLongPolling: true, useFetchStreams: false });
-        }
-      }catch(e){}
-
-
-      // (Προαιρετικό αλλά προτείνεται για Capacitor WebView)
-      // 1) Auth persistence: σταθερό uid ανά συσκευή/εγκατάσταση.
-      //    Αν το περιβάλλον δεν το υποστηρίζει, πέφτουμε σε SESSION/DEFAULT.
-      
-      // Small helpers (avoid "hanging" promises on some Android WebViews)
-      function __lbWait(ms){ return new Promise(function(res){ setTimeout(res, ms); }); }
-      function __lbWithTimeout(p, ms, code){
-        ms = Math.max(500, ms || 9000);
-        return Promise.race([
-          p,
-          __lbWait(ms).then(function(){
-            var e = new Error(String(code || 'LB_TIMEOUT'));
-            e.code = String(code || 'LB_TIMEOUT');
-            throw e;
-          })
-        ]);
-      }
-
-      // (Προαιρετικό αλλά προτείνεται για Capacitor WebView)
-      // 1) Auth persistence: σταθερό uid ανά συσκευή/εγκατάσταση.
-      //    Σε ορισμένες Android συσκευές έχει παρατηρηθεί ότι setPersistence "κολλάει".
-      //    Γι’ αυτό βάζουμε μικρό timeout και προχωράμε.
-      var __lbPersistEnum = null;
-      try{
-        if (firebase.auth && firebase.auth.Auth && firebase.auth.Auth.Persistence){
-          __lbPersistEnum = firebase.auth.Auth.Persistence;
-        }
-      }catch(e){}
-
-      function __lbSafeSetPersistence(mode){
-        try{
-          if (auth && auth.setPersistence && __lbPersistEnum && mode){
-            return __lbWithTimeout(auth.setPersistence(mode), 2000, 'LB_PERSIST_TIMEOUT');
-          }
-        }catch(e){}
-        return Promise.resolve();
-      }
-
-      var __lbAuthPersist = (__lbPersistEnum ? __lbSafeSetPersistence(__lbPersistEnum.LOCAL) : Promise.resolve())
-        .catch(function(err){
-          console.warn("[Firebase] setPersistence(LOCAL) failed/timeout, fallback.", err);
-          return (__lbPersistEnum ? __lbSafeSetPersistence(__lbPersistEnum.SESSION) : Promise.resolve())
-            .catch(function(e){ /* ignore */ });
-        });
-
-      // 2) Firestore offline persistence (στο Web είναι off by default).
-      //    Χρήσιμο για WebView: cache + λιγότερα reads. Αν αποτύχει, συνεχίζουμε χωρίς persistence.
-      try{
-        if (db && db.enablePersistence){
-          db.enablePersistence().catch(function(err){
-            console.warn("[Firestore] enablePersistence failed (ok).", err);
-          });
-        }
-      }catch(e){ /* ignore */ }
-
-            function __lbBuildReady(){
-        // Σε ορισμένες Android/Opera/Chrome υλοποιήσεις, το signInAnonymously μπορεί να "κολλήσει" (promise που δεν λήγει).
-        // Χρησιμοποιούμε onAuthStateChanged ώστε να ολοκληρώνει μόλις εμφανιστεί χρήστης, και βάζουμε προστατευτικό timeout.
-        var __ua = (navigator && navigator.userAgent) ? navigator.userAgent : '';
-        var __isAndroid = /Android/i.test(__ua);
-        var __authTimeout = __isAndroid ? 20000 : 12000;
-
-        return __lbAuthPersist.then(function(){
-          return new Promise(function(resolve, reject){
-            var done = false;
-            var timer = 0;
-            var unsub = null;
-
-            function finish(ok, val){
-              if (done) return;
-              done = true;
-              try{ if (timer) clearTimeout(timer); }catch(e){}
-              try{ if (typeof unsub === 'function') unsub(); }catch(e){}
-              ok ? resolve(val) : reject(val);
-            }
-
-            try{
-              if (auth.currentUser){
-                finish(true, auth.currentUser);
-                return;
-              }
-            }catch(e){}
-
-            try{
-              unsub = auth.onAuthStateChanged(function(u){
-                if (u) finish(true, u);
-              }, function(err){
-                finish(false, err);
-              });
-            }catch(e){ unsub = null; }
-
-            try{
-              auth.signInAnonymously()
-                .then(function(cred){
-                  try{ if (cred && cred.user) finish(true, cred.user); }catch(e){}
-                })
-                .catch(function(err){
-                  finish(false, err);
-                });
-            }catch(e){
-              finish(false, e);
-            }
-
-            timer = setTimeout(function(){
-              var e = new Error('LB_TIMEOUT');
-              e.code = 'LB_TIMEOUT';
-              finish(false, e);
-            }, __authTimeout);
-          });
-        });
-      }
-// Ανώνυμο login (πρέπει να είναι ενεργό στο Firebase Console → Authentication)
-      window.__LB_FIREBASE_READY__ = __lbBuildReady()
-        .catch(function(err){
-          console.warn("[Firebase] anonymous auth init failed", err);
-          throw err;
-        });
-
-      // ✅ Retry helper (χρήσιμο σε Android Chrome / WebView αν κολλήσει)
-      window.__LB_FIREBASE_RETRY__ = function(){
-        try{
-          window.__LB_FIREBASE_READY__ = __lbBuildReady()
-            .catch(function(err){
-              console.warn("[Firebase] anonymous auth retry failed", err);
-              throw err;
-            });
-          return window.__LB_FIREBASE_READY__;
-        }catch(e){
-          window.__LB_FIREBASE_READY__ = Promise.reject(e);
-          return window.__LB_FIREBASE_READY__;
-        }
-      };
-
-window.__LB_FIREBASE__ = { firebase: firebase, auth: auth, db: db };
-    }catch(e){
-      console.warn("[Firebase] init failed", e);
-      window.__LB_FIREBASE_ENABLED__ = false;
-      window.__LB_FIREBASE_READY__ = Promise.reject(e);
-    }
-  })();
-</script>
 
 <script>
     // =========================================================
@@ -5393,7 +4839,68 @@ window.__LB_FIREBASE__ = { firebase: firebase, auth: auth, db: db };
   ✔︎ Καλή σχολική χρονιά.<br>
 
 </p>
-            `                   
+
+
+            `
+          },
+          {
+            id: 'periexomena',
+            label: 'Περιεχόμενα',
+            htmlText: `
+              <p>
+                Τα περιεχόμενα του βιβλίου είναι οργανωμένα σε ενότητες (και ένα ένθετο).
+                Από την αριστερή στήλη μπορείς να μεταβείς άμεσα σε οποιοδήποτε κεφάλαιο.
+              </p>
+
+              <strong>Αναλυτικά οι ενότητες και τα εδάφια του βιβλίου:</strong>
+
+              <div class="callout">
+
+                <div class="reveal-block">
+                  <button type="button" class="reveal-toggle"><strong>Εισαγωγή</strong></button>
+                  <div class="reveal-content">
+                    <ul>
+                      <li>Πρόλογος</li>
+                      <li>Περιεχόμενα</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="reveal-block">
+                  <button type="button" class="reveal-toggle"><strong>Ενότητα 1:</strong> Μαγνήτες και Μαγνητικό πεδίο της Γης</button>
+                  <div class="reveal-content">
+                    <ul>
+                      <li>Μαγνητικό πεδίο της Γης</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="reveal-block">
+                  <button type="button" class="reveal-toggle"><strong>Ένθετο:</strong> Η ανεμογεννήτρια</button>
+                  <div class="reveal-content">
+                    <ul>
+                      <li>Εξερεύνηση</li>
+                      <li>Εξάσκηση</li>
+                      <li>Περίληψη ενότητας</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="reveal-block">
+                  <button type="button" class="reveal-toggle"><strong>Μάθετε για εμάς</strong></button>
+                  <div class="reveal-content">
+                    <ul>
+                      <li>Εκδόσεις iPedia</li>
+                      <li>Βιβλιογραφία και Credits</li>
+                      <li>Copyright</li>
+                    </ul>
+                  </div>
+                </div>
+
+              </div>
+
+
+            `
           }
         ]
       },
@@ -5790,13 +5297,12 @@ window.__LB_FIREBASE__ = { firebase: firebase, auth: auth, db: db };
 Κάτι που ανανεώνεται, εξελίσσεται και βελτιώνεται συνεχώς.
 </div>
 
-<div class="gg-audio-player" data-audio="MicroMagnets.mp3" data-volume="1"></div>
 
 </div>
 
 <p>   
 <div class="reveal-block">
-    <button type="button" class="reveal-toggle"><strong> Που στοχεύουν τα βοηθήματα μου </strong></button>
+    <button type="button" class="reveal-toggle"><strong> Που στοχεύουν τα βοηθήματα μας </strong></button>
     <div class="reveal-content">
 <strong> Κριτική σκέψη για τους μαθητές, αξιοποίηση των νέων τεχνολογιών για τους καθηγητές.</strong><br><br>
 Ένας από τους βασικούς στόχους ενός διαδραστικού βιβλίου είναι να βοηθήσει τους μαθητές να αναπτύξουν κριτική σκέψη. Η σύγχρονη εποχή έχει μια εμμονή με τις βαθμολογικές επιδόσεις, χωρίς να δίνει έμφαση στην πραγματική ουσία της εκπαίδευσης.  Αυτό οδηγεί σε μια κουλτούρα όπου οι μαθητές συχνά απλά μαθαίνουν να επιτυγχάνουν καλές βαθμολογίες, αντί να αναπτύσσουν τις ικανότητες τους και να κατανοούν την ουσία της μάθησης. Το διαδραστικό βιβλίο βοηθά τους μαθητές να αναλύουν και να αξιολογούν τις πληροφορίες που παρουσιάζονται, καθώς και να αναπτύξουν την ικανότητα να σκέπτονται ανεξάρτητα και να βγάζουν τα δικά τους συμπεράσματα.
@@ -5820,7 +5326,7 @@ H πλειοψηφία των εκδόσεων επικεντρώνονται σ
  <div class="kcallout">
   <div class="kcallout-head">
     <div class="kcallout-icon">📕</div>
-    <p class="kcallout-title">Τα βοηθήματα μου σε καμία περίπτωση δεν έχουν σκοπό να αναιρέσουν τον καθηγητή ή τον φροντιστή.</p>
+    <p class="kcallout-title">Τα βοηθήματα μας σε καμία περίπτωση δεν έχουν σκοπό να αναιρέσουν τον καθηγητή ή τον φροντιστή.</p>
   </div>
 Κάθε βοήθημα απευθύνεται σε όλους τους μαθητές, και μέσα από το ψηφιακό περιεχόμενο του, τους παροτρύνει σε κάθε ευκαιρία την συζήτηση θεμάτων, ασκήσεων και διαδραστικού περιεχομένου με τον καθηγητή τους. Έτσι λοιπόν, τα βοηθήματα μου έρχονται να βοηθήσουν και τους δύο. Τον καθηγητή στην παράδοση του μαθήματος και τους μαθητές στην μελέτη στο σπίτι.
   </div>
@@ -5995,6 +5501,96 @@ function playTick() {
   var p = clickSound.play();
   if (p && p.catch) p.catch(function(){});
 }
+
+// =========================
+// ✅ Stop narration audio when leaving a tab / starting a new one
+// =========================
+function ggStopAudioPlayersInDoc(doc){
+  if (!doc) return;
+
+  var win = null;
+  try{ win = doc.defaultView || doc.parentWindow || window; }catch(e){ win = window; }
+
+  var arr = null;
+  try{
+    arr = (win && win.__ggAudioPlayers && win.__ggAudioPlayers.length != null) ? win.__ggAudioPlayers : null;
+  }catch(e){ arr = null; }
+
+  // Prefer the shared registry (window.__ggAudioPlayers), else scan DOM
+  var list = [];
+  if (arr && arr.length){
+    try{ list = Array.prototype.slice.call(arr); }catch(e){ list = []; }
+  } else {
+    try{ list = Array.prototype.slice.call(doc.querySelectorAll('.gg-audio-player')); }catch(e){ list = []; }
+  }
+
+  var kept = [];
+  for (var i=0; i<list.length; i++){
+    var w = list[i];
+    if (!w) continue;
+
+    // Stop + reset
+    try{
+      var a = w.__ggApAudio;
+      if (a){
+        try{ a.pause(); }catch(e){}
+        try{ a.currentTime = 0; }catch(e){}
+      }
+    }catch(e){}
+
+    try{ if (w.classList) w.classList.remove('is-playing'); }catch(e){}
+    try{ if (w.style && w.style.setProperty) w.style.setProperty('--gg-ap-p','0%'); }catch(e){}
+    try{
+      var rr = (w.querySelector ? w.querySelector('[data-ap=progress]') : null);
+      if (rr && !w.__ggApDragging){ rr.value = '0'; }
+    }catch(e){}
+
+    // prune stale nodes (avoid registry growth)
+    try{
+      if (doc.contains(w)) kept.push(w);
+    }catch(e){
+      kept.push(w);
+    }
+  }
+
+  if (arr){
+    try{
+      arr.length = 0;
+      for (var k=0; k<kept.length; k++) arr.push(kept[k]);
+    }catch(e){}
+  }
+}
+
+function ggStopAllNarrations(reason){
+  try{ ggStopAudioPlayersInDoc(document); }catch(e){}
+
+  // stop any same-origin iframe narrations we can access
+  var ifrs = document.querySelectorAll('iframe');
+  for (var i=0; i<ifrs.length; i++){
+    var f = ifrs[i];
+    try{
+      if (!f) continue;
+      var d = f.contentDocument;
+      if (!d) continue;
+      ggStopAudioPlayersInDoc(d);
+    }catch(e){}
+  }
+}
+
+// Stop narration when the user leaves the browser tab / app is backgrounded
+(function(){
+  function stopNow(){
+    try{ ggStopAllNarrations('visibility'); }catch(e){}
+  }
+  try{
+    document.addEventListener('visibilitychange', function(){
+      if (document.hidden) stopNow();
+    }, false);
+  }catch(e){}
+  try{ window.addEventListener('pagehide', stopNow, false); }catch(e){}
+})();
+
+
 
 // =========================
 // Lesson SFX buttons (inside iframes/lessons)
@@ -6390,8 +5986,8 @@ try{
 "    function _pauseOthers(){\n"+
 "      for(var i=0;i<players.length;i++){\n"+
 "        var w = players[i]; if(!w || w===wrap) continue;\n"+
-"        try{ if(w.__ggApAudio && !w.__ggApAudio.paused) w.__ggApAudio.pause(); }catch(e){}\n"+
-"        try{ if(w.classList) w.classList.remove('is-playing'); }catch(e){}\n"+
+"        try{ if(w.__ggApAudio){ w.__ggApAudio.pause(); try{ w.__ggApAudio.currentTime=0; }catch(e){} } }catch(e){}\n"+
+"        try{ if(w.classList) w.classList.remove('is-playing'); }catch(e){} try{ if(w.style&&w.style.setProperty) w.style.setProperty('--gg-ap-p','0%'); }catch(e){} try{ var rr=(w.querySelector?w.querySelector('[data-ap=progress]'):null); if(rr && !w.__ggApDragging) rr.value='0'; }catch(e){}\n"+
 "      }\n"+
 "    }\n"+
 "    function _safePlay(){\n"+
@@ -8446,6 +8042,8 @@ function focusNoteInContent(noteId) {
       var lesson = lessons[lessonId];
       if (!lesson) return;
 
+      try{ if (typeof ggStopAllNarrations === 'function') ggStopAllNarrations('lesson'); }catch(e){}
+
       currentLessonId = lessonId;
       currentTabId = null;
 
@@ -8487,6 +8085,8 @@ function renderTab(lessonId, tabId) {
 
   var tab = lesson.tabs.find(function (t) { return t.id === tabId; });
   if (!tab) return;
+
+  try{ if (typeof ggStopAllNarrations === 'function') ggStopAllNarrations('tab'); }catch(e){}
 
   currentTabId = tabId;
 
@@ -11840,7 +11440,7 @@ function lbRender(){
       if (lbIsFirebase()){
         lbFootEl.innerHTML = '<span class="lb-foot-dot"></span><span>Η κατάταξη ενημερώνεται όταν ανοίγεις την κάρτα.</span>';
       } else {
-        lbFootEl.innerHTML = '<span class="lb-foot-dot"></span><span>Τοπική λειτουργία (demo). Δεν θα δεις άλλους χρήστες μέχρι να ενεργοποιηθεί το Firebase config.</span>';
+        lbFootEl.innerHTML = '<span class="lb-foot-dot"></span><span></span>';
       }
       lbFootEl.style.display = '';
     }
@@ -11876,8 +11476,8 @@ function lbRender(){
   var isDemo = !lbIsFirebase();
   if (isDemo){
     lbBodyEl.innerHTML = '' +
-      '<div class="lb-err" style="margin-bottom:10px">⚠️ Το Leaderboard είναι σε <strong>demo/local mode</strong> (δεν θα δεις άλλους χρήστες). ' +
-      'Συμπλήρωσε το <code>FIREBASE_CONFIG</code> (apiKey/authDomain/appId) και έλεγξε ότι τα Firestore Rules επιτρέπουν read.</div>' +
+      '<div class="lb-err" style="margin-bottom:10px">⚠️ ' +
+      '</div>' +
       '<div class="xp-section"><div class="xp-section-title">Δοκιμαστική κατάταξη (τοπικά)</div></div>';
   } else {
     lbBodyEl.innerHTML = '<div class="xp-section"><div class="xp-section-title">Φορτώνει η κατάταξη…</div></div>';
@@ -11900,8 +11500,8 @@ function lbRender(){
         var onlyMe = (top.length === 1 && top[0] && String(top[0].nick||'') === String(nick||''));
         var onlyMeMsg = '';
         if (onlyMe){
-          onlyMeMsg = '<div class="lb-ok" style="margin-bottom:10px">Είσαι (προς το παρόν) ο μοναδικός χρήστης. ' +
-            'Για δοκιμή: άνοιξε την εφαρμογή σε Incognito/άλλη συσκευή και δες αν εμφανίζεται δεύτερος χρήστης.</div>';
+          onlyMeMsg = '<div class="lb-ok" style="margin-bottom:10px">Η κατάταξη δεν είναι διαθέσιμη στην επίδειξη της εφαρμογής.' +
+            '';
         }
 
         // ✅ Δείξε άμεσα τον πίνακα χωρίς να περιμένεις το "Η θέση σου"
@@ -12294,7 +11894,7 @@ if (lbChangeNickBtn){
       html: [
         '<p>Βρες γρήγορα λέξεις/έννοιες μέσα στο βιβλίο (κεφάλαια, κείμενα και όρους).</p>',
         '<ul>',
-          '<li>Γράφεις στο πεδίο <strong>Αναζήτηση…</strong> και εμφανίζονται αποτελέσματα.</li>',
+          '<li>Γράφεις στο πεδίο <strong>Αναζήτηση…</strong> και εμφανίζονται τα αποτελέσματα.</li>',
           '<li>Πατάς ένα αποτέλεσμα και μεταφέρεσαι αυτόματα στο σημείο του κειμένου.</li>',
           '<li>Με το <strong>×</strong> καθαρίζεις άμεσα την αναζήτηση.</li>',
         '</ul>'
@@ -12307,7 +11907,7 @@ if (lbChangeNickBtn){
         '<p>Κράτα προσωπικές σημειώσεις πάνω στο κείμενο.</p>',
         '<ul>',
           '<li>Επίλεξε μια φράση: εμφανίζεται μπάρα εργαλείων (Χρώμα / Σχόλιο / Αφαίρεση).</li>',
-          '<li>Όλες οι σημειώσεις συγκεντρώνονται στην κάρτα <strong>📝</strong>.</li>',
+          '<li>Όλες οι σημειώσεις συγκεντρώνονται σε κάρτα από το κουμπί <strong>📝</strong>.</li>',
           '<li>Μπορείς να διαγράψεις επιλεγμένες σημειώσεις από τον συγκεντρωτικό πίνακα.</li>',
         '</ul>'
       ].join('')
@@ -12331,7 +11931,7 @@ if (lbChangeNickBtn){
         '<p>Άμεσες επεξηγήσεις σε βασικές έννοιες του ηλεκτρομαγνητισμού.</p>',
         '<ul>',
           '<li>Πατάς το <strong>📚</strong> για να δεις όλους τους όρους.</li>',
-          '<li>Οι όροι μέσα στο κείμενο (με ειδική σήμανση) εμφανίζουν ορισμό.</li>',
+          '<li>Οι έντονοι όροι μέσα στο κείμενο εμφανίζουν παράθυρο με ορισμό.</li>',
           '<li>Υπάρχει αναζήτηση μέσα στο γλωσσάρι για γρήγορο εντοπισμό.</li>',
         '</ul>'
       ].join('')

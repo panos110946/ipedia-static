@@ -464,7 +464,7 @@ html{
       padding: 22px;
     }
 
-    /* Interactive device mock */
+            /* Interactive device mock */
     .device{
       padding: 18px;
       display:flex;
@@ -472,39 +472,162 @@ html{
       justify-content:center;
       min-height: 380px;
     }
-    .phone{
+
+    /* Smartphone mock (from mock.html) — namespaced to avoid clashes with site .card */
+    .phoneMock{
       width: min(340px, 100%);
       aspect-ratio: 9 / 18.5;
-      border-radius: 34px;
-      background: rgba(10,10,14,.65);
-      border:1px solid rgba(255,255,255,.14);
-      box-shadow: 0 30px 100px rgba(0,0,0,.55);
-      position:relative;
-      overflow:hidden;
+      background: #000;
+      border-radius: 35px;
+      border: 2px solid rgb(40, 40, 40);
+      padding: 7px;
+      position: relative;
+      box-shadow: 2px 5px 15px rgba(0, 0, 0, 0.486);
+      overflow: visible; /* allow side buttons to protrude */
     }
-    .phone:before{
-      content:"";
-      position:absolute; inset:-2px;
-      background:
-        radial-gradient(260px 260px at 20% 20%, rgba(255,126,121,.22), transparent 60%),
-        radial-gradient(260px 240px at 80% 35%, rgba(120,170,255,.18), transparent 62%),
-        radial-gradient(260px 260px at 50% 92%, rgba(122,255,208,.10), transparent 62%);
-      filter: blur(0px);
+
+    .phoneMockInner{
+      background-image: linear-gradient(
+        to right bottom,
+        #8e8989,
+        #ff004431,
+        #5a3e4b,
+        #262225,
+        #2c0334,
+        #ffffff,
+        #6a6878,
+        #c1d9ff,
+        #003d94,
+        #002e66,
+        #001d3a,
+        #020812
+      );
+      background-size: 200% 200%;
+      background-position: 0% 0%;
+      height: 100%;
+      border-radius: 25px;
+      transition: all 0.6s ease-out;
+      overflow: hidden;
+      position: relative;
     }
-    .phone .top{
-      height: 34px; display:flex; align-items:center; justify-content:center;
-      color: rgba(255,255,255,.65); font-weight:900;
-      position:relative; z-index:1;
+    .phoneMock:hover .phoneMockInner{ background-position: 100% 100%; }
+
+    /* Notch */
+    .phoneMockNotch{
+      position: absolute;
+      top: 0px;
+      right: 50%;
+      transform: translate(50%, 0%);
+      width: 35%;
+      height: 18px;
+      background-color: rgb(1, 1, 1);
+      border-bottom-left-radius: 10px;
+      border-bottom-right-radius: 10px;
+      z-index: 20;
+      pointer-events: none;
     }
-    .phone .screen{
-      position:absolute; inset: 34px 12px 12px 12px;
+    .phoneMockSpeaker{
+      position: absolute;
+      top: 2px;
+      right: 50%;
+      transform: translate(50%, 0%);
+      width: 40%;
+      height: 2px;
+      border-radius: 2px;
+      background-color: rgb(20, 20, 20);
+    }
+    .phoneMockCamera{
+      position: absolute;
+      top: 6px;
+      right: 84%;
+      transform: translate(50%, 0%);
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.048);
+    }
+    .phoneMockCamInt{
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      top: 50%;
+      right: 50%;
+      transform: translate(50%, -50%);
+      background-color: rgba(0, 0, 255, 0.212);
+    }
+
+    /* Side buttons */
+    .phoneMockBtn1,
+    .phoneMockBtn2,
+    .phoneMockBtn3,
+    .phoneMockBtn4{
+      position: absolute;
+      width: 2px;
+      pointer-events: none;
+    }
+
+    .phoneMockBtn1,
+    .phoneMockBtn2,
+    .phoneMockBtn3{
+      height: 45px;
+      top: 30%;
+      right: -4px;
+      background-image: linear-gradient(
+        to right,
+        #111111,
+        #222222,
+        #333333,
+        #464646,
+        #595959
+      );
+    }
+
+    .phoneMockBtn2,
+    .phoneMockBtn3{
+      left: -4px;
+      right: auto;
+      transform: scale(-1);
+      height: 30px;
+    }
+    .phoneMockBtn2{ top: 26%; }
+    .phoneMockBtn3{ top: 36%; }
+
+    .phoneMockBtn4{
+      height: 45px;
+      top: 30%;
+      right: -4px;
+      background: transparent;
+      opacity: 0;
+    }
+
+    /* Inner UI (keeps your photos + dock buttons) */
+    .phoneMockStatus{
+      height: 34px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color: rgba(255,255,255,.65);
+      font-weight: 900;
+      position: relative;
+      z-index: 2;
+      padding-top: 4px; /* breathing room under notch */
+      text-align:center;
+      user-select:none;
+    }
+
+    .phoneMockInner .screen{
+      position:absolute;
+      inset: 34px 12px 12px 12px;
       border-radius: 26px;
       background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
       border:1px solid rgba(255,255,255,.10);
       overflow:hidden;
-      z-index:1;
+      z-index: 1;
     }
-    .dock{
+
+    /* Restore screen UI layout so the screenshot never covers the dock */
+    .phoneMockInner .dock{
       position:absolute; left: 10px; right: 10px; bottom: 10px;
       display:grid; grid-template-columns: repeat(6, 1fr);
       gap: 8px;
@@ -514,9 +637,9 @@ html{
       border: 1px solid rgba(255,255,255,.10);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-          z-index: 10;
+      z-index: 10;
     }
-    .appIcon{
+    .phoneMockInner .appIcon{
       border-radius: 14px;
       background: rgba(255,255,255,.08);
       border: 1px solid rgba(255,255,255,.10);
@@ -524,29 +647,30 @@ html{
       display:flex; align-items:center; justify-content:center;
       cursor:pointer;
       transition: transform .12s ease, border-color .15s ease, background .15s ease;
-      position:relative;
     }
-    .appIcon:hover{transform: translateY(-1px)}
-    .appIcon.active{
-      border-color: rgba(255,126,121,.55);
-      background: rgba(255,126,121,.14);
-      box-shadow: 0 18px 40px rgba(255,126,121,.12);
+    .phoneMockInner .appIcon:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.16); background: rgba(255,255,255,.10); }
+    .phoneMockInner .appIcon:active{ transform: translateY(0px) scale(.98); }
+    .phoneMockInner .appIcon.active{
+      border-color: rgba(255,126,121,.38);
+      box-shadow: 0 10px 28px rgba(255,126,121,.12);
     }
-    .appIcon svg{width: 22px; height:22px; opacity:.95}
-    .screenContent{
+    .phoneMockInner .appIcon svg{ width: 22px; height:22px; opacity:.95 }
+
+    .phoneMockInner .screenContent{
       padding: 16px;
-      padding-bottom: 92px;
+      padding-bottom: 92px; /* reserve space for the dock */
       display:flex;
       flex-direction:column;
       gap: 10px;
       height: 100%;
+      box-sizing: border-box;
     }
-    .screenTitle{
+    .phoneMockInner .screenTitle{
       display:flex; align-items:center; gap:10px;
       font-weight: 950;
       letter-spacing: .1px;
     }
-    .screenTitle .badge{
+    .phoneMockInner .screenTitle .badge{
       font-size: 12px;
       padding: 6px 9px;
       border-radius: 999px;
@@ -554,7 +678,7 @@ html{
       background: rgba(255,255,255,.06);
       opacity:.9;
     }
-    .screenBox{
+    .phoneMockInner .screenBox{
       flex:1;
       border-radius: 18px;
       border:1px solid rgba(255,255,255,.12);
@@ -565,10 +689,11 @@ html{
       color: rgba(255,255,255,.90);
       position: relative;
       overflow: hidden;
+      min-height: 0;
     }
-    .screenBox b{color: rgba(255,255,255,.95)}
+    .phoneMockInner .screenBox b{ color: rgba(255,255,255,.95) }
 
-    .shotBg{
+    .phoneMockInner .shotBg{
       position:absolute;
       inset:0;
       width:100%;
@@ -576,15 +701,15 @@ html{
       object-fit: cover;
       transform: scale(1.02);
       filter: saturate(1.06) contrast(1.05);
-          pointer-events: none;
+      pointer-events: none;
     }
-    .shotShade{
+    .phoneMockInner .shotShade{
       position:absolute;
       inset:0;
       background: linear-gradient(180deg, rgba(0,0,0,.62) 0%, rgba(0,0,0,.12) 55%, rgba(0,0,0,.56) 100%);
-          pointer-events: none;
+      pointer-events: none;
     }
-    .shotOverlay{
+    .phoneMockInner .shotOverlay{
       position:relative;
       z-index: 2;
       height: 100%;
@@ -593,9 +718,9 @@ html{
       justify-content:flex-end;
       gap: 10px;
       padding: 10px;
-          pointer-events: none;
+      pointer-events: none;
     }
-    .shotCopy{
+    .phoneMockInner .shotCopy{
       border: 1px solid rgba(255,255,255,.12);
       background: rgba(0,0,0,.28);
       border-radius: 16px;
@@ -603,8 +728,8 @@ html{
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
     }
-    .shotCopy .muted{color: rgba(255,255,255,.80)}
-    .shotOverlay .mini{justify-content:flex-start; margin-top: 0}
+    .phoneMockInner .shotCopy .muted{ color: rgba(255,255,255,.80) }
+    .phoneMockInner .shotOverlay .mini{ justify-content:flex-start; margin-top: 0 }
 
     /* Feature grid */
     .featuresGrid{
@@ -1173,28 +1298,28 @@ html{
 
   <!-- =============================
        SEO + Social previews (Google / OpenGraph / Twitter)
-       NOTE: Replace https://YOUR-DOMAIN.gr/ with your real domain (HTTPS).
+       NOTE: Replace https://www.ipedia.online/ with your real domain (HTTPS).
        ============================= -->
   <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
   <meta name="googlebot" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
   <meta name="theme-color" content="#0b0b0f" />
   <link rel="icon" href="ipediaNw.png" />
   <link rel="apple-touch-icon" href="ipediaNw.png" />
-  <link rel="canonical" href="https://YOUR-DOMAIN.gr/" />
+  <link rel="canonical" href="https://www.ipedia.online/" />
 
   <meta property="og:locale" content="el_GR" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="iPedia Interactive Books" />
   <meta property="og:title" content="iPedia Interactive Books — Διαδραστικά βιβλία και εφαρμογές" />
   <meta property="og:description" content="iPedia Interactive Books — σύγχρονος εκδοτικός οίκος διαδραστικών Multi‑touch eBooks για Apple Books και Google Play." />
-  <meta property="og:url" content="https://YOUR-DOMAIN.gr/" />
-  <meta property="og:image" content="https://YOUR-DOMAIN.gr/ipediaNw.png" />
+  <meta property="og:url" content="https://www.ipedia.online/" />
+  <meta property="og:image" content="https://www.ipedia.online/ipediaNw.png" />
   <meta property="og:image:alt" content="iPedia Interactive Books" />
 
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="iPedia Interactive Books — Διαδραστικά βιβλία και εφαρμογές" />
   <meta name="twitter:description" content="iPedia Interactive Books — σύγχρονος εκδοτικός οίκος διαδραστικών Multi‑touch eBooks για Apple Books και Google Play." />
-  <meta name="twitter:image" content="https://YOUR-DOMAIN.gr/ipediaNw.png" />
+  <meta name="twitter:image" content="https://www.ipedia.online/ipediaNw.png" />
 
   <script type="application/ld+json">
   {
@@ -1203,8 +1328,8 @@ html{
       {
         "@type": "Organization",
         "name": "iPedia Interactive Books",
-        "url": "https://YOUR-DOMAIN.gr/",
-        "logo": "https://YOUR-DOMAIN.gr/ipediaNw.png",
+        "url": "https://www.ipedia.online/",
+        "logo": "https://www.ipedia.online/ipediaNw.png",
         "sameAs": [
           "https://www.facebook.com/ipediaforall/",
           "https://www.tiktok.com/@ipediaebooks?_r=1&_t=ZN-93y4rR3vLMc",
@@ -1216,7 +1341,7 @@ html{
       {
         "@type": "WebSite",
         "name": "iPedia Interactive Books",
-        "url": "https://YOUR-DOMAIN.gr/",
+        "url": "https://www.ipedia.online/",
         "inLanguage": "el-GR"
       }
     ]
@@ -1253,10 +1378,10 @@ html{
         <a href="#top">Για εμάς</a>
         <a href="#play-structure">Play Store</a>
         <a href="#content">Περιεχόμενο</a>
-        <a href="#sketchfab">3D Αποθετήριο</a>
         <a href="#applebooks">Apple Books</a>
         <a href="#youtube">YouTube</a>
         <a href="#ministry">Σχολικά βιβλία & Συνεργασίες</a>
+        <a href="#sketchfab">3D Αποθετήριο</a>
         <a class="cta" href="#contact">Επικοινωνία</a>
       </nav>
     </div>
@@ -1319,9 +1444,15 @@ html{
       </div>
 
       <div class="card device reveal" aria-label="Mockup βασικών δυνατοτήτων (Play Store)">
-        <div class="phone" role="img" aria-label="Mock κινητού με εικονίδια δυνατοτήτων">
-          <div class="top">Προβολή σε έξυπνο τηλέφωνο</div>
-          <div class="screen">
+        <div class="phoneMock" role="img" aria-label="Mock κινητού με εικονίδια δυνατοτήτων">
+          <div class="phoneMockBtn1" aria-hidden="true"></div>
+          <div class="phoneMockBtn2" aria-hidden="true"></div>
+          <div class="phoneMockBtn3" aria-hidden="true"></div>
+          <div class="phoneMockBtn4" aria-hidden="true"></div>
+
+          <div class="phoneMockInner">
+            <div class="phoneMockStatus"></div>
+            <div class="screen">
             <div class="screenContent">
               <div class="screenTitle">
                 <span id="featTitle">Γλωσσάρι</span>
@@ -1346,10 +1477,17 @@ html{
               </div>
             </div>
           </div>
+          </div>
+
+          <div class="phoneMockNotch" aria-hidden="true">
+            <div class="phoneMockCamera"><div class="phoneMockCamInt"></div></div>
+            <div class="phoneMockSpeaker"></div>
+          </div>
         </div>
       </div>
 
-      <div class="timelineWrap reveal timelineOutside">
+
+<div class="timelineWrap reveal timelineOutside">
           <button class="btn timelineToggle js-timeline-toggle" type="button" aria-expanded="false" aria-controls="ipediaTimeline">
             📅 Χρονολόγιο iPedia (2011–2026)
             <span class="tlHint">Άνοιγμα</span>
@@ -1392,7 +1530,7 @@ html{
             <div class="tlEvents" hidden>
               <div class="tlEvent" data-year="2011"><b>Η αρχή</b><br> Γεννιέται η ιδέα της iPedia ως εκπαιδευτικό εγχείρημα με στόχο τη δημιουργία διαδραστικών ηλεκτρονικών βιβλίων που θα είναι ξεκάθαρα, όμορφα και πρακτικά. Βασική σκέψη: τα ψηφιακά εργαλεία (ψηφιακή μετάβαση της εκπαίδευσης) είναι προς όφελος του μαθητή.</div>
 
-              <div class="tlEvent" data-year="2012"><b>Το πρώτο εγχείρημα</b><br> Εκδίδεται το πρώτο εγχείρημα της iPedia που αφορά των Φυσική της Γ Γυμνασίου. Περιλαμβάνει παρουσιάσεις, βιντεοασκήσεις, εικόνες, διαδραστικό γλωσσάρι κλπ</div>
+              <div class="tlEvent" data-year="2012"><b>Το πρώτο εγχείρημα</b><br> Εκδίδεται το πρώτο εγχείρημα της iPedia που αφορά την Φυσική της Γ Γυμνασίου. Περιλαμβάνει παρουσιάσεις, βιντεοασκήσεις, εικόνες και διαδραστικό γλωσσάρι.</div>
 
               <div class="tlEvent" data-year="2013"><b>Νέα προσέγγιση</b><br> Αποφασίζεται η δημιουργία ενός βιβλίου για τον Παρθενώνα. Έτσι, ξεκινά η ανάπτυξη μιας ολοκληρωμένης τρισδιάστατης ψηφιακής αναπαράστασης του ναού πάνω στην οποία θα βασιστεί το βιβλίο.</div>
 
@@ -1404,23 +1542,24 @@ html{
 
               <div class="tlEvent" data-year="2017"><b>Μελέτη και διευρεύνηση</b><br> Χρονιά διαβάσματος και έρευνας. Αυτοματοποίηση, περιεχόμενο, νέες αγορές. Πρώτες σκέψεις να διαθέσουμε τα βιβλία μας στο οικοσύστημα της Google και το Android.</div>
 
-              <div class="tlEvent" data-year="2018"><b>Νέα βιβλία στην Α Λυκείου</b><br> Έκδοση των βιβλίων Τράπεζα θεμάτων και Δυναμική Α Λυκείου. Η μη υποστήριξη των βιβλίων μας στο Google Play Store προβληματίζει. Εξερευνούνται εναλλακτικές.</div>
+              <div class="tlEvent" data-year="2018"><b>Νέα βιβλία στην Α Λυκείου</b><br> Έκδοση των βιβλίων Τράπεζα θεμάτων και Δυναμική Α Λυκείου. Η μη υποστήριξη των βιβλίων μας στο Google Play Books προβληματίζει. Εξερευνούνται εναλλακτικές.</div>
 
-              <div class="tlEvent" data-year="2019"><b>Χρονιά επιδημίας</b><br> Χρόνος για μελέτη, έρευνας και ενημέρωσης των βιβλίων μας. Ενισχύεται η παρουσία της iPedia με περισσότερα εκπαιδευτικά βίντεο στο YouTube.</div>
+              <div class="tlEvent" data-year="2019"><b>Χρονιά επιδημίας</b><br> Χρόνος για μελέτη, έρευνα και ενημέρωση των βιβλίων μας. Ενισχύεται η παρουσία της iPedia με περισσότερα εκπαιδευτικά βίντεο στο YouTube.</div>
 
               <div class="tlEvent" data-year="2020"><b>Η αναπάντεχη ώθηση</b><br> Κατά την διάρκεια της επιδημίας οι πωλήσεις εκτοξεύονται και στο Top 10 της κατηγορίας Σχολικά Βιβλία του Apple Books φιγουράρουν 5 τίλτοι μας. Εκδίδονται τα διαδραστικά βιβλία Ηλεκτρομαγνητισμός Γ Λυκείου και Οριζόντια Βολή. Το κανάλι μας στο YouΤube φτάνει τους 4000 συνδρομητές!</div>
 
-              <div class="tlEvent" data-year="2021"><b>Ενημερώσεις</b><br> Στόχος: άψογη λειτουργία σε κινητό και tablet, με responsive σχεδίαση και σταθερότητα. Η Google συνεχίζει να αγνοεί την λεννοιτα του διαδραστικού βιβλίου. Ανεβάουμε στην Amazon μια ψηφιακά «φτωχή» έκδοση του βιβλίου του Παρθενώνα καθώς υποστηρίζεται μόνο εικόνα, βίντεο και ήχος.</div>
+              <div class="tlEvent" data-year="2021"><b>Ενημερώσεις</b><br> Στόχος: άψογη λειτουργία σε κινητό και tablet, με responsive σχεδίαση και σταθερότητα. Η Google συνεχίζει να αγνοεί την έννοια του διαδραστικού βιβλίου. Ανεβάζουμε στην Amazon μια ψηφιακά «φτωχή» έκδοση του βιβλίου του Παρθενώνα καθώς υποστηρίζεται μόνο εικόνα, βίντεο και ήχος.</div>
 
-              <div class="tlEvent" data-year="2022"><b>Εμπλουτισμός</b><br> Μεγαλώνει η συλλογή εφαρμογών/μοντέλων και η ποικιλία δραστηριοτήτων. Ξεκινά η συγγραφή του διαδραστικού βιβλίο Ενέργεια Α Λυκείου. Οι συνδρομητές στο κανάλι μας στο YouTube φτάνουν τους 5500!</div>
+              <div class="tlEvent" data-year="2022"><b>Εμπλουτισμός</b><br> Μεγαλώνει η συλλογή εφαρμογών/μοντέλων και η ποικιλία δραστηριοτήτων. Ξεκινά η συγγραφή του διαδραστικού βιβλίου Ενέργεια Α Λυκείου. Οι συνδρομητές στο κανάλι μας στο YouTube φτάνουν τους 5500!</div>
 
               <div class="tlEvent" data-year="2023"><b>Νέα προγράμματα σπουδών</b><br> Δημοσιεύονται τα νέα προγράμματα σπουδών από το Υπουργείο Παιδείας. Ξεκινά ένας νέος κύκλος ενημερώσεων των βιβλίων μας ώστε να εναρμονιστούν στα νέα προγράμματα.</div>
 
-              <div class="tlEvent" data-year="2024"><b>Νέα σειρά βοηθημάτων στο Γυμνάσιο.</b> Εκδίδεται μια νέα σειρά διαδραστικών βιβλίων για τη Φυσική του Γυμνασίου με το ίδιο ύφος και σχεδίαση. Περιλαμβάνονται πια προσομοιώσεις, πειράματα, έξυπνα τεστ κλπ</div>
+              <div class="tlEvent" data-year="2024"><b>Ενημέρωση των βοηθημάτων του Γυμνασίου.</b><br>Ενημερώνονται τα διαδραστικά βιβλία της Φυσικής του Γυμνασίου στα νέα προγράμματα σπουδών και αποκτούν το ίδιο ύφος και σχεδίαση. Περιλαμβάνονται πια προσομοιώσεις, πειράματα, έξυπνα τεστ και πολλά άλλα!</div>
 
-              <div class="tlEvent" data-year="2025"><b>Ενιαίο οικοσύστημα</b><br> Περιεχόμενο, 3D εφαρμογές και δοκιμασίες δένουν σε μια ομοιόμορφη εμπειρία ανάγνωσης. Έναρξη σχεδιάσμου του διαδραστικού βιβλίου - εφαρμογή για το Android. (Google, δεν μπορούμε να σε περιμένουμε άλλο!)</div>
+              <div class="tlEvent" data-year="2025"><b>Ενιαίο οικοσύστημα στο Google Play Store</b><br> Περιεχόμενο, 3D εφαρμογές και δοκιμασίες δένουν σε μια ομοιόμορφη εμπειρία ανάγνωσης. Έναρξη σχεδιάσμου του διαδραστικού βιβλίου - εφαρμογή για το Android. (Google, δεν μπορούμε να σε περιμένουμε άλλο!)</div>
 
-              <div class="tlEvent" data-year="2026"><b>Σήμερα</b><br> Ολόκληρώθηκε η δομή του βιβλίου που θα διαθέτουμε στο Google Play store. Πραγματοποιείται η δημιουργία και η ανάπτυξη του περιεχομένου του διαδραστικού βιβλίου Ηλεκτρομαγνητισμός Γυμνασίου που θα διατεθεί σύντομα στο Play Store. Παράλληλα, εστιάζουμε σε μετατροπή περιεχομένου σε interactive, βελτιώσεις και νέες κυκλοφορίες σε Apple & Android. Συνδρομητές στο YouTube: 7500!</div>
+              <div class="tlEvent" data-year="2026"><b>Σήμερα</b><br> Ολόκληρώθηκε η δομή του βιβλίου που θα διαθέτουμε στο Google Play store. H δημιουργία και η ανάπτυξη του περιεχομένου του διαδραστικού βιβλίου Ηλεκτρομαγνητισμός Γυμνασίου που θα διατεθεί σύντομα στο Play Store βρίσκεται σε εξέλιξη. Παράλληλα, εστιάζουμε σε μετατροπή περιεχομένου σε διαδραστικό, βελτιώσεις και νέες κυκλοφορίες σε Apple & Android.<br>
+Συνδρομητές στο YouTube: 7500!</div>
             </div>
 
 </div>
@@ -1569,7 +1708,22 @@ html{
           <h3>Πίνακας Κατάταξης</h3>
           <p>Δες το TOP 10 και τη θέση σου. Ένα επιπλέον κίνητρο για συνέπεια στη μελέτη.</p>
         </div>
-      </div>
+      
+        <div class="card feature reveal">
+                  <div class="icon" aria-hidden="true">👁️</div>
+                  <h3>Επίδειξη εφαρμογής</h3>
+                  <p>
+                    Άνοιξε ένα ζωντανό demo και <b>πάτησε το κουμπί «Ξενάγηση»</b> μέσα στην εφαρμογή.
+                  </p>
+                  <div class="featureActions">
+                    <button class="btn primary js-open-iframe" type="button"
+                            data-iframe-src="EmAppDemo.html"
+                            data-iframe-title="Επίδειξη εφαρμογής Ηλεκτρομαγνητισμός Γυμνασίου">
+                      Επίδειξη εφαρμογής
+                    </button>
+                  </div>
+                </div>
+</div>
       </div>
     </div>
   </section>
@@ -1601,7 +1755,7 @@ html{
         <div class="card feature reveal">
           <div class="icon" aria-hidden="true">🧪</div>
           <h3>Έξυπνα Τεστ</h3>
-          <p>Έλεγξε αμέσως την επίδοση σου. Το αποτέλεσμα εμφανίζεται άμεσα!</p>
+          <p>Έλεγξε αμέσως την επίδοση σου. Το αποτέλεσμα εμφανίζεται άμεσα! (Δες Επίδειξη Εφαρμογής)</p>
         </div>
         <div class="card feature reveal">
           <div class="icon" aria-hidden="true">🧾</div>
@@ -1650,20 +1804,7 @@ html{
           <p>Προσομοιώσεις φαινομένων με "pro" δυνατότητες και συνοδευτικές πειραματικές διαδικασίες.<br> <strong>Θυμίσου:</strong> η φυσική είναι η επιστήμη της παρατήρησης!</p>
         </div>
 
-        <div class="card feature reveal">
-          <div class="icon" aria-hidden="true">👁️</div>
-          <h3>Επίδειξη εφαρμογής</h3>
-          <p>
-            Άνοιξε ένα ζωντανό demo και <b>πάτησε το κουμπί «Ξενάγηση»</b> μέσα στην εφαρμογή.
-          </p>
-          <div class="featureActions">
-            <button class="btn primary js-open-iframe" type="button"
-                    data-iframe-src="EmAppDemo.html"
-                    data-iframe-title="Επίδειξη εφαρμογής — EmAppDemo">
-              Επίδειξη εφαρμογής
-            </button>
-          </div>
-        </div>
+        
       </div>
 
       <div class="notice reveal" style="margin-top:14px">
@@ -1674,33 +1815,7 @@ html{
       </div>
     </div>
   </section>
-  <!-- SKETCHFAB -->
-  <section class="section" id="sketchfab">
-    <div class="wrap">
-      <div class="reveal">
-        <h2>Ψηφιακό αποθετήριο τρισδιάστατων μοντέλων</h2>
-        <p class="lead">
-          Φιλοξενούμε πάνω από <strong>300 τρισδιάστατα μοντέλα</strong> στο ψηφιακό μας αποθετήριο, ως συνοδευτικό υλικό των διαδραστικών βιβλίων μας.
-          Μπορείς να τα περιστρέψεις, να κάνεις zoom και να τα ανοίξεις σε πλήρη οθόνη.
-        </p>
-</div>
-
-      <div class="sfGrid" id="sfGrid"></div>
-
-      <p class="sfNote reveal">
-        <strong>Tip:</strong> Πάνω στα μοντέλα υπάρχουν αριθμοί· πάτα πάνω τους για να δεις τον σχολιασμό.
-      </p>
-
-      <div class="reveal" style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap">
-        <a class="btn primary" href="https://sketchfab.com/iPedia/models" target="_blank" rel="noopener">
-          Άνοιγμα αποθετηρίου
-        </a>
-      </div>
-
-
-    </div>
-  </section>
-
+ 
 
   <!-- APPLE BOOKS -->
   <section class="section" id="applebooks">
@@ -1787,6 +1902,7 @@ html{
     </div>
   </section>
 
+
     <!-- MINISTRY / PUBLIC INITIATIVE -->
   <section class="section" id="ministry">
     <div class="wrap">
@@ -1852,9 +1968,9 @@ html{
         <div class="card pad reveal">
           <h3 style="margin:0 0 10px; font-size: 18px">3) Έκδοση & Διάθεση</h3>
           <ul class="list">
-            <li><span class="check" aria-hidden="true">✓</span><span>Apple Books - Multi‑touch eBook</span></li>
-            <li><span class="check" aria-hidden="true">✓</span><span>Android app‑book (Google Play)</span></li>
-            <li><span class="check" aria-hidden="true">✓</span><span>Stand-alone app (να την διαθέσετε όπου εσείς θέλετε.)</span></li>
+            <li><span class="check" aria-hidden="true">✓</span><span>Apple Books - διαδραστικό βιβλίο</span></li>
+            <li><span class="check" aria-hidden="true">✓</span><span>Android εφαρμογή ‑ διαδραστικό βιβλίο (Google Play)</span></li>
+            <li><span class="check" aria-hidden="true">✓</span><span>Αυτόνομη εφαρμογή (Windows, Mac, Web κλπ για να την διαθέσετε όπου και όπως εσείς θέλετε)</span></li>
   <li><span class="check" aria-hidden="true">✓</span><span>Έλεγχος & υποστήριξη</span></li>
           </ul>
         </div>
@@ -1865,6 +1981,35 @@ html{
       </div>
     </div>
   </section>
+
+
+ <!-- SKETCHFAB -->
+  <section class="section" id="sketchfab">
+    <div class="wrap">
+      <div class="reveal">
+        <h2>Ψηφιακό αποθετήριο τρισδιάστατων μοντέλων</h2>
+        <p class="lead">
+          Φιλοξενούμε πάνω από <strong>300 τρισδιάστατα μοντέλα</strong> στο ψηφιακό μας αποθετήριο, ως συνοδευτικό υλικό των διαδραστικών βιβλίων μας.
+          Μπορείς να τα περιστρέψεις, να κάνεις zoom και να τα ανοίξεις σε πλήρη οθόνη.
+        </p>
+</div>
+
+      <div class="sfGrid" id="sfGrid"></div>
+
+      <p class="sfNote reveal">
+        <strong>Tip:</strong> Πάνω στα μοντέλα υπάρχουν αριθμοί· πάτα πάνω τους για να δεις τον σχολιασμό.
+      </p>
+
+      <div class="reveal" style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap">
+        <a class="btn primary" href="https://sketchfab.com/iPedia/models" target="_blank" rel="noopener">
+          Επισκέψου το αποθετηρίο
+        </a>
+      </div>
+
+
+    </div>
+  </section>
+
 
   <!-- SERVICES -->
   
