@@ -329,9 +329,9 @@
 
 <footer>
   <div class="wrap">
-    <a href="https://apple.co/2Q7Blxq" target="_blank" rel="noopener">iPedia Interactive Books</a>
+    <a href="https://apple.co/2Q7Blxq" target="_blank" rel="noopener"></a>
     &nbsp;•&nbsp;
-    <a href="https://apple.co/2WWPyk0" target="_blank" rel="noopener">Φυσική Γ Γυμνασίου</a>
+    <a href="https://apple.co/2WWPyk0" target="_blank" rel="noopener"></a>
   </div>
 </footer>
 
@@ -349,7 +349,7 @@ document.getElementById('btnMute').onclick = ()=>{ bgMusic.muted = !bgMusic.mute
 
 /* ---------- Three.js ---------- */
 let renderer, scene, camera, controls;
-let worldGroup, earth, cloudsGroup, geomagGroup, geogGroup, starfield, atmosphereGlow;
+let worldGroup, earth, earthTiltGroup, earthSpinGroup, cloudsGroup, geomagGroup, geogGroup, starfield, atmosphereGlow;
 let rotateOn = true, showAxesAngle = true;
 let compassGroup = null, compassNeedle = null, compassOn = false;
 const RADIUS = 100;
@@ -653,8 +653,8 @@ const INFO_TEXTS = {
   northMag: "Ο Βόρειος Μαγνητικός Πόλος βρίσκεται κοντά στον Νότιο Γεωγραφικό Πόλο, στην Ανταρκτική. Μετακινείται συνεχώς με ρυθμό περίπου 10 km/έτος.",
   northGeo: "Ο Βόρειος Γεωγραφικός Πόλος είναι το βόρειο άκρο του άξονα περιστροφής της Γης. Βρίσκεται στον Αρκτικό Ωκεανό, όπου η επιφάνεια καλύπτεται από πάγο.",
   southGeo: "Ο Νότιος Γεωγραφικός Πόλος είναι το νότιο άκρο του άξονα περιστροφής της Γης. Βρίσκεται στην Ανταρκτική, σε σταθερή θέση.",
-  rotAxis:  "Άξονας Περιστροφής: Ο άξονας περιστροφής συνδέει τους γεωγραφικούς πόλους. Η Γη περιστρέφεται γύρω του κάθε 24 ώρες (κλίση ~23,5°).",
-  magAxis:  "Άξονας Γεωμαγνητικού Πεδίου: Ενώνει τους μαγνητικούς πόλους. Η γωνία με τον άξονα περιστροφής είναι περίπου 11°."
+  rotAxis:  "Ο άξονας περιστροφής συνδέει τους γεωγραφικούς πόλους. Η Γη περιστρέφεται κάθε 24 ώρες σχηματίζοντας κλίση ~23,5°.",
+  magAxis:  "Ενώνει τους μαγνητικούς πόλους. Η γωνία με τον άξονα περιστροφής είναι περίπου 11°."
 };
 function getInfoText(key){
   const PHASE = predPhase;
@@ -666,7 +666,7 @@ function getInfoText(key){
     northMag(){ if (PHASE===0) return "Ο Βόρειος Μαγνητικός Πόλος κοντά στην Ανταρκτική, μετακινείται (~10 km/έτος).";
                 if (PHASE===0.5) return "Πρόβλεψη ("+phaseTag+"): μετατόπιση προς νότιο ημισφαίριο, απόκλιση ~90°.";
                 return "Πρόβλεψη ("+phaseTag+"): μετά από αναστροφή, κοντά στον Βόρειο Γεωγραφικό Πόλο."; },
-    magAxis(){ if (PHASE===0) return "Άξονας Γεωμαγνητικού Πεδίου: σήμερα ~11° από τον γεωγραφικό.";
+    magAxis(){ if (PHASE===0) return "σήμερα ~11° από τον γεωγραφικό.";
                if (PHASE===0.5) return "Πρόβλεψη ("+phaseTag+"): μέγιστη απόκλιση κοντά στις 90°.";
                return "Πρόβλεψη ("+phaseTag+"): αντιστροφή προσανατολισμού έναντι του γεωγραφικού."; }
   };
@@ -722,6 +722,15 @@ function init(){
 
   worldGroup = new THREE.Group(); scene.add(worldGroup);
 
+  // --- Γη: σταθερή κλίση άξονα (obliquity) + ξεχωριστή περιστροφή ---
+  earthTiltGroup = new THREE.Group();
+  earthSpinGroup = new THREE.Group();
+  earthTiltGroup.add(earthSpinGroup);
+  earthTiltGroup.rotation.z = THREE.MathUtils.degToRad(23.4);
+  earthTiltGroup.name = "earthTiltGroup";
+  earthSpinGroup.name = "earthSpinGroup";
+  worldGroup.add(earthTiltGroup);
+
   controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true; controls.dampingFactor = .08;
   controls.minDistance = RADIUS * 2; controls.maxDistance = RADIUS * 9;
@@ -743,7 +752,7 @@ function init(){
   ]).then(([dayTex, nightTex, normalTex, bumpTex, specTex])=>{
     earth = createEarthShader(RADIUS, dayTex, nightTex, normalTex, bumpTex, specTex, sun);
     earth.material.side = THREE.DoubleSide;
-    worldGroup.add(earth);
+    earthSpinGroup.add(earth);
 
     addGeomagneticAxisAndMarkers(earth, RADIUS);
     addGeographicAxis(earth, RADIUS);
@@ -756,7 +765,7 @@ function init(){
     updateAxesAngleVisual(RADIUS); setAxesAngleVisible(true);
 
     geomagGroup.visible = false;
-    document.getElementById('btnAxis').textContent = 'Μαγνητικό Πεδίο: OFF';
+    document.getElementById('btnAxis').textContent = 'Γεωμαγνητικό Πεδίο: OFF';
     document.getElementById('linesGroup').style.display = 'none';
     updateSpritesVisibility(); setAxesAngleVisible(showAxesAngle);
 
@@ -765,7 +774,7 @@ function init(){
     loader.load(URLs.day, (t)=>{
       const mat = new THREE.MeshPhongMaterial({ map: t, shininess: 6, specular: 0x333333, side: THREE.DoubleSide });
       const geo = new THREE.SphereGeometry(RADIUS, 128, 128);
-      earth = new THREE.Mesh(geo, mat); worldGroup.add(earth);
+      earth = new THREE.Mesh(geo, mat); earthSpinGroup.add(earth);
 
       addGeomagneticAxisAndMarkers(earth, RADIUS);
       addGeographicAxis(earth, RADIUS);
@@ -776,7 +785,7 @@ function init(){
       if (geomagGroup?.userData?.magDir) initialMagDir = geomagGroup.userData.magDir.clone().normalize();
       updateAxesAngleVisual(RADIUS); setAxesAngleVisible(true);
       geomagGroup.visible = false;
-      document.getElementById('btnAxis').textContent = 'Μαγνητικό Πεδίο: OFF';
+      document.getElementById('btnAxis').textContent = 'Γεωμαγνητικό Πεδίο: OFF';
       document.getElementById('linesGroup').style.display = 'none';
       updateSpritesVisibility(); setAxesAngleVisible(showAxesAngle);
 
@@ -791,7 +800,7 @@ function init(){
   document.getElementById('btnAxis').onclick = ()=>{
     if (!geomagGroup) return;
     geomagGroup.visible = !geomagGroup.visible;
-    document.getElementById('btnAxis').textContent = `Μαγνητικό Πεδίο: ${geomagGroup.visible?'ON':'OFF'}`;
+    document.getElementById('btnAxis').textContent = `Γεωμαγνητικό Πεδίο: ${geomagGroup.visible?'ON':'OFF'}`;
     updateAxesAngleVisual(RADIUS);
     updateSpritesVisibility();
     document.getElementById('linesGroup').style.display = geomagGroup.visible ? '' : 'none';
@@ -1784,9 +1793,12 @@ function followGeographicSpritesEachFrame(){
   if (northGeo) placeOnSurface(northGeo.getWorldPosition(new THREE.Vector3()), nSprite, 3);
   if (southGeo) placeOnSurface(southGeo.getWorldPosition(new THREE.Vector3()), sSprite, 3);
 
-  if (rotSprite){
+  if (rotSprite && earth){
     const axisDistance = RADIUS + 40;
-    rotSprite.position.set(0, axisDistance, 0);
+    const localPoint = new THREE.Vector3(0, axisDistance, 0);
+    const worldPoint = earth.localToWorld(localPoint.clone());
+    const dir = worldPoint.clone().normalize();
+    rotSprite.position.copy(dir.multiplyScalar(axisDistance));
   }
 }
 
@@ -1801,7 +1813,7 @@ function animate(){
 
   if (rotateOn){
     const earthSpeed = 0.0015;
-    if (earth) earth.rotation.y += earthSpeed;
+    if (earthSpinGroup) earthSpinGroup.rotation.y += earthSpeed;
     if (cloudsGroup){ cloudsGroup.rotation.y += earthSpeed * 0.6; }
   }
 

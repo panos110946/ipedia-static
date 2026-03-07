@@ -565,6 +565,8 @@ aside.sidebar {
       max-width: var(--page-max-width);
       margin: 0 auto;
       box-sizing: border-box;
+      -webkit-user-select: text;
+      user-select: text;
     }
 
     .section-label {
@@ -2609,6 +2611,15 @@ mark.search-hit{
   padding: 0 2px;
 }
 
+
+
+/* ✅ Android: προσωρινό highlight preview (χωρίς native selection) */
+.gg-selection-preview{
+  background: rgba(255, 126, 121, 0.307);
+  border-radius: 6px;
+  padding: 0 2px;
+  box-shadow: 0 0 0 1px rgba(255, 126, 121, 0.18);
+}
 .user-highlight.user-highlight-comment{
   background: rgba(255, 126, 121, 0.34);
   border-bottom-color: rgba(215, 90, 85, 0.85);
@@ -2665,23 +2676,31 @@ mark.search-hit{
 
 .reveal-block1 .reveal-answer{
   width: 100%;
+  max-width: 100%;
   resize: vertical;
   min-height: 92px;
-  border-radius: 12px;
-  padding: 10px 12px;
-  font: 13px Arial, sans-serif;
-  color: #625C5C;
-  outline: none;
-  background: rgba(255,255,255,.95);
+  border-radius: 10px;
+
+  /* look like test2.html (.gg-input) */
+  outline: 2px solid var(--accent, #FF7E79);
+  outline-offset: 3px;
   border: 0;
+  font-family: inherit;
+  background-color: #e2e2e2;
+  padding: 10px 1rem;
+  margin-top: 8px;
+  transition: 0.25s;
+
+  /* prevent iOS zoom */
+  font-size: 16px;
+  color: var(--ink, #625C5C);
 }
 
 .reveal-block1 .reveal-answer:focus{
-  background: #fff;
+  outline-offset: 5px;
+  background-color: #fff;
   box-shadow: none;
 }
-
-
 .reveal-block1 .reveal-actions{
   display: flex;
   gap: 10px;
@@ -2765,33 +2784,132 @@ mark.search-hit{
   margin-bottom: 6px;
 }
 
+/* ✅ Checklist grid (2 columns) */
 .reveal-block1 .reveal-checklist-grid{
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 6px 12px;
 }
 
-.reveal-block1 .reveal-kw{
-  display:flex;
-  align-items:center;
-  gap:10px;
+/* ===== Keyword items: GG Radio look (match test2.html) ===== */
+.reveal-block1 .reveal-kw-item{
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
   font: 13px Arial, sans-serif;
-  color:#625C5C;
+  color: #625C5C;
 }
-
-.reveal-block1 .reveal-kw input{
-  width: 16px;
-  height: 16px;
-  accent-color: #FF7E79;
-}
-
-.reveal-block1 .reveal-kw.is-missing{
+.reveal-block1 .reveal-kw-item.is-missing{
   opacity: .95;
 }
-.reveal-block1 .reveal-kw.is-missing .reveal-kw-label{
+.reveal-block1 .reveal-kw-item.is-missing .reveal-kw-label{
   font-weight: 700;
 }
+.reveal-block1 .reveal-kw-label{
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  padding-top: 2px;
+}
 
+/* ===== GG Radio buttons (Uiverse "checkbox-wrapper-12" adapted) — scoped to reveal-block1 ===== */
+.reveal-block1 .gg-radio-12{
+  position: relative;
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  margin-top: 1px;
+}
+.reveal-block1 .gg-radio-12 *{ box-sizing: border-box; }
+.reveal-block1 .gg-radio-12 input[type="radio"],
+.reveal-block1 .gg-radio-12 input[type="checkbox"]{
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  cursor: default;
+  margin: 0;
+  transform: none;
+}
+.reveal-block1 .gg-radio-12 input[type="radio"]:focus,
+.reveal-block1 .gg-radio-12 input[type="checkbox"]:focus{ outline: 0; }
+
+.reveal-block1 .gg-radio-12 .cbx{
+  width: 24px;
+  height: 24px;
+  position: relative;
+  filter: url("#goo-12");
+}
+.reveal-block1 .gg-radio-12 .cbx input{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 24px;
+  height: 24px;
+  border: 2px solid #bfbfc0;
+  border-radius: 50%;
+  background: transparent;
+}
+.reveal-block1 .gg-radio-12 .cbx label{
+  width: 24px;
+  height: 24px;
+  background: none;
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate3d(0, 0, 0);
+  pointer-events: none;
+}
+.reveal-block1 .gg-radio-12 .cbx svg{
+  position: absolute;
+  top: 5px;
+  left: 4px;
+  z-index: 1;
+  pointer-events: none;
+}
+.reveal-block1 .gg-radio-12 .cbx svg path{
+  stroke: #fff;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 19;
+  stroke-dashoffset: 19;
+  transition: stroke-dashoffset 0.3s ease;
+  transition-delay: 0.2s;
+}
+.reveal-block1 .gg-radio-12 .cbx input:checked + label{
+  animation: ggSplash-12 0.6s ease forwards;
+}
+.reveal-block1 .gg-radio-12 .cbx input:checked + label + svg path{
+  stroke-dashoffset: 0;
+}
+
+@keyframes ggSplash-12 {
+  40% {
+    background: #FF7E79;
+    box-shadow:
+      0 -18px 0 -8px #FF7E79,
+      16px -8px 0 -8px #FF7E79,
+      16px 8px 0 -8px #FF7E79,
+      0 18px 0 -8px #FF7E79,
+      -16px 8px 0 -8px #FF7E79,
+      -16px -8px 0 -8px #FF7E79;
+  }
+  100% {
+    background: #FF7E79;
+    box-shadow:
+      0 -36px 0 -10px transparent,
+      32px -16px 0 -10px transparent,
+      32px 16px 0 -10px transparent,
+      0 36px 0 -10px transparent,
+      -32px 16px 0 -10px transparent,
+      -32px -16px 0 -10px transparent;
+  }
+}
 /* =========================
    Reusable App Iframe Modal
    ========================= */
@@ -4082,204 +4200,6 @@ color:#FF7E79
   transform: scale(1.06);
 }
 
-
-/* =========================
-   Guided Tour (Demo)
-   ========================= */
-.gg-tour-fab{
-  position: fixed;
-  right: calc(env(safe-area-inset-right, 0px) + 14px);
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 64px);
-  z-index: 26000; /* πάνω από header/footer, κάτω από reward toast */
-  border: 1px solid rgba(255,126,121,.55);
-  background: rgba(255,255,255,.92);
-  color: var(--ink);
-  border-radius: 999px;
-  padding: 10px 14px;
-  font-weight: 900;
-  letter-spacing: .2px;
-  cursor: pointer;
-  box-shadow: 0 14px 40px rgba(15,23,42,.18);
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-.gg-tour-fab:hover{ transform: translateY(-1px); background: #fff; }
-.gg-tour-fab:active{ transform: translateY(0); }
-.gg-tour-fab:focus-visible{ outline: 3px solid rgba(255,126,121,.55); outline-offset: 3px; }
-@media (max-width: 600px){
-  .gg-tour-fab{
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 58px);
-    padding: 9px 12px;
-    font-size: 0.92em;
-  }
-}
-
-.gg-tour{
-  position: fixed;
-  inset: 0;
-  z-index: 25000;
-  display: none;
-  pointer-events: none;
-}
-.gg-tour.is-open{
-  display: block;
-  pointer-events: auto;
-}
-
-.gg-tour-backdrop{
-  position: absolute;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.35);
-  opacity: 0;
-  transition: opacity .22s ease-out;
-}
-.gg-tour.is-open .gg-tour-backdrop{ opacity: 1; }
-
-.gg-tour-highlight{
-  position: absolute;
-  border-radius: 14px;
-  border: 2px solid rgba(255,126,121,.95);
-  box-shadow:
-    0 0 0 6px rgba(255,126,121,.12),
-    0 0 0 9999px rgba(15, 23, 42, 0.35);
-  transition: top .18s ease-out, left .18s ease-out, width .18s ease-out, height .18s ease-out, opacity .18s ease-out;
-  opacity: 0;
-  pointer-events: none;
-}
-.gg-tour.is-open .gg-tour-highlight{ opacity: 1; }
-.gg-tour-highlight.pulse{
-  animation: ggTourPulse 1.15s ease-in-out infinite;
-}
-@keyframes ggTourPulse{
-  0%,100%{ box-shadow: 0 0 0 6px rgba(255,126,121,.12), 0 0 0 9999px rgba(15,23,42,.35); }
-  50%{ box-shadow: 0 0 0 9px rgba(255,126,121,.18), 0 0 0 9999px rgba(15,23,42,.35); }
-}
-
-.gg-tour-card{
-  position: absolute;
-  width: min(420px, calc(100vw - 24px));
-  max-height: min(78vh, 520px);
-  overflow: hidden;
-  background: rgba(255,255,255,.96);
-  border: 1px solid rgba(0,0,0,.08);
-  border-radius: 18px;
-  box-shadow: 0 18px 55px rgba(15,23,42,.30);
-  transform: translateY(10px);
-  opacity: 0;
-  transition: opacity .22s ease-out, transform .22s ease-out;
-  pointer-events: auto;
-}
-.gg-tour.is-open .gg-tour-card{
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.gg-tour-card-inner{ display:flex; flex-direction:column; }
-
-.gg-tour-head{
-  display:flex;
-  align-items:center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 12px 12px 8px;
-}
-.gg-tour-step{
-  font-size: 0.74em;
-  text-transform: uppercase;
-  letter-spacing: .16em;
-  color: #9ca3af;
-  font-weight: 800;
-}
-.gg-tour-x{
-  border: none;
-  background: transparent;
-  font-size: 1.25em;
-  line-height: 1;
-  cursor: pointer;
-  color: #9ca3af;
-  padding: 2px 6px;
-  border-radius: 999px;
-}
-.gg-tour-x:hover{ background: rgba(0,0,0,.04); color:#4b5563; }
-
-.gg-tour-title{
-  padding: 0 12px 8px;
-  font-weight: 900;
-  color: var(--accent);
-  font-size: 1.05em;
-}
-.gg-tour-body{
-  padding: 0 12px 12px;
-  color: var(--ink);
-  font-size: 0.92em;
-  line-height: 1.55;
-}
-.gg-tour-body ul{
-  margin: 0.4rem 0 0.2rem 1.1rem;
-  padding: 0;
-}
-.gg-tour-body li{ margin-bottom: 0.25rem; }
-
-.gg-tour-actions{
-  display:flex;
-  align-items:center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 10px 12px 12px;
-  border-top: 1px solid rgba(0,0,0,.08);
-  background: rgba(249,250,251,.78);
-}
-.gg-tour-actions-right{
-  display:flex;
-  gap: 8px;
-  align-items:center;
-}
-
-.gg-tour-btn{
-  border: 1px solid rgba(255,126,121,.55);
-  background: #fff7f5;
-  color: var(--ink);
-  border-radius: 999px;
-  padding: 8px 12px;
-  font-weight: 900;
-  cursor: pointer;
-  font-size: 0.9em;
-}
-.gg-tour-btn:hover{ background: #ffe4de; }
-.gg-tour-btn:active{ transform: translateY(1px); }
-
-.gg-tour-btn.ghost{
-  border-color: rgba(148,163,184,.75);
-  background: #ffffff;
-  font-weight: 800;
-}
-.gg-tour-btn.ghost:hover{ background: #f3f4f6; }
-
-.gg-tour-foot{
-  padding: 10px 12px 12px;
-  display:flex;
-  justify-content:flex-end;
-  gap: 10px;
-  background: rgba(255,255,255,.96);
-}
-.gg-tour-skip{
-  border: none;
-  background: transparent;
-  color: #9ca3af;
-  font-weight: 800;
-  cursor: pointer;
-  padding: 0;
-}
-.gg-tour-skip:hover{ color: #4b5563; text-decoration: underline; }
-
-@media (prefers-reduced-motion: reduce){
-  .gg-tour-highlight.pulse{ animation: none !important; }
-  .gg-tour-card, .gg-tour-highlight, .gg-tour-backdrop{ transition: none !important; }
-}
-
 </style>
 </head>
 <body>
@@ -4339,21 +4259,14 @@ color:#FF7E79
 <span class="toc-label">Ενοτητα 1</span>
 <div class="toc-title">Μαγνήτες και Μαγνητικό πεδίο της Γης</div>
 <p class="toc-desc">
-              Γνωριμία με τους μαγνήτες, τις ιδιότητές τους και το αόρατο μαγνητικό πεδίο
-              που περιβάλλει τη Γη και μας προστατεύει.
+              Το γεωμαγνητικό πεδίο και ο ρόλος του στη ζωή στη Γη.
             </p>
 </div>
 <div class="toc-item" data-id="inset">
 <span class="toc-label">Ένθετο</span>
-<div class="toc-title">Ένθετο: Η ανεμογγεννήτρια</div>
+<div class="toc-title">Ένθετο: Η ανεμογεννήτρια</div>
 <p class="toc-desc">
-              Μάθε πως μετατρέπουμε την Αιολική ενέργεια σε ηλεκτρική.            </p>
-</div>
-<div class="toc-item" data-id="ipedia">
-<span class="toc-label">Μαθετε για εμας</span>
-<div class="toc-title">iPedia</div>
-<p class="toc-desc">
-              Εκδόσεις iPedia, διαδραστικά βιβλία και χρήσιμες πληροφορίες.
+              Μάθε πως μετατρέπουμε την Αιολική ενέργεια σε ηλεκτρική.
             </p>
 </div>
 </div>
@@ -4449,7 +4362,7 @@ color:#FF7E79
 
     <div class="lb-modal-foot" id="lbFootNote">
       <span class="lb-foot-dot"></span>
-      <span></span>
+      <span>Προσωρινά λειτουργεί τοπικά (local demo). Στο επόμενο βήμα το συνδέουμε με Firebase.</span>
     </div>
   </div>
 </div>
@@ -4642,6 +4555,237 @@ color:#FF7E79
 </div>
 </div>
 
+<!-- =========================================================
+     🔥 Firebase (Firestore) — Leaderboard XP
+     1) Συμπλήρωσε το FIREBASE_CONFIG από: Firebase Console → Project settings → Your apps → Web app
+     2) Ενεργοποίησε Anonymous Auth: Authentication → Sign-in method → Anonymous
+     3) Ενεργοποίησε Firestore: Firestore Database → Create database (Production)
+========================================================== -->
+<script>
+  // ΠΡΟΣΟΧΗ: Αν δεις "PASTE_..." στην κονσόλα, πρέπει να κάνεις paste το πραγματικό config.
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyDmu2vTU6Cv6iwUOYanlDfFF-TvSVVS6Tg",
+  authDomain: "ggemlboard.firebaseapp.com",
+  projectId: "ggemlboard",
+  storageBucket: "ggemlboard.firebasestorage.app",
+  messagingSenderId: "807575352026",
+  appId: "1:807575352026:web:aaedbf6f6ecf189cf02be3",
+  measurementId: "G-JWYN9CQZGV"
+};
+</script>
+<script type="module">
+  import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+  import {
+    getAuth,
+    setPersistence,
+    indexedDBLocalPersistence,
+    browserLocalPersistence,
+    browserSessionPersistence,
+    inMemoryPersistence,
+    signInAnonymously,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+  import {
+    initializeFirestore,
+    memoryLocalCache,
+    persistentLocalCache,
+    persistentSingleTabManager,
+    serverTimestamp,
+    runTransaction,
+    doc,
+    collection,
+    query,
+    where,
+    orderBy,
+    limit,
+    getDocs,
+    getCountFromServer
+  } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+  (function(){
+    try{
+      const cfg = window.FIREBASE_CONFIG || (typeof firebaseConfig !== 'undefined' ? firebaseConfig : null) || {};
+      const missing = (!cfg.apiKey || String(cfg.apiKey).indexOf("PASTE_") === 0);
+      if (missing){
+        console.warn("[Firebase] FIREBASE_CONFIG δεν έχει συμπληρωθεί ακόμη. Το Leaderboard θα μείνει σε demo/local mode.");
+        window.__LB_FIREBASE_ENABLED__ = false;
+        window.__LB_FIREBASE_READY__ = Promise.resolve(false);
+        return;
+      }
+
+      window.__LB_FIREBASE_ENABLED__ = true;
+      window.__LB_USE_REST__ = false; // διατηρείται ως flag για συμβατότητα (REST fallback απενεργοποιημένο στο modular setup)
+
+      // Small helpers (avoid "hanging" promises on some Android WebViews)
+      function __lbWait(ms){ return new Promise(res => setTimeout(res, ms)); }
+      function __lbWithTimeout(p, ms, code){
+        ms = Math.max(500, ms || 9000);
+        return Promise.race([
+          p,
+          __lbWait(ms).then(function(){
+            const e = new Error(String(code || 'LB_TIMEOUT'));
+            e.code = String(code || 'LB_TIMEOUT');
+            throw e;
+          })
+        ]);
+      }
+
+      // Init App (idempotent)
+      const app = (getApps && getApps().length) ? getApps()[0] : initializeApp(cfg);
+
+      // Auth
+      const auth = getAuth(app);
+
+      // Firestore (NEW approach: FirestoreSettings.localCache via initializeFirestore)
+      const ua = (navigator && navigator.userAgent) ? navigator.userAgent : '';
+      const isAndroid = /Android/i.test(ua);
+
+
+       // Περιβάλλοντα τύπου file:// (Hype Reflect / offline preview) ή WebViews με απενεργοποιημένο storage
+       // μπορεί να απορρίψουν IndexedDB / localStorage. Σε αυτή την περίπτωση ΔΕΝ επιχειρούμε persistent cache/persistence.
+       const __isFileProtocol = (typeof location !== 'undefined' && location && location.protocol === 'file:');
+       function __storageWritable(){
+         try{
+           if (typeof localStorage === 'undefined') return false;
+           const k = '__lb_t_' + Math.random().toString(16).slice(2);
+           localStorage.setItem(k, '1');
+           localStorage.removeItem(k);
+           return true;
+         }catch(e){
+           return false;
+         }
+       }
+       const __storageOK = (!__isFileProtocol) && __storageWritable();
+
+      let db = null;
+      try{
+        // Νέα προσέγγιση (future-proof): FirestoreSettings.localCache
+        // Αν το storage δεν είναι διαθέσιμο (π.χ. file://), πάμε κατευθείαν σε memory cache.
+        const opts = __storageOK
+          ? { localCache: persistentLocalCache({ tabManager: persistentSingleTabManager() }) }
+          : { localCache: memoryLocalCache() };
+        if (isAndroid){
+          opts.experimentalForceLongPolling = true;
+          opts.useFetchStreams = false;
+        }
+        db = initializeFirestore(app, opts);
+      }catch(e){
+        // Fallback to memory cache if persistent cache isn't supported in this environment
+        try{
+          const opts2 = { localCache: memoryLocalCache() };
+          if (isAndroid){
+            opts2.experimentalForceLongPolling = true;
+            opts2.useFetchStreams = false;
+          }
+          db = initializeFirestore(app, opts2);
+        }catch(e2){
+          // As a last resort, try default init (memory cache)
+          db = initializeFirestore(app);
+        }
+      }
+
+      // Expose Firestore modular helpers to non-module scripts
+      window.__LB_FS__ = {
+        serverTimestamp,
+        runTransaction,
+        doc,
+        collection,
+        query,
+        where,
+        orderBy,
+        limit,
+        getDocs,
+        getCountFromServer
+      };
+
+      // Auth persistence (keep your previous "bulletproof" behavior, but in modular)
+      function __setAuthPersistence(mode){
+        if (!mode) return Promise.resolve(true);
+        return __lbWithTimeout(setPersistence(auth, mode), 2500, 'LB_PERSIST_TIMEOUT');
+      }
+
+      // Auth persistence (future-proof & safe):
+      // - Σε http/https με διαθέσιμο storage: IndexedDB → Local → Session → Memory
+      // - Σε file:// ή όταν storage δεν είναι διαθέσιμο: ΜΟΝΟ in-memory (για να μη βγαίνουν warnings/σφάλματα)
+      (async function(){
+        if (!__storageOK){
+          try{ await __setAuthPersistence(inMemoryPersistence); }catch(e0){}
+          return;
+        }
+        try{
+          await __setAuthPersistence(indexedDBLocalPersistence);
+        }catch(e1){
+          try{ await __setAuthPersistence(browserLocalPersistence); }
+          catch(e2){
+            try{ await __setAuthPersistence(browserSessionPersistence); }
+            catch(e3){
+              try{ await __setAuthPersistence(inMemoryPersistence); }catch(e4){}
+            }
+          }
+        }
+      })();
+
+      function __signInAnonBulletproof(){
+        const timeoutMs = isAndroid ? 20000 : 12000;
+
+        return new Promise(function(resolve, reject){
+          let done = false;
+          let unsub = null;
+          const finish = (ok, payload)=>{
+            if (done) return;
+            done = true;
+            try{ if (unsub) unsub(); }catch(e){}
+            ok ? resolve(payload) : reject(payload);
+          };
+
+          try{
+            if (auth.currentUser){
+              finish(true, auth.currentUser);
+              return;
+            }
+          }catch(e){}
+
+          try{
+            unsub = onAuthStateChanged(auth, function(u){
+              if (u) finish(true, u);
+            });
+          }catch(e){}
+
+          // Start sign-in
+          __lbWithTimeout(signInAnonymously(auth), timeoutMs, 'LB_AUTH_TIMEOUT')
+            .then(function(cred){
+              const u = (cred && cred.user) ? cred.user : auth.currentUser;
+              if (u) finish(true, u);
+              else __lbWait(50).then(()=>finish(true, auth.currentUser));
+            })
+            .catch(function(err){
+              // 1 retry
+              __lbWithTimeout(signInAnonymously(auth), timeoutMs, 'LB_AUTH_TIMEOUT_RETRY')
+                .then(function(cred2){
+                  const u2 = (cred2 && cred2.user) ? cred2.user : auth.currentUser;
+                  finish(true, u2);
+                })
+                .catch(function(err2){
+                  console.warn("[Firebase] anonymous auth init failed", err2);
+                  finish(false, err2);
+                });
+            });
+        });
+      }
+
+      window.__LB_FIREBASE__ = { app, auth, db };
+
+      window.__LB_FIREBASE_READY__ = __signInAnonBulletproof();
+
+    }catch(err){
+      console.warn("[Firebase] init failed; fallback to local demo mode.", err);
+      window.__LB_FIREBASE_ENABLED__ = false;
+      window.__LB_FIREBASE_READY__ = Promise.resolve(false);
+    }
+  })();
+</script>
+
 <script>
     // =========================================================
     // ✅ Robust helpers for Safari/iOS: event.target may be TextNode
@@ -4701,7 +4845,6 @@ color:#FF7E79
 
                 </ul>
                 
-<p>   
 <div class="reveal-block">
     <button type="button" class="reveal-toggle"><strong>📚 Γλωσσάρι</strong></button>
     <div class="reveal-content">
@@ -4709,13 +4852,11 @@ color:#FF7E79
 <ul>
 <li>Αναζήτηση όρων: γράφεις μια λέξη και εντοπίζεις άμεσα τον αντίστοιχο όρο.</li> 
 <li>Ορισμός: σύντομη και κατανοητή επεξήγηση της έννοιας.</li>
-<li>Γρήγορη βοήθεια στο κείμενο: όταν πατήσεις έναν υπογραμμισμένο όρο, εμφανίζεται μικρό παράθυρο με την εξήγησή του.</li> 
+<li>Γρήγορη βοήθεια στο κείμενο: όταν πατήσεις έναν υπογραμμισμένο όρο, εμφανίζεται μικρό pop-up με την εξήγησή του.</li> 
 </ul>
 </div>
-</div>
-</p>  
+</div>  
                 
-<p>   
 <div class="reveal-block">
     <button type="button" class="reveal-toggle"><strong>🏆 Σύστημα Προόδου - Εμπειρία XP</strong></button>
     <div class="reveal-content">
@@ -4727,25 +4868,20 @@ color:#FF7E79
 <li>Ανάλυση προόδου: λίστα με XP ανά εφαρμογή και ανά μάθημα, ταξινομημένη ώστε να βλέπεις πρώτα τα πιο πρόσφατα/σημαντικά.</li>
 </ul>
 </div>
-</div>
-</p> 
+</div> 
 
-<p>   
 <div class="reveal-block">
     <button type="button" class="reveal-toggle"><strong>🏅 Πίνακας Κατάταξης</strong></button>
     <div class="reveal-content">
 Κάθε φορά που ανεβαίνεις επίπεδο, πιάνεις ορόσημα και ολοκληρώνεις μαθήματα/δοκιμασίες, κερδίζεις εμπειρία. Πατώντας το κουμπί της κατάταξης 🏅 (στο κάτω μέρος της οθόνης), μπορείς να δεις τη θέση που καταλαμβάνει η επίδοση σου σε σχέση με τους υπόλοιπους μαθητές. Για να δούμε. Θα είσαι ο καλύτερος ή η καλύτερη;  </div>
-</div>
-</p> 
+</div> 
 
-<p>   
 <div class="reveal-block">
     <button type="button" class="reveal-toggle"><strong>📈 Αποτελέσματα Τεστ</strong></button>
     <div class="reveal-content">
 Στο τέλος κάθε ενότητας, υπάρχουν διαδραστικά τεστ με άμεση βαθμολόγηση. Πατώντας το κουμπί 📈 εμφανίζεις την κάρτα: Αποτελέσματα Τεστ. Στην κάρτα αυτή θα βρείς τα τεστ που έχεις ολοκληρώσει, την βαθμολογία που έχεις επιτύχει, τις συνολικές προσπάθειες και τον μέσο όρο σου. Η επιδόσεις σου απεικονίζονται και με διάγραμμα για να αποτυπώνεται η εξέλιξη σου με την πάροδο του χρόνου. 
 </div>
-</div>
-</p>  
+</div>  
 
 <div class="double-bar1">
 Το βιβλίο αυτό δεν σχεδιάστηκε για να αντικαταστήσει τον καθηγητή ή το φροντιστήριο. Είναι ένα εργαλείο στήριξης — ένα μέσο που λειτουργεί ως γέφυρα ανάμεσα στη διδασκαλία και την προσωπική μελέτη. Η Φυσική, εξάλλου, δεν είναι μόνο θεωρία. Είναι παρατήρηση, ερμηνεία, απορίες, ανακαλύψεις και, πάνω απ’ όλα, ερωτήσεις! Ο στόχος του βιβλίου δεν είναι να σου δώσει έτοιμες απαντήσεις, αλλά να σε παρακινήσει να ρωτήσεις, να πειραματιστείς, να εξερευνήσεις, να συζητήσεις με τον καθηγητή σου και να χρησιμοποιήσεις την αγαπημένη σου συσκευή — κινητό, tablet ή υπολογιστή — με γόνιμο και εποικοδομητικό τρόπο.
@@ -4753,7 +4889,6 @@ color:#FF7E79
 </div>
 
 
-<p>   
 <div class="reveal-block">
     <button type="button" class="reveal-toggle"><strong>Η τεχνολογία μετασχηματίζει την εκπαίδευση</strong></button>
     <div class="reveal-content">
@@ -4762,18 +4897,14 @@ color:#FF7E79
 Σκέψου, για παράδειγμα, έναν καθηγητή Φυσικής που χρησιμοποιεί μια τρισδιάστατη διαδραστική απεικόνιση ενός ηλεκτρικού κινητήρα. Ο μαθητής μπορεί να περιστρέψει το μοντέλο, να δει την εσωτερική του δομή, να ενεργοποιήσει και να απενεργοποιήσει ρεύματα και μαγνητικά πεδία και να παρατηρήσει πώς παράγεται η κίνηση. Δεν πρόκειται απλώς για θεωρητική παρουσίαση μιας διάταξης, αλλά για μια ζωντανή, βιωματική εμπειρία που ενισχύει την κατανόηση και καλλιεργεί την κριτική σκέψη.   
 </div>
 </div>
-</p>
 
-<p>   
 <div class="reveal-block">
     <button type="button" class="reveal-toggle"><strong>Τι συμβαίνει τώρα στον κόσμο</strong></button>
     <div class="reveal-content">
 Ο μετασχηματισμός της εκπαίδευσης έχει ήδη ξεκινήσει σε παγκόσμιο επίπεδο. Στις Ηνωμένες Πολιτείες και τη Φινλανδία, εφαρμόζονται εξατομικευμένα ψηφιακά περιβάλλοντα μάθησης. Στη Γερμανία, τα σχολεία έχουν ενσωματώσει σύγχρονους διαδραστικούς πίνακες και λογισμικά STEM. Και στην Ελλάδα, με τη μεταρρύθμιση του Ψηφιακού Σχολείου, ενισχύεται η χρήση διαδραστικών βιβλίων, η βιωματική προσέγγιση της ύλης, και η αξιοποίηση σύγχρονων τεχνολογιών μέσα στην τάξη.
 Μέσα σε αυτό το πλαίσιο, το βιβλίο εξακολουθεί να αποτελεί βασικό εργαλείο μάθησης. Αυτό που αλλάζει δεν είναι η αξία του, αλλά η μορφή του. Από στατικό και παθητικό, μεταμορφώνεται σε δυναμικό και διαδραστικό. Αυτή η αλλαγή, όμως, συνοδεύεται από μια νέα πρόκληση: την ανάγκη για συνεχή εξέλιξη και προσαρμογή εκ μέρους του εκπαιδευτικού. Η τεχνολογία δεν έρχεται να αντικαταστήσει τον ρόλο του, αλλά να τον ενισχύσει. Όσο περισσότερο εξοικειώνεται με τα νέα εργαλεία, τόσο πιο ουσιαστική γίνεται η συμβολή του στη μαθησιακή διαδικασία. Η μετάβαση στη νέα εποχή της εκπαίδευσης είναι ήδη σε εξέλιξη — και είναι στο χέρι κάθε εκπαιδευτικού να αποτελέσει ενεργό μέρος αυτής της αλλαγής.   
 </div>
-</div>
-</p>     
-<p>   
+</div>     
 <div class="reveal-block">
     <button type="button" class="reveal-toggle"><strong>Η φετινή χρονιά</strong></button>
     <div class="reveal-content">
@@ -4782,13 +4913,9 @@ color:#FF7E79
 <div class="double-bar1">
 Είναι σημαντικό να γνωρίζεις ότι με την αγορά οποιουδήποτε βιβλίου αποκτάς και όλες τις μελλοντικές αναβαθμίσεις και ενημερώσεις, χωρίς καμία επιπλέον χρέωση. Δεν υπάρχουν συνδρομές, κρυφές χρεώσεις ή περιορισμοί πρόσβασης. Το βιβλίο αυτό είναι δικό σου — για πάντα. </div>
 
-<div class="gg-audio-player" data-audio="ThisYear.mp3" data-volume="1"></div>
-
 </div>
-</div>
-</p>  
+</div>  
 
-<p>   
 <div class="reveal-block">
     <button type="button" class="reveal-toggle"><strong> Ακολούθησέ μας</strong></button>
     <div class="reveal-content">
@@ -4800,7 +4927,7 @@ color:#FF7E79
     </svg>
             </a>
         <a class="ipediaSocialContainer ipediaFB"
-   href="https://www.ipedia.com"
+   href="https://www.ipedia.online"
    target="_blank"
    rel="noopener noreferrer"
    aria-label="Website">
@@ -4832,8 +4959,7 @@ color:#FF7E79
             </a>
           </div>
 </div>
-</div>
-</p>  
+</div>  
               
 <p>
   ✔︎ Καλή σχολική χρονιά.<br>
@@ -4848,58 +4974,57 @@ color:#FF7E79
             label: 'Περιεχόμενα',
             htmlText: `
               <p>
-                Τα περιεχόμενα του βιβλίου είναι οργανωμένα σε ενότητες (και ένα ένθετο).
-                Από την αριστερή στήλη μπορείς να μεταβείς άμεσα σε οποιοδήποτε κεφάλαιο.
+                Τα περιεχόμενα του βιβλίου είναι οργανωμένα σε ενότητες (και ένα ένθετο). Από την αριστερή στήλη μπορείς
+                να μεταβείς άμεσα σε οποιοδήποτε κεφάλαιο.
               </p>
 
-              <strong>Αναλυτικά οι ενότητες και τα εδάφια του βιβλίου:</strong>
+                <strong>Αναλυτικά οι ενότητες και τα εδάφια του βιβλίου:</strong>
+
 
               <div class="callout">
 
-                <div class="reveal-block">
-                  <button type="button" class="reveal-toggle"><strong>Εισαγωγή</strong></button>
-                  <div class="reveal-content">
-                    <ul>
-                      <li>Πρόλογος</li>
-                      <li>Περιεχόμενα</li>
-                    </ul>
-                  </div>
-                </div>
+<div class="reveal-block">
+    <button type="button" class="reveal-toggle"><strong>Εισαγωγή</strong></button>
+    <div class="reveal-content">
 
-                <div class="reveal-block">
-                  <button type="button" class="reveal-toggle"><strong>Ενότητα 1:</strong> Μαγνήτες και Μαγνητικό πεδίο της Γης</button>
-                  <div class="reveal-content">
-                    <ul>
-                      <li>Μαγνητικό πεδίο της Γης</li>
-                    </ul>
-                  </div>
-                </div>
-
-                <div class="reveal-block">
-                  <button type="button" class="reveal-toggle"><strong>Ένθετο:</strong> Η ανεμογεννήτρια</button>
-                  <div class="reveal-content">
-                    <ul>
-                      <li>Εξερεύνηση</li>
-                      <li>Εξάσκηση</li>
-                      <li>Περίληψη ενότητας</li>
-                    </ul>
-                  </div>
-                </div>
-
-                <div class="reveal-block">
-                  <button type="button" class="reveal-toggle"><strong>Μάθετε για εμάς</strong></button>
-                  <div class="reveal-content">
-                    <ul>
-                      <li>Εκδόσεις iPedia</li>
-                      <li>Βιβλιογραφία και Credits</li>
-                      <li>Copyright</li>
-                    </ul>
-                  </div>
-                </div>
-
-              </div>
+<ul>
+<li>Πρόλογος</li>
+<li>Περιεχόμενα</li>
+</ul>
+          </div>
+  </div>
 
 
+<div class="reveal-block">
+    <button type="button" class="reveal-toggle"><strong>Ενότητα 1:</strong> Μαγνήτες και Μαγνητικό πεδίο της Γης</button>
+    <div class="reveal-content">
+
+<ul>
+<li>Μαγνητικό πεδίο της Γης</li>   
+</ul>
+          </div>
+  </div>
+
+
+<div class="reveal-block">
+    <button type="button" class="reveal-toggle"><strong>Ένθετο:</strong> Η ανεμογεννήτρια</button>
+    <div class="reveal-content">
+
+<ul>
+<li>Εξερεύνηση</li>
+<li>Εξάσκηση</li>
+<li>Περίληψη ενότητας</li>
+</ul>
+          </div>
+  </div>
+
+  </div>
+
+
+              <p>
+                Συμβουλή: Διάβαζε την θεωρία και πραγματοποίησε τις πειραματικές διαδικασίες/προσομοιώσεις/δραστηριότητες για να «δέσει» η γνώση. Στόχος μας είναι να μάθεις με τρόπο <strong>ενεργητικό</strong> και <strong>βιωματικό</strong>.
+                Ξεκίνα από την ενότητα 1 και προχώρησε βήμα-βήμα!<br> Καλό διάβασμα!
+              </p>
             `
           }
         ]
@@ -4913,9 +5038,9 @@ color:#FF7E79
             label: 'Μαγνητικό πεδίο της Γης',
             htmlText: `
               <p>
-              Η <strong class="gloss-term" data-gloss-key="earth">Γη</strong> αποτελεί έναν τεράστιο φυσικό <strong class="gloss-term" data-gloss-key="magnet">μαγνήτη</strong> με χαρακτηριστικά ανάλογα με αυτά ενός <strong class="gloss-term" data-gloss-key="rod_magnet">ραβδόμορφου μαγνήτη</strong> - <em>ενεργοποίησε τον διακόπτη Γεωμαγνητικό Πεδίο στην εφαρμογή Γεωμαγνητικό πεδίο</em>. Την ύπαρξη του γεωμαγνητικού πεδίου επιβεβαιώνει η <strong class="gloss-term" data-gloss-key="compass">μαγνητική πυξίδα</strong> η οποία πάντα μας δείχνει τον βορρά, ανεξαρτήτως του γεωγραφικού μήκους και πλάτους που βρισκόμαστε - <em >ενεργοποίησε τον διακόπτη Πυξίδα στην εφαρμογή Γεωμαγνητικό πεδίο</em>. Αυτό οφείλεται στην <strong class="gloss-term" data-gloss-key="magnetic_force">μαγνητική δύναμη</strong> που δέχεται από αυτό. 
+              Η <strong class="gloss-term" data-gloss-key="earth">Γη</strong> αποτελεί έναν τεράστιο φυσικό <strong class="gloss-term" data-gloss-key="magnet">μαγνήτη</strong> με χαρακτηριστικά ανάλογα με αυτά ενός <strong class="gloss-term" data-gloss-key="rod_magnet">ραβδόμορφου μαγνήτη</strong> - <em>ενεργοποίησε τον διακόπτη Γεωμαγνητικό Πεδίο στην εφαρμογή Γεωμαγνητικό πεδίο</em>. Την ύπαρξη του γεωμαγνητικού πεδίου επιβεβαιώνει η <strong class="gloss-term" data-gloss-key="compass">μαγνητική πυξίδα</strong> η οποία πάντα μας δείχνει τον βορρά, ανεξαρτήτως του γεωγραφικού μήκους και πλάτους που βρισκόμαστε - <em >ενεργοποίησε τον διακόπτη Πυξίδα στην εφαρμογή Γεωμαγνητικό πεδίο</em>. Αυτό οφείλεται στην <strong class="gloss-term" data-gloss-key="magnetic_force">μαγνητική δύναμη</strong> που δέχεται από αυτό. <br>
               
-              <br>Οι <strong class="gloss-term" data-gloss-key="dynamic_lines">δυναμικές γραμμές</strong> του <strong class="gloss-term" data-gloss-key="geomagnetic_field">γεωμαγνητικού πεδίου</strong>, ξεκινούν από τον μαγνητικό βόρειο πόλο και καταλήγουν στον μαγνητικό νότιο πόλο, σχηματίζοντας ένα καμπυλωτό μοτίβο γύρω από τον πλανήτη. Η αόρατη αυτή <em>«ασπίδα»</em> συμβάλλει στην προστασία της <strong class="gloss-term" data-gloss-key="earth">Γης</strong>, καθώς εκτρέπει τα φορτισμένα σωματίδια του διαστήματος όπως αυτά του <strong class="gloss-term" data-gloss-key="solar_wind">ηλιακού ανέμου</strong>, αποτρέποντας τις βλαβερές επιδράσεις τους στην ατμόσφαιρα - <em>πάτα το κουμπί Αόρατη Ασπίδα στην εφαρμογή Γεωμαγνητικό πεδίο.</em>
+Οι <strong class="gloss-term" data-gloss-key="dynamic_lines">δυναμικές γραμμές</strong> του <strong class="gloss-term" data-gloss-key="geomagnetic_field">γεωμαγνητικού πεδίου</strong>, ξεκινούν από τον μαγνητικό βόρειο πόλο και καταλήγουν στον μαγνητικό νότιο πόλο, σχηματίζοντας ένα καμπυλωτό μοτίβο γύρω από τον πλανήτη. Η αόρατη αυτή <em>«ασπίδα»</em> συμβάλλει στην προστασία της <strong class="gloss-term" data-gloss-key="earth">Γης</strong>, καθώς εκτρέπει τα φορτισμένα σωματίδια του διαστήματος όπως αυτά του <strong class="gloss-term" data-gloss-key="solar_wind">ηλιακού ανέμου</strong>, αποτρέποντας τις βλαβερές επιδράσεις τους στην ατμόσφαιρα - <em>πάτα το κουμπί Αόρατη Ασπίδα στην εφαρμογή Γεωμαγνητικό πεδίο.</em>
 
 <br>Ο <strong class="gloss-term" data-gloss-key="magnetic_axis">μαγνητικός άξονας</strong>, δηλαδή η ευθεία που ενώνει τους γεωμαγνητικούς πόλους, δεν συμπίπτει με τον άξονα περιστροφής της Γης. Συνεπώς, οι μαγνητικοί της πόλοι δεν συμπίπτουν με τους γεωγραφικούς της - <em>εξερεύνησε τα «χεράκια» στην εφαρμογή Γεωμαγνητικό πεδίο.</em> Μάλιστα, μετακινούνται με την πάροδο του χρόνου λόγω των κινήσεων του ρευστού σιδήρου που περιέχει ο πυρήνας του πλανήτη μας. Συνεπώς, <strong class="gloss-term" data-gloss-key="magnetic_density">η ένταση Β</strong> του γεωμαγνητικού πεδίου δεν είναι σταθερή. Παρόλα αυτά, μεταβάλλεται τόσο πολύ αργά με την πάροδο του χρόνου (σε κλίμακα ετών ή αιώνων) που πρακτικά την θεωρούμε σταθερή - <em>πάτα το κουμπί Χαρακτηριστικά και προβλέψεις στην εφαρμογή Γεωμαγνητικό πεδίο.</em> 
 
@@ -4933,13 +5058,27 @@ color:#FF7E79
               </ul></div>
               <div class="gg-audio-player" data-audio="GeoMagneticNar.mp3" data-volume="1"></div>
 
-              <div class="callout">
-                <strong>Δραστηριότητα:</strong>
-                Στην εφαρμογή μπορείς να εισάγεις μια πυξίδα και να
-                παρατηρήσεις πώς προσανατολίζεται πάντοτε προς τον γεωγραφικό Βορρά, να δεις τις δυναμικές γραμμές του γεωμαγνητικού πεδίου, να ανακαλύψεις πως θα είναι σε 300.000 χρόνια αλλά και να παρατηρήσεις πως μας προστατεύει από τους ηλιακούς ανέμους.
-              </div>
+<br>
+<div class="reveal-block">
+    <button type="button" class="reveal-toggle"><strong>▶︎ Η πυξίδα και το ταξίδι στις θάλασσες</strong></button>
+    <div class="reveal-content">Γεια σας, μικροί εξερευνητές!<br>
+Φανταστείτε ότι βρίσκεστε πάνω σε ένα ξύλινο καράβι, με τα πανιά φουσκωμένα από τον άνεμο και τη μυρωδιά της θάλασσας να γεμίζει τα ρουθούνια σας. Ο ουρανός είναι απέραντος, ο ήλιος λάμπει και πουθενά δεν φαίνεται στεριά. Πώς θα βρείτε τον δρόμο σας; Πώς θα φτάσετε στο νησί που ονειρεύεστε ή πίσω στο λιμάνι του σπιτιού σας;
+Εδώ μπαίνει η πυξίδα – η πιο πιστή σύντροφος κάθε ναυτικού από την αρχαιότητα μέχρι σήμερα!<br>
+Η πυξίδα δεν είναι απλώς ένα μικρό κουτί με μια βελόνα. Είναι ένα μαγικό εργαλείο που δείχνει πάντα προς τον Βορρά (ή ακριβέστερα προς τον μαγνητικό Βορρά). Ό,τι κι αν γίνει – φουρτούνα, ομίχλη, νύχτα χωρίς αστέρια – η βελόνα της συνεχίζει να δείχνει σταθερά προς την ίδια κατεύθυνση. Χάρη σε αυτήν, οι ναυτικοί μπορούσαν να σχεδιάζουν πορεία, να λένε «πλέουμε 45 μοίρες βορειοανατολικά» και να ξέρουν ότι δεν θα χαθούν.<br>
+<strong>Οι πρώτοι που χρησιμοποίησαν πυξίδα</strong><br>
+Η ιστορία της πυξίδας ξεκινά πολύ μακριά, στην αρχαία Κίνα! Πάνω από 2.000 χρόνια πριν, κατά τη δυναστεία Han (περίπου από τον 2ο αιώνα π.Χ. μέχρι τον 1ο αιώνα μ.Χ.), οι Κινέζοι ανακάλυψαν τις μαγνητικές ιδιότητες μιας πέτρας που λέγεται μαγνητίτης. Αρχικά δεν τη χρησιμοποιούσαν για ναυσιπλοΐα, αλλά για μαντεία, feng shui (αρμονία χώρων) και ευθυγράμμιση κτιρίων. Έφτιαχναν ένα είδος «νότιου δείκτη» – συχνά σε σχήμα κουταλιού – που έδειχνε πάντα προς το Νότο (γιατί οι Κινέζοι προσανατολίζονταν προς το Νότο, όχι προς το Βορρά όπως εμείς σήμερα!). Αργότερα, γύρω στον 11ο αιώνα μ.Χ. (δυναστεία Song), η πυξίδα εξελίχθηκε σε πραγματικό εργαλείο πλοήγησης: μαγνητισμένη βελόνα που επέπλεε σε νερό ή κρεμόταν, και χρησιμοποιήθηκε πρώτα στη στεριά και μετά στα πλοία. Αυτή η εφεύρεση άλλαξε τα πάντα! Οι Κινέζοι ναυτικοί ταξίδευαν πιο μακριά και πιο ασφαλώς, και σιγά-σιγά η πυξίδα έφτασε και στην Ευρώπη, όπου έγινε ακόμα πιο δημοφιλής.<br>
+Πριν από την πυξίδα, οι αρχαίοι Έλληνες, οι Φοίνικες και άλλοι ναυτικοί λαοί προσανατολίζονταν με τον ήλιο, τα αστέρια, τους ανέμους, τα πουλιά και την εμπειρία. Κάθε ταξίδι ήταν μια μεγάλη περιπέτεια γεμάτη κινδύνους, αλλά και ατελείωτες συγκινήσεις: νέα νησιά, άγνωστα ζώα, θησαυρούς, καταιγίδες!<br>
+
+</div>
+
+
+<div class="callout">
+<strong>Δραστηριότητα:</strong><br> 
+Στην Εφαρμογή - Γεωμαγνητικό πεδίο μπορείς να εισάγεις μια πυξίδα και να
+παρατηρήσεις πώς προσανατολίζεται πάντοτε προς τον γεωγραφικό Βορρά, να δεις τις δυναμικές γραμμές του γεωμαγνητικού πεδίου, να ανακαλύψεις πως θα είναι σε 300.000 χρόνια αλλά και να παρατηρήσεις πως μας προστατεύει από τους ηλιακούς ανέμους.
+</div>
             `,
-            iframeTitle: 'Εφαρμογή – Μαγνητικό πεδίο της Γης',
+            iframeTitle: 'Εφαρμογή – Γεωμαγνητικό πεδίο',
             iframeHint: 'Μαγνητικοί και Γεωγραφικοί Πόλοι, δυναμικές γραμμές, προβλέψεις και προστασία.',
             iframeSrc: 'EarthMagneticField.html',
             afterIframeHtml: `
@@ -4982,12 +5121,11 @@ color:#FF7E79
 🏆
 </button>
   </div>
-      </div> </p>
+      </div>
             `
           }
         ]       
       },
-
       inset: {
         sectionLabel: 'Ένθετο',
         title: 'Η ανεμογεννήτρια ',
@@ -5010,18 +5148,35 @@ color:#FF7E79
 </div>
              
        
-Κάθε <strong class="gloss-term" data-gloss-key="wind_turbine">ανεμογεννήτρια</strong> διαθέτει τρία μακριά πτερύγια που σχηματίζουν την λεγόμενη <strong class="gloss-term" data-gloss-key="turbine_rotor">φτερωτή</strong>. Όταν φυσάει άνεμος, τα πτερύγια περιστρέφονται λόγω της δυναμικής πίεσης του αέρα. Η περιστροφική αυτή ενέργεια μεταφέρεται μέσω ενός άξονα σε ένα κιβώτιο ταχυτήτων (gearbox), το οποίο κινεί μια <strong class="gloss-term" data-gloss-key="electric_generator">ηλεκτρογεννήτρια</strong>. Ο ρότορας της ηλεκτρογεννήτριας περιστρέφεται μέσα σε ένα σταθερό <strong class="gloss-term" data-gloss-key="magnetic_field">μαγνητικό πεδίο</strong>. Δημιουργείται επομένως <strong class="gloss-term" data-gloss-key="electric_voltage">ηλεκτρική τάση</strong> στους ακροδέκτες της. Αν συνδέσουμε την έξοδο της γεννήτριας με ένα εξωτερικό <strong class="gloss-term" data-gloss-key="circuit_loop">ηλεκτρικό κύκλωμα</strong>, τότε δημιουργείται ηλεκτρικό ρεύμα, το οποίο μπορεί να χρησιμοποιηθεί για την τροφοδοσία καταναλωτών, την αποθήκευση σε μπαταρίες ή τη διοχέτευσή της στο δίκτυο ηλεκτροδότησης. Έτσι, η <strong class="gloss-term" data-gloss-key="wind_energy">αιολική ενέργεια</strong> μετατρέπεται σε <strong class="gloss-term" data-gloss-key="electrical_energy">ηλεκτρική</strong>! 
+Κάθε <strong class="gloss-term" data-gloss-key="wind_turbine">ανεμογεννήτρια</strong> διαθέτει τρία μακριά πτερύγια που σχηματίζουν την λεγόμενη <strong class="gloss-term" data-gloss-key="turbine_rotor">φτερωτή</strong>. Όταν φυσάει άνεμος, τα πτερύγια περιστρέφονται λόγω της δυναμικής πίεσης του αέρα. Η περιστροφική αυτή ενέργεια μεταφέρεται μέσω ενός άξονα σε ένα κιβώτιο μετάδοσης της κίνησης, το οποίο κινεί μια <strong class="gloss-term" data-gloss-key="electric_generator">ηλεκτρογεννήτρια</strong>. Ο ρότορας της ηλεκτρογεννήτριας περιστρέφεται μέσα σε ένα σταθερό <strong class="gloss-term" data-gloss-key="magnetic_field">μαγνητικό πεδίο</strong>. Δημιουργείται επομένως <strong class="gloss-term" data-gloss-key="electric_voltage">ηλεκτρική τάση</strong> στους ακροδέκτες της. Αν συνδέσουμε την έξοδο της γεννήτριας με ένα εξωτερικό <strong class="gloss-term" data-gloss-key="circuit_loop">ηλεκτρικό κύκλωμα</strong>, τότε δημιουργείται ηλεκτρικό ρεύμα, το οποίο μπορεί να χρησιμοποιηθεί για την τροφοδοσία καταναλωτών, την αποθήκευση σε μπαταρίες ή τη διοχέτευσή της στο δίκτυο ηλεκτροδότησης. Έτσι, η <strong class="gloss-term" data-gloss-key="wind_energy">αιολική ενέργεια</strong> μετατρέπεται σε <strong class="gloss-term" data-gloss-key="electrical_energy">ηλεκτρική</strong>! 
 </p>
 
             
             `,
             iframeTitle: 'Εφαρμογή – Εξερεύνησε μια ανεμογεννήτρια',
             iframeHint: 'Σε αυτήν την τρισδιάστατη αναπαράσταση μπορείς να εξερευνήσεις τα μέρη που αποτελούν μια ανεμογεννήτρια και να κατανοήσεις τη λειτουργία της.',
-            iframeSrc: '',
+            iframeSrc: 'WindTurbine.html',
             afterIframeHtml: `
-         <p>        
-
-
+         <div class="reveal-block">            
+      <button type="button" class="reveal-toggle"><strong>Τι παρατηρείς</strong>
+</button>
+      <div class="reveal-content">                
+      <p><strong></strong></p>
+                <p>
+                  Από την εφαρμογή για την λειτουργία της αναμεγεννήτριας συμπεραίνεις ότι:
+                </p>
+                <p>
+                  <strong>① </strong>
+Η λειτουργία της ανεμογεννήτριας βασίζεται στο φαινόμενο της ηλεκτρομαγνητικής επαγωγής.                </p>
+                <p>
+                  <strong>② </strong>
+               Όταν αυξάνεται η ταχύτητα περιστροφής αυξάνεται και η παραγωγή ηλεκτρικής ενέργειας. Η πολύ μεγάλη ταχύτητα περιστροφής μπορεί να δημιουργήσει προβλήματα. Για να προστατεύσουμε την ανεμογεννήτρια χρησιμοποιούμε μια ειδική διάταξη που ονομάζεται φρένο και η οποία διασφαλίζει την ομαλή λειτουργία της.
+                </p>
+                <p>
+                  <strong>③ </strong>
+               Μια ανεμογεννήτρια παράγει εναλλασσόμενο ρεύμα (AC) το οποίο μετατρέπεται σε συνεχές (DC) μέσω ειδικών διατάξεων (ανορθωτής). 
+                </p>
+              </div></p>
 
               <div class="callout">
 <strong>Τεχνικά χαρακτηριστικά ανεμογεννητριών</strong><br>
@@ -5047,7 +5202,7 @@ color:#FF7E79
 </button>
       <div class="reveal-content">
 <p>
-Η ένταση του ανέμου έχει μεγάλες διακυμάνσεις κατά την διάρκεια της ημέρας. Για αυτό το λόγο ανάμεσα στο κιβώτιο μετάδοσης και της ηλεκτρογεννήτριας έχει προσαρτηθεί το επονομαζόμενο <strong class="gloss-term" data-gloss-key="wind_turbine_brake">φρένο</strong>. Η διάταξη αυτή περιορίζει την υπερβολική αύξηση της περιστροφής της <strong class="gloss-term" data-gloss-key="turbine_rotor">φτερωτής</strong> και εγγυάται την αξιόπιστη λειτουργία της ανεμογεννήτριας.  </p>
+Η ένταση του ανέμου έχει μεγάλες διακυμάνσεις κατά την διάρκεια της ημέρας. Για αυτό το λόγο ανάμεσα στο κιβώτιο μετάδοσης κίνησης και της ηλεκτρογεννήτριας έχει προσαρτηθεί το επονομαζόμενο <strong class="gloss-term" data-gloss-key="wind_turbine_brake">φρένο</strong>. Η διάταξη αυτή περιορίζει την υπερβολική αύξηση της περιστροφής της <strong class="gloss-term" data-gloss-key="turbine_rotor">φτερωτής</strong> και εγγυάται την αξιόπιστη λειτουργία της ανεμογεννήτριας.  </p>
   </div>
     
     
@@ -5192,7 +5347,6 @@ color:#FF7E79
 </button><br>
 </div> 
 
-
 </p>
 
 <p>
@@ -5201,10 +5355,21 @@ color:#FF7E79
 Η <strong class="gloss-term" data-gloss-key="wind_energy">αιολική ενέργεια</strong>, ως ανανεώσιμης πηγή ενέργειας, είναι ανεξάντλητη. Δεν ισχύει όμως το ίδιο για τις μονάδες αποθήκευσης, οι οποίες έχουν περιορισμένη χωρητικότητα. Έτσι, όταν οι αποθήκες γεμίσουν και οι ενεργειακές ανάγκες έχουν ήδη καλυφθεί, η λειτουργία των ανεμογεννητριών πρέπει να διακοπεί προσωρινά. Αν αυτό δεν συμβεί, μπορεί να προκύψουν φαινόμενα υπερφόρτωσης στο δίκτυο, με καταστροφικές συνέπειες.
 Η αναγκαστική διακοπή της παραγωγής σημαίνει ότι ένα μέρος της αιολικής ενέργειας μένει ανεκμετάλλευτο, γεγονός που περιορίζει τις δυνατότητες ενεργειακής αυτάρκειας και τελικά επιβραδύνει την πρόοδο της κοινωνίας. Το φαινόμενο αυτό είναι γνωστό ως «πρόβλημα της αποθήκευσης» και αποτελεί μια από τις σημαντικότερες προκλήσεις στον τομέα της πράσινης ενέργειας. Η αντιμετώπιση του απαιτεί πολύπλοκες και καινοτόμες λύσεις. Οι επιστήμονες και οι μηχανικοί σε όλο τον κόσμο εργάζονται για την ανάπτυξη και αξιοποίηση νέων τεχνολογιών αποθήκευσης, όπως οι <strong class="gloss-term" data-gloss-key="lithium_battery">μπαταρίες λιθίου</strong>, οι <strong class="gloss-term" data-gloss-key="compressed_air_battery">μπαταρίες πεπιεσμένου αέρα</strong>, οι <strong class="gloss-term" data-gloss-key="flow_battery">μπαταρίες ροής</strong>, και οι <strong class="gloss-term" data-gloss-key="flywheel_battery">μπαταρίες σφονδύλου</strong>.
 
-
 </p>
 
-
+           <div class="callout">
+     <strong>Κέρδισε Εμπειρία (XP)</strong> <br>
+              <button
+  type="button"
+  class="header-btn app-launch-btn"
+  data-app-src="WindTurbineLesson.html"
+  data-app-title="🏆 Κέρδισε εμπειρία (XP)     "
+  aria-label="Άνοιγμα εφαρμογής"
+>
+🏆
+</button>
+  </div>
+      </div>  
             `
           },
           {
@@ -5216,7 +5381,7 @@ color:#FF7E79
              
   <p>
     <strong style="color:#FF7E79;">1.</strong>
-    Να αναλύσεις τη διαδικασία μετατροπής της αιολικής ενέργειας σε ηλεκτρική μέσω μιας ανεμογεννήτριας, περιγράφοντας τα κύρια μέρη της (φτερωτή - πτερύγια, κιβώτιο ταχυτήτων, ηλεκτρογεννήτρια) και τη λειτουργία τους.
+    Να αναλύσεις τη διαδικασία μετατροπής της αιολικής ενέργειας σε ηλεκτρική μέσω μιας ανεμογεννήτριας, περιγράφοντας τα κύρια μέρη της (φτερωτή - πτερύγια, κιβώτιο μετάδοσης κίνησης, φρένο, ηλεκτρογεννήτρια) και τη λειτουργία τους.
   </p>
 
   <div class="reveal-block">
@@ -5224,7 +5389,7 @@ color:#FF7E79
     <div class="reveal-content">
       <p>
         Δείξε την αλυσίδα μετατροπών: <strong>άνεμος → περιστροφή φτερωτής/ρότορα → άξονας</strong>,
-        μετά το <strong>κιβώτιο ταχυτήτων</strong> αυξάνει τις στροφές (όπου υπάρχει),
+        μετά το <strong>κιβώτιο ταχυτήτων</strong> αυξάνει τις στροφές (όπου υπάρχει), το φρένο που εξασφαλίζει την ομαλή περιστροφή
         και η <strong>ηλεκτρογεννήτρια</strong> μετατρέπει τη μηχανική κίνηση σε <strong>ηλεκτρική ενέργεια</strong> με επαγωγή.
       </p>
     </div>
@@ -5232,11 +5397,11 @@ color:#FF7E79
 
   <div class="reveal-block1"
        data-qid="windTurb_q1"
-       data-keywords="2:ανεμογεννήτρια|ανεμογεννητρια;2:αιολική ενέργεια|αιολικη ενεργεια|άνεμος|ανεμος;2:φτερωτή|φτερωτη|πτερύγια|πτερυγια|ρότορας|ροτορας;2:περιστροφή|περιστροφη|ροπή|ροπη;2:κιβώτιο ταχυτήτων|κιβωτιο ταχυτητων|πολλαπλασιαστής|πολλαπλασιαστης;2:ηλεκτρογεννήτρια|ηλεκτρογεννητρια;1:άξονας|αξονας|μετάδοση|μεταδοση;1:μετατροπή|μετατροπη|μηχανική σε ηλεκτρική|μηχανικη σε ηλεκτρικη;1:επαγωγή|επαγωγη|ηλεκτρομαγνητική επαγωγή|ηλεκτρομαγνητικη επαγωγη;1:ισχύς|ισχυς|ενέργεια|ενεργεια">
+       data-keywords="2:ανεμογεννήτρια|ανεμογεννητρια;2:αιολική ενέργεια|αιολικη ενεργεια|άνεμος|ανεμος;2:φτερωτή|φτερωτη|πτερύγια|πτερυγια|ρότορας|ροτορας;2:περιστροφή|περιστροφη|ροπή|ροπη;2:κιβώτιο μετάδοσης|κιβωτιο μεταδοσης;2:φρένο|φρένο;2:ηλεκτρογεννήτρια|ηλεκτρογεννητρια;1:άξονας|αξονας|μετάδοση|μεταδοση;1:μετατροπή|μετατροπη|μηχανική σε ηλεκτρική|μηχανικη σε ηλεκτρικη;1:επαγωγή|επαγωγη|ηλεκτρομαγνητική επαγωγή|ηλεκτρομαγνητικη επαγωγη;1:ισχύς|ισχυς|ενέργεια|ενεργεια">
     <button type="button" class="reveal-toggle">Απάντηση</button>
     <div class="reveal-content">
       <p class="reveal1-hint">
-        Περιέγραψε ρόλο για: φτερωτή, κιβώτιο ταχυτήτων, ηλεκτρογεννήτρια. Μην ξεχάσεις να γράψεις τη σειρά των ενεργειακών μετατροπών.
+        Περιέγραψε ρόλο για: φτερωτή, κιβώτιο μετάδοσης, φρένο, ηλεκτρογεννήτρια. Μην ξεχάσεις να γράψεις τη σειρά των ενεργειακών μετατροπών.
       </p>
       <textarea class="reveal-answer" rows="7" placeholder="Γράψε εδώ την απάντησή σου…"></textarea>
 
@@ -5251,6 +5416,161 @@ color:#FF7E79
   </div>
 
 
+  <!-- Ερώτηση 2 -->
+  <p>
+    <strong style="color:#FF7E79;">2.</strong>
+    Ποια είναι τα πλεονεκτήματα και οι προκλήσεις της εγκατάστασης παράκτιων αιολικών πάρκων σε σύγκριση με τα χερσαία, και πώς αυτά επηρεάζουν την παραγωγή ενέργειας;
+  </p>
+
+  <div class="reveal-block">
+    <button type="button" class="reveal-toggle">Υπόδειξη</button>
+    <div class="reveal-content">
+      <p>
+        Γράψε <strong>πλεονεκτήματα υπεράκτιων/παράκτιων</strong> (συνήθως <strong>πιο ισχυροί και σταθεροί άνεμοι</strong>, μεγαλύτερη παραγωγή)
+        και <strong>προκλήσεις</strong> (υψηλότερο <strong>κόστος</strong>, δύσκολη <strong>εγκατάσταση/συντήρηση</strong>, <strong>διασύνδεση</strong> με υποθαλάσσια καλώδια, <strong>διάβρωση</strong>).
+        Σύνδεσέ τα με την <strong>παραγωγή</strong> και τη <strong>διαθεσιμότητα</strong> ενέργειας.
+      </p>
+    </div>
+  </div>
+
+  <div class="reveal-block1"
+       data-qid="windTurb_q2"
+       data-keywords="2:παράκτια|παρακτια|υπεράκτια|υπερακτια|offshore;2:χερσαία|χερσαια|onshore;2:άνεμος|ανεμος|ισχυρότεροι άνεμοι|ισχυροτεροι ανεμοι|σταθερότεροι άνεμοι|σταθεροτεροι ανεμοι;2:παραγωγή|παραγωγη|περισσότερη ενέργεια|περισσοτερη ενεργεια|συντελεστής φορτίου|συντελεστης φορτιου;2:κόστος|κοστος;1:εγκατάσταση|εγκατασταση|συντήρηση|συντηρηση;1:διασύνδεση|διασυνδεση|υποθαλάσσια καλώδια|υποθαλασσια καλωδια;1:διάβρωση|διαβρωση|θαλάσσιο περιβάλλον|θαλασσιο περιβαλλον;1:προκλήσεις|προκλησεις|πλεονεκτήματα|πλεονεκτηματα">
+    <button type="button" class="reveal-toggle">Απάντηση</button>
+    <div class="reveal-content">
+      <p class="reveal1-hint">
+        Κάνε σύγκριση σε 2 λίστες: πλεονεκτήματα (άνεμοι/παραγωγή) και προκλήσεις (κόστος/συντήρηση/διασύνδεση). Μετά εξήγησε πώς αυτό αλλάζει την παραγωγή ενέργειας.
+      </p>
+      <textarea class="reveal-answer" rows="7" placeholder="Γράψε εδώ την απάντησή σου…"></textarea>
+
+      <div class="reveal-actions">
+        <button type="button" class="reveal-eval-btn">Αξιολόγηση</button>
+        <button type="button" class="reveal-clear-btn">Καθαρισμός</button>
+      </div>
+
+      <div class="reveal-score" aria-live="polite"></div>
+      <div class="reveal-checklist" aria-label="Checklist λέξεων-κλειδιών"></div>
+    </div>
+  </div>
+
+
+  <!-- Ερώτηση 3 -->
+  <p>
+    <strong style="color:#FF7E79;">3.</strong>
+    Να εξηγήσεις το «πρόβλημα της αποθήκευσης», και να προτείνεις πιθανές λύσεις που μπορούν να βοηθήσουν στην αντιμετώπισή του, με βάση τις τεχνολογίες που αναφέρονται στο εδάφιο.
+  </p>
+
+  <div class="reveal-block">
+    <button type="button" class="reveal-toggle">Υπόδειξη</button>
+    <div class="reveal-content">
+      <p>
+        Εξήγησε ότι οι ΑΠΕ (άνεμος/ήλιος) είναι <strong class="gloss-term" data-gloss-key="intermittent_energy">διαλείπουσες</strong>, άρα δεν ταιριάζει πάντα η <strong>παραγωγή</strong> με τη <strong>ζήτηση</strong>.
+        Πρότεινε λύσεις: <strong>μπαταρίες</strong>, <strong>αντλησιοταμίευση</strong>, <strong>υδρογόνο (ηλεκτρόλυση)</strong>,
+        <strong>διασυνδέσεις/έξυπνα δίκτυα</strong> και <strong>διαχείριση ζήτησης</strong>.
+      </p>
+    </div>
+  </div>
+
+  <div class="reveal-block1"
+       data-qid="windTurb_q3"
+       data-keywords="2:πρόβλημα αποθήκευσης|προβλημα αποθηκευσης|αποθήκευση|αποθηκευση;2:διαλείπουσα παραγωγή|διαλειπουσα παραγωγη|αστάθεια|ασταθεια|μεταβλητότητα|μεταβλητοτητα;2:ζήτηση|ζητηση|κατανάλωση|καταναλωση;2:πλεόνασμα|πλεονασμα|έλλειμμα|ελλειμμα;2:μπαταρίες|μπαταριες|συσσωρευτές|συσσωρευτες;1:έξυπνο δίκτυο|εξυπνο δικτυο|διασύνδεση|διασυνδεση;1:διαχείριση ζήτησης|διαχειριση ζητησης|demand response">
+    <button type="button" class="reveal-toggle">Απάντηση</button>
+    <div class="reveal-content">
+      <p class="reveal1-hint">
+        Πρώτα όρισε το πρόβλημα (παραγωγή ≠ ζήτηση λόγω διαλείπουσας ΑΠΕ) και μετά γράψε 3–5 λύσεις (μπαταρίες, αντλησιοταμίευση, υδρογόνο, δίκτυα, διαχείριση ζήτησης).
+      </p>
+      <textarea class="reveal-answer" rows="7" placeholder="Γράψε εδώ την απάντησή σου…"></textarea>
+
+      <div class="reveal-actions">
+        <button type="button" class="reveal-eval-btn">Αξιολόγηση</button>
+        <button type="button" class="reveal-clear-btn">Καθαρισμός</button>
+      </div>
+
+      <div class="reveal-score" aria-live="polite"></div>
+      <div class="reveal-checklist" aria-label="Checklist λέξεων-κλειδιών"></div>
+    </div>
+  </div>
+
+
+  <!-- Ερώτηση 4 -->
+  <p>
+    <strong style="color:#FF7E79;">4.</strong>
+    Ποια τεχνικά χαρακτηριστικά μιας ανεμογεννήτριας (όπως ύψος πυλώνα, διάμετρος πτερυγίων, παραγόμενη ισχύς) επηρεάζουν την αποδοτικότητά της, και γιατί είναι σημαντική η επιλογή κατάλληλης τοποθεσίας για την εγκατάστασή της;
+  </p>
+
+  <div class="reveal-block">
+    <button type="button" class="reveal-toggle">Υπόδειξη</button>
+    <div class="reveal-content">
+      <p>
+        Σύνδεσε τα χαρακτηριστικά με την παραγωγή: <strong>ύψος πυλώνα</strong> (πιο δυνατοί άνεμοι ψηλότερα),
+        <strong>διάμετρος/εμβαδόν σάρωσης</strong> (πιάνει περισσότερο άνεμο), <strong>ονομαστική ισχύς</strong> και
+        «πότε ξεκινά/σταματά» (<strong>ταχύτητα έναρξης/διακοπής</strong>).
+        Για την τοποθεσία: <strong>μέση ταχύτητα ανέμου</strong>, <strong>εμπόδια</strong>, και <strong>κοντά στο δίκτυο</strong>.
+      </p>
+    </div>
+  </div>
+
+  <div class="reveal-block1"
+       data-qid="windTurb_q4"
+       data-keywords="2:ύψος πυλώνα|υψος πυλωνα|ύψος|υψος;2:διάμετρος πτερυγίων|διαμετρος πτερυγιων|διάμετρος ρότορα|διαμετρος ροτορα|εμβαδόν σάρωσης|εμβαδον σαρωσης;2:παραγόμενη ισχύς|παραγομενη ισχυς|ονομαστική ισχύς|ονομαστικη ισχυς;2:ταχύτητα ανέμου|ταχυτητα ανεμου|μέση ταχύτητα|μεση ταχυτητα;1:καμπύλη ισχύος|καμπυλη ισχυος|cut-in|cut in|cut-out|cut out;1:αποδοτικότητα|αποδοτικοτητα|συντελεστής φορτίου|συντελεστης φορτιου;1:τοποθεσία|τοποθεσια|ανεμολογικά δεδομένα|ανεμολογικα δεδομενα;1:εμπόδια|εμποδια|τύρβη|τυρβη|αναταράξεις|αναταραξεις;1:διασύνδεση δικτύου|διασυνδεση δικτυου|γραμμή μεταφοράς|γραμμη μεταφορας">
+    <button type="button" class="reveal-toggle">Απάντηση</button>
+    <div class="reveal-content">
+      <p class="reveal1-hint">
+        Γράψε 3–4 χαρακτηριστικά (ύψος, διάμετρος, ισχύς, ταχύτητα ανέμου) και μετά εξήγησε γιατί η τοποθεσία είναι κρίσιμη (άνεμος, εμπόδια/τύρβη, σύνδεση στο δίκτυο).
+      </p>
+      <textarea class="reveal-answer" rows="7" placeholder="Γράψε εδώ την απάντησή σου…"></textarea>
+
+      <div class="reveal-actions">
+        <button type="button" class="reveal-eval-btn">Αξιολόγηση</button>
+        <button type="button" class="reveal-clear-btn">Καθαρισμός</button>
+      </div>
+
+      <div class="reveal-score" aria-live="polite"></div>
+      <div class="reveal-checklist" aria-label="Checklist λέξεων-κλειδιών"></div>
+    </div>
+  </div>
+
+
+  <!-- Ερώτηση 5 -->
+  <p>
+    <strong style="color:#FF7E79;">5.</strong>
+    Να συγκρίνεις τις ενεργειακές μετατροπές που συμβαίνουν σε έναν ηλεκτρικό κινητήρα, μια ηλεκτρογεννήτρια και μια ανεμογεννήτρια, και να εξηγήσεις πώς η καθεμία συμβάλλει στη βιώσιμη παραγωγή και χρήση ενέργειας.
+  </p>
+
+  <div class="reveal-block">
+    <button type="button" class="reveal-toggle">Υπόδειξη</button>
+    <div class="reveal-content">
+      <p>
+        Κάνε καθαρά τις μετατροπές:
+        <strong>κινητήρας: ηλεκτρική → μηχανική</strong>,
+        <strong>γεννήτρια: μηχανική → ηλεκτρική</strong>,
+        <strong>ανεμογεννήτρια: αιολική → μηχανική → ηλεκτρική</strong>.
+        Μετά σύνδεσε με βιωσιμότητα: <strong>ΑΠΕ</strong>, <strong>μείωση εκπομπών</strong>, και γιατί βοηθούν
+        <strong>αποδοτικότητα</strong> και <strong>αποθήκευση/δίκτυο</strong>.
+      </p>
+    </div>
+  </div>
+
+  <div class="reveal-block1"
+       data-qid="windTurb_q5"
+       data-keywords="2:μετατροπή ενέργειας|μετατροπη ενεργειας|ενεργειακές μετατροπές|ενεργειακες μετατροπες;2:ηλεκτρικός κινητήρας|ηλεκτρικος κινητηρας|κινητήρας|κινητηρας;2:ηλεκτρογεννήτρια|ηλεκτρογεννητρια|γεννήτρια|γεννητρια;2:ανεμογεννήτρια|ανεμογεννητρια;2:ηλεκτρική σε μηχανική|ηλεκτρικη σε μηχανικη;2:μηχανική σε ηλεκτρική|μηχανικη σε ηλεκτρικη;2:αιολική σε μηχανική|αιολικη σε μηχανικη|αιολική σε ηλεκτρική|αιολικη σε ηλεκτρικη;1:ΑΠΕ|ανανεώσιμες|ανανεωσιμες|ανανεώσιμες πηγές|ανανεωσιμες πηγες;1:βιωσιμότητα|βιωσιμοτητα|βιώσιμη|βιωσιμη;1:εκπομπές|εκπομπες|CO2|διοξείδιο|διοξειδιο;1:απόδοση|αποδοση|εξοικονόμηση|εξοικονομηση;1:αποθήκευση|αποθηκευση|δίκτυο|δικτυο">
+    <button type="button" class="reveal-toggle">Απάντηση</button>
+    <div class="reveal-content">
+      <p class="reveal1-hint">
+        Γράψε 1–2 γραμμές για κάθε συσκευή (τι ενέργεια μπαίνει/βγαίνει) και μετά σύνδεσε με βιώσιμη ενέργεια (ΑΠΕ, λιγότερες εκπομπές, καλύτερη χρήση μέσω απόδοσης/αποθήκευσης).
+      </p>
+      <textarea class="reveal-answer" rows="7" placeholder="Γράψε εδώ την απάντησή σου…"></textarea>
+
+      <div class="reveal-actions">
+        <button type="button" class="reveal-eval-btn">Αξιολόγηση</button>
+        <button type="button" class="reveal-clear-btn">Καθαρισμός</button>
+      </div>
+
+      <div class="reveal-score" aria-live="polite"></div>
+      <div class="reveal-checklist" aria-label="Checklist λέξεων-κλειδιών"></div>
+    </div>
+  </div>
+    </div>
  
             `,
             iframeTitle: 'Διαδραστική δοκιμασία - Κινητήρες, Γεννήτριες και Ανεμογεννήτριες',
@@ -5276,192 +5596,6 @@ color:#FF7E79
                   }          
         ]
       }
-      ,
-      ipedia: {
-        sectionLabel: 'Μαθετε για εμας',
-        title: 'iPedia Interactive Books',
-        tabs: [
-          {
-            id: 'edoseis',
-            label: 'Εκδόσεις iPedia',
-            htmlText: `
-              <p>
-                <div class="callout">
-                <strong><strong>Λιγα λογια για την iPedia</strong></strong><br>
-                Οι εκδόσεις iPedia είναι ένας σύγχρονος εκδοτικός οίκος με βασικό προσανατολισμό την εκπαίδευση. Τα θέματα των τίτλων επικεντρώνονται στην πλειοψηφία τους στην σχολική Φυσική και στο μέλλον θα περιλαμβάνουν ειδικότερα θέματα του επιστημονικού κλάδου. 
-Το είδος του βιβλίου που δημιουργούμε είναι το διαδραστικό ηλεκτρονικό βιβλίο ― Multi-touch ebook ή αλλιώς Interactive ebook.
-Η διαδικασία συγγραφής δεν είναι απλή. Απαιτεί δεξιότητες που σε αρκετούς από εσάς βρίσκονται πολύ μακρυά από αυτό που έχετε στο μυαλό σας για την παραδοσιακή συγγραφή ενός βιβλίου. H δημιουργία διαδραστικών εφαρμογών πρωταγωνιστεί αποτελώντας την σημαντικότερη διαφοροποίηση ενός τέτοιου βιβλίου από το κλασικό ηλεκτρονικό βιβλίο. Όλα τα παραπάνω στοιχεία προσδίδουν στο σύγγραμμα μια μοναδικότητα και μια αναβαθμισμένη εμπειρία ανάγνωσης.
-
-<div class="double-bar1">
-Αναμφίβολα η μορφή του βιβλίου στην σύγχρονη εποχή αλλάζει. Δημιουργείται κάτι καινούργιο. 
-Κάτι που ανανεώνεται, εξελίσσεται και βελτιώνεται συνεχώς.
-</div>
-
-
-</div>
-
-<p>   
-<div class="reveal-block">
-    <button type="button" class="reveal-toggle"><strong> Που στοχεύουν τα βοηθήματα μας </strong></button>
-    <div class="reveal-content">
-<strong> Κριτική σκέψη για τους μαθητές, αξιοποίηση των νέων τεχνολογιών για τους καθηγητές.</strong><br><br>
-Ένας από τους βασικούς στόχους ενός διαδραστικού βιβλίου είναι να βοηθήσει τους μαθητές να αναπτύξουν κριτική σκέψη. Η σύγχρονη εποχή έχει μια εμμονή με τις βαθμολογικές επιδόσεις, χωρίς να δίνει έμφαση στην πραγματική ουσία της εκπαίδευσης.  Αυτό οδηγεί σε μια κουλτούρα όπου οι μαθητές συχνά απλά μαθαίνουν να επιτυγχάνουν καλές βαθμολογίες, αντί να αναπτύσσουν τις ικανότητες τους και να κατανοούν την ουσία της μάθησης. Το διαδραστικό βιβλίο βοηθά τους μαθητές να αναλύουν και να αξιολογούν τις πληροφορίες που παρουσιάζονται, καθώς και να αναπτύξουν την ικανότητα να σκέπτονται ανεξάρτητα και να βγάζουν τα δικά τους συμπεράσματα.
-Παράλληλα, το εκπαιδευτικό προσωπικό, σε παγκόσμια κλίμακα, αντιμετωπίζει μια δυσκολία στο να αφομοιώσει τις νέες τεχνολογίες (διαδραστικές αναπαραστάσεις, 3D μοντέλα, προσομοιώσεις κ.α.). Η τεχνολογία προσφέρει αρκετές δυνατότητες για τη διευκόλυνση της μάθησης και την ανάπτυξη των ικανοτήτων των μαθητών, αλλά πολλές φορές οι εκπαιδευτικοί δεν είναι εξοικειωμένοι με αυτές τις δυνατότητες και αδυνατούν να τις χρησιμοποιήσουν. Είναι σημαντικό να κατανοήσουμε ότι οι τεχνολογίες αυτές  δεν αποτελούν απειλή για την παραδοσιακή διδασκαλία, αλλά μπορούν να ενισχύσουν τις δυνατότητες των μαθητών να μάθουν και να αναπτύξουν τις δεξιότητες τους. Για παράδειγμα μπορούν να να προσφέρουν μια πιο ενδιαφέρουσα και διαδραστική διαδικασία διδασκαλίας στην τάξη, καθώς συνδυάζουν κείμενο, εικόνες, ήχους και βίντεο, να τραβήξουν την προσοχή των μαθητών με αποτέλεσμα να συμμετέχουν περισσότερο στη διαδικασία της μάθησης και να αποκτήσουν μια καλύτερη κατανόηση των θεμάτων.
-</div>
-</div>
-</p> 
-
-<p>   
-<div class="reveal-block">
-    <button type="button" class="reveal-toggle"><strong>Η iPedia και τα διαδραστικά σχολικά βοηθηματα.</strong></button>
-    <div class="reveal-content">
-<strong> Ξαναφράφουμε την φυσική με σύγχρονο τρόπο.</strong><br>
-<br>
-
-H πλειοψηφία των εκδόσεων επικεντρώνονται στα σχολικά βοηθήματα και ειδικότερα στην σχολική φυσική. Από την πρώτη στιγμή που διαμορφώθηκε η ιδέα του διαδραστικού βιβλίου - περίπου το 2011, ήταν προφανές ότι οι δυνατότητες του θα έβρισκαν τέλεια εφαρμογή στην επεξήγηση της σχολικής φυσικής, προσφέροντας πρακτικά αποτελέσματα στην κατανόηση των εννοιών από τους μαθητές. Προσαρμόζοντας λοιπόν κάθε βοήθημα στην ύλη που καθορίζει το Υπουργείο, δημιουργούμε βοηθήματα που κάνουν την μελέτη στο σπίτι κάθε φορά μια καινούργια εμπειρία. 
-</div>
-</div>
-</p>  
-
- <div class="kcallout">
-  <div class="kcallout-head">
-    <div class="kcallout-icon">📕</div>
-    <p class="kcallout-title">Τα βοηθήματα μας σε καμία περίπτωση δεν έχουν σκοπό να αναιρέσουν τον καθηγητή ή τον φροντιστή.</p>
-  </div>
-Κάθε βοήθημα απευθύνεται σε όλους τους μαθητές, και μέσα από το ψηφιακό περιεχόμενο του, τους παροτρύνει σε κάθε ευκαιρία την συζήτηση θεμάτων, ασκήσεων και διαδραστικού περιεχομένου με τον καθηγητή τους. Έτσι λοιπόν, τα βοηθήματα μου έρχονται να βοηθήσουν και τους δύο. Τον καθηγητή στην παράδοση του μαθήματος και τους μαθητές στην μελέτη στο σπίτι.
-  </div>
-</div>
-
-<p>   
-<div class="reveal-block">
-    <button type="button" class="reveal-toggle"><strong>Προτερήματα και χρήση</strong></button>
-    <div class="reveal-content">
-<strong>Εμβάθυνση για τους μαθητές, αναβάθμιση της διδασκαλίας για τους καθηγητές.</strong><br>
-<br>
-Το διαδραστικό βιβλίο αποτελεί μια καινοτόμα εκπαιδευτική εργαλειοθήκη που στοχεύει στην ανάπτυξη της κριτικής σκέψης των μαθητών. Η εμμονή της σύγχρονης εποχής στις βαθμολογικές επιδόσεις και όχι στην ουσία, έχει δημιουργήσει μια σχολική κουλτούρα όπου η αναζήτηση της πληρότητας της γνώσης έχει αντικατασταθεί από τον απλό σκοπό της επίτευξης υψηλής βαθμολογίας. Ως αποτέλεσμα, η δυνατότητα των μαθητών να σκέφτονται κριτικά έχει υποβαθμιστεί.
-Επιπλέον, η δυσκολία του εκπαιδευτικού προσωπικού να παράξει ψηφιακό υλικό προσαρμοσμένο στις ανάγκες του, αποτελεί ένα άλλο σημαντικό πρόβλημα. Το διαδραστικό βιβλίο προσφέρει την πιο σύγχρονη λύση, καθώς είναι εύκολο στη χρήση και παρέχει σημαντικά εργαλεία για τη διδασκαλία. Το ψηφιακό περιεχόμενο των βοηθημάτων μας έχει δημιουργηθεί για να καλύψει τις ανάγκες τόσο του μαθητή όσο και του καθηγητή. Για πρώτη φορά ένα βοήθημα δίνει σε έναν καθηγητή Φυσικής την δυνατότητα να εξηγήσει με παραστατικό τρόπο τα μέρη και την λειτουργία μιας ανεμογεννήτριας ενώ παράλληλα ένας μαθητής μπορεί πλέον να κατανοήσει εμπειρικά - και όχι νοητά - πως διατάσσεται στον χώρο ένα άτομο. Είναι προφανές ότι με την χρήση των βοηθημάτων μας η μελέτη του μαθητή στο σπίτι γίνεται αποδοτικότερη ενώ ταυτόχρονα ο καθηγητής αναβαθμίζει το δια ζώσης και διαδικτυακό του μάθημα, καθώς κάθε βιβλίο αποτελεί μια εξαιρετική πηγή έτοιμου υλικού.
-</div>
-</div>
-</p> 
-
-<p>   
-<div class="reveal-block">
-    <button type="button" class="reveal-toggle"><strong> Ακολούθησέ μας</strong></button>
-    <div class="reveal-content">
-<br>
-          <div class="ipedia-social-card ipedia-social-compact" aria-label="iPedia social links">
-            <a class="ipediaSocialContainer ipediaFB" href="https://www.facebook.com/ipediaforall/" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
-              <svg viewBox="0 0 320 512" class="ipediaSocialSvg" aria-hidden="true">
-      <path d="M279.14 288l14.22-92.66h-88.91V117.78c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.2V288z"></path>
-    </svg>
-            </a>
-                    <a class="ipediaSocialContainer ipediaFB"
-   href="https://www.ipedia.com"
-   target="_blank"
-   rel="noopener noreferrer"
-   aria-label="Website">
-  <svg viewBox="0 0 24 24" class="ipediaSocialSvg" aria-hidden="true">
-    <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm7.93 9h-3.18a15.7 15.7 0 0 0-1.23-5.01A8.03 8.03 0 0 1 19.93 11ZM12 4c.95 1.2 1.8 3.52 2.16 7H9.84C10.2 7.52 11.05 5.2 12 4ZM4.07 13h3.18c.18 1.82.62 3.54 1.23 5.01A8.03 8.03 0 0 1 4.07 13Zm3.18-2H4.07a8.03 8.03 0 0 1 4.41-5.01A15.7 15.7 0 0 0 7.25 11Zm0 2h7.5c-.21 2.2-.77 4.1-1.45 5.34-.37.68-.73 1.12-1.05 1.37-.32-.25-.68-.69-1.05-1.37-.68-1.24-1.24-3.14-1.45-5.34Zm9.5 0h3.18a8.03 8.03 0 0 1-4.41 5.01c.61-1.47 1.05-3.19 1.23-5.01Z"/>
-  </svg>
-</a>
-            <a class="ipediaSocialContainer ipediaX" href="https://x.com/iPediaEbooks" target="_blank" rel="noopener noreferrer" aria-label="X">
-              <svg viewBox="0 0 512 512" class="ipediaSocialSvg" aria-hidden="true">
-      <path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 25 48h145.1l100.7 132.1L389.2 48zM364.4 421.8h39.1L142.7 88.3H100.7l263.7 333.5z"></path>
-    </svg>
-            </a>
-            <a class="ipediaSocialContainer ipediaYT" href="https://www.youtube.com/@iPediainteractivebooks" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
-              <svg viewBox="0 0 24 24" class="ipediaSocialSvg" aria-hidden="true">
-      <path d="M23.498 6.186a2.996 2.996 0 0 0-2.108-2.118C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.39.568A2.996 2.996 0 0 0 .502 6.186 31.36 31.36 0 0 0 0 12a31.36 31.36 0 0 0 .502 5.814 2.996 2.996 0 0 0 2.108 2.118C4.5 20.5 12 20.5 12 20.5s7.5 0 9.39-.568a2.996 2.996 0 0 0 2.108-2.118A31.36 31.36 0 0 0 24 12a31.36 31.36 0 0 0-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"></path>
-    </svg>
-            </a>
-            <a class="ipediaSocialContainer ipediaTT" href="https://www.tiktok.com/@ipediaebooks?_r=1&_t=ZN-93y4rR3vLMc" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
-              <svg viewBox="0 0 24 24" class="ipediaSocialSvg" aria-hidden="true">
-      <path d="M14 3v10.3a3.8 3.8 0 1 1-2-3.35V5h6v2h-4z"></path>
-    </svg>
-            </a>
-            <a class="ipediaSocialContainer ipediaIG" href="https://www.instagram.com/ipediainteractivebooks?igsh=am5rNHZ2YnJ2Zjhy&utm_source=qr" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-              <svg viewBox="0 0 16 16" class="ipediaSocialSvg" aria-hidden="true">
-      <path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.917 3.917 0 0 0-1.417.923A3.927 3.927 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.916 3.916 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.926 3.926 0 0 0-.923-1.417A3.911 3.911 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0h.003zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599.28.28.453.546.598.92.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.47 2.47 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.478 2.478 0 0 1-.92-.598 2.48 2.48 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233 0-2.136.008-2.388.046-3.231.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92.28-.28.546-.453.92-.598.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045v.002zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92zm-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217zm0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334z"></path>
-    </svg>
-            </a>
-          </div>
-</div>
-</div>
-</p>  
-
-
-
-`,
-          },
-                         {
-            id: 'biblioCredits',
-            label: 'Βιβλιογραφία και credits',
-            htmlText: `
-              <p>
-                  <div class="callout">
-                <strong>Το παρόν διαδραστικό σχολικό βοήθημα έχει δημιουργηθεί με βάση το πρόγραμμα σπουδών του Υπουργείου Παιδείας και του Ινστιτούτου Εκπαιδευτικής Πολιτικής (ΙΕΠ).
-</strong>
-</div>
-
-<div class="kcallout">
-  <div class="kcallout-head">
-    <div class="kcallout-icon">📖</div>
-    <p class="kcallout-title">Βιβλιογραφία</p>
-  </div>
-
-<ul>
-<li>Φυσική Α Γυμνασίου - iPedia | Κώστας Κατσούλης.</li>
-<li>Φυσική Β γυμνασίου - iPedia | Κώστας Κατσούλης.</li>
-<li>Φυσική Γ γυμνασίου / Ο.Ε.Δ.Β.</li>
-<li>Τόμος Ι - Μηχανική / Serway.</li>
-<li>Τόμος ΙΙΙ - Θερμοδυναμική / Serway.</li>
-<li>Κλασική Μηχανική / Κανάρης Χ. Τσίγκανος.</li>
-<li>Φυσική Β Γυμνασίου / Άγγελος και Σπύρος Σαββάλας.</li>
-<li>Πανεπιστημιακή Φυσική - Τόμος Α / Hugh D.Young. </li>
-<li>Πανεπιστημιακή Φυσική - Τόμος B / Hugh D.Young. </li>
-<li>IB standard Level Physics student Handbook / David Roberts. </li>
-<li>Trigonometry / SchoolYourself.</li>
-<li>Work and Energy / Tom Henderson. </li>
-<li>Physics / WAG mob.</li>
-<li>Φυσική των ταλαντώσεων και των κυμάτων / H.J. Pain</li>
-<li>Physics / Michael J. Dickinson. </li>
-<li>Physics ∙ 2013 / Boundless.</li>
-</ul>
-  </div>
-</div>
-
-
-              </p>
-
-                <strong>Προτεινόμενες εκπαιδευτικές ιστοσελίδες από το δημιουργό:</strong>
-                <ul>
-                  <li>Πανελλήνιο Σχολικό Δίκτυο (ΠΣΔ): http://ebooks.edu.gr/new/</li>
-                  <li>Ιστοσελίδες: study4exams.gr, https://www.khanacademy.org/, Phet.</li>
-                  <li>Εκπαιδευτικά Κανάλια στο YouTube: iPedia, Καθημερινή Φυσική.</li>
-                </ul>
-
-              
-                <div class="double-bar1">
-
-
-Τα βίντεο, τα τρισδιάστατα μοντέλα, οι τρισδιάστατες σκηνές, οι διαδραστικές εφαρμογές και όλο το υπόλοιπο υλικό που περιλαμβάνεται στο βιβλίο έχει σχεδιαστεί αποκλειστικά από τον δημιουργό Κώστα Κατσούλη για τις ανάγκες του βιβλίου.
-  </div>
-            `
-          },
-          {
-            id: 'copyright',
-            label: 'Copyright',
-            htmlText: `
- 
-              <div class="callout">
-© 2026 Κώστας Κατσούλης - Φυσικός.<br>
-Διεύθυνση ηλεκτρονικού ταχυδρομείου: kostaskatsoulis.ebook@gmail.com<br>
-Απαγορεύεται η αναδημοσίευση, η αναπαραγωγή (ολική, μερική ή περιληπτική) ή η απόδοση κατά παράφραση του περιεχομένου του βιβλίου με οποιονδήποτε τρόπο, μηχανικό, ηλεκτρονικό, φωτοτυπικό ή άλλο, χωρίς προηγούμενη γραπτή άδεια του εκδότη.              </div>
-            `
-          }
-        ]
-      }
-
 
     };
     
@@ -5589,8 +5723,6 @@ function ggStopAllNarrations(reason){
   }catch(e){}
   try{ window.addEventListener('pagehide', stopNow, false); }catch(e){}
 })();
-
-
 
 // =========================
 // Lesson SFX buttons (inside iframes/lessons)
@@ -6165,8 +6297,8 @@ try{
       function pauseOthers(){
         for(var i=0;i<players.length;i++){
           var w=players[i]; if(!w||w===wrap) continue;
-          try{ if(w.__ggApAudio && !w.__ggApAudio.paused) w.__ggApAudio.pause(); }catch(e){}
-          try{ w.classList.remove('is-playing'); }catch(e){}
+          try{ if(w.__ggApAudio){ w.__ggApAudio.pause(); try{ w.__ggApAudio.currentTime=0; }catch(e){} } }catch(e){}
+          try{ w.classList.remove('is-playing'); }catch(e){} try{ if(w.style&&w.style.setProperty) w.style.setProperty('--gg-ap-p','0%'); }catch(e){} try{ var rr=(w.querySelector?w.querySelector('[data-ap=progress]'):null); if(rr && !w.__ggApDragging) rr.value='0'; }catch(e){}
         }
       }
       function safePlay(){
@@ -6426,17 +6558,64 @@ function ggPlaySfxBuffer(audioBuf, gain){
   }catch(e){}
 }
 
+
+// ----------------- iOS/iframe safety: proxy Reward SFX to active iframe -----------------
+function ggPostToAllIframes(payload){
+  try{
+    var ifrs = document.querySelectorAll('iframe');
+    for (var i=0; i<ifrs.length; i++){
+      var f = ifrs[i];
+      if (!f || !f.contentWindow) continue;
+      var src = '';
+      try{ src = (f.getAttribute('src') || f.src || '').trim(); }catch(e){ src=''; }
+      if (!src || src === 'about:blank') continue;
+      try{ f.contentWindow.postMessage(payload, '*'); }catch(e){}
+    }
+  }catch(e){}
+}
+
+function ggProxyRewardSfxToIframes(kind, gain){
+  try{
+    var url = (kind === 'milestone') ? __GG_SFX_MILESTONE_URL : __GG_SFX_LEVELUP_URL;
+    ggPostToAllIframes({ source:'GG-SFX', type:'PLAY', kind: String(kind||''), url: url, gain: (gain==null?1.0:gain) });
+  }catch(e){}
+}
+
+function ggPlayRewardSfxOrProxy(kind, buf, gain){
+  var g = (gain == null ? 1.0 : gain);
+
+  var ctx = null;
+  try{ ctx = ggEnsureSfx(); }catch(e){ ctx = null; }
+
+  // If this document can't run WebAudio (common on iOS when the user interacts inside an iframe),
+  // ask the iframe to play the same sound instead.
+  try{
+    if (!ctx || ctx.state !== 'running'){
+      try{ if (ctx && typeof ctx.resume === 'function') ctx.resume(); }catch(e){}
+      if (!ctx || ctx.state !== 'running'){
+        ggProxyRewardSfxToIframes(kind, g);
+        return;
+      }
+    }
+  }catch(e){
+    try{ ggProxyRewardSfxToIframes(kind, g); }catch(_){}
+    return;
+  }
+
+  ggPlaySfxBuffer(buf, g);
+}
+
 function ggPlayLevelUpMp3(){
   if (!ggShouldPlaySfx(140)) return;
   ggLoadSfx(__GG_SFX_LEVELUP_URL, 'levelup').then(function(buf){
-    ggPlaySfxBuffer(buf, 1.0);
+    ggPlayRewardSfxOrProxy('levelup', buf, 1.0);
   });
 }
 
 function ggPlayMilestoneMp3(){
   if (!ggShouldPlaySfx(200)) return;
   ggLoadSfx(__GG_SFX_MILESTONE_URL, 'milestone').then(function(buf){
-    ggPlaySfxBuffer(buf, 1.0);
+    ggPlayRewardSfxOrProxy('milestone', buf, 1.0);
   });
 }
 
@@ -6619,7 +6798,7 @@ function ggPlayRewardItem(item){
     var toast = ggBuildRewardToast(item);
 
     if (ggShouldPlaySfx(minGap)){
-      ggPlaySfxBuffer(buf, 1.0);
+      ggPlayRewardSfxOrProxy(key, buf, 1.0);
     }
 
     return ggToastShowFor(toast, durMs);
@@ -6769,6 +6948,9 @@ if (commentOkBtn) {
 
 function cancelCommentDialog() {
   closeCommentDialog();
+  try { __ggClearSelectionPreview(); } catch(e) {}
+  try { hideSelectionToolbar(); } catch(e) {}
+  try { var sel = window.getSelection && window.getSelection(); if (sel) sel.removeAllRanges(); } catch(e) {}
 }
 
 if (commentCancelBtn) {
@@ -7288,7 +7470,7 @@ var notesState = {
     </svg>
             </a>
                     <a class="ipediaSocialContainer ipediaFB"
-   href="https://www.ipedia.com"
+   href="https://www.ipedia.online"
    target="_blank"
    rel="noopener noreferrer"
    aria-label="Website">
@@ -7349,6 +7531,124 @@ var notesState = {
         // Για το σύστημα σημειώσεων / χρωματισμών
     var selectionToolbarEl = document.getElementById('selectionToolbar');
     var lastSelectionRange = null;
+// ===== Android selection-preview (αποφεύγουμε το OS popup που καλύπτει το toolbox) =====
+var __ggSelectionPreviewEl = null;
+var __ggSelectionPreviewNoteIds = null;
+
+function __ggIsAndroidWV(){
+  try { return (typeof isAndroidWebView === 'function') && isAndroidWebView(); } catch(e){ return false; }
+}
+
+function __ggClearSelectionPreview(){
+  if (!__ggSelectionPreviewEl) return;
+  try { unwrapElement(__ggSelectionPreviewEl); } catch(e) {}
+  __ggSelectionPreviewEl = null;
+  __ggSelectionPreviewNoteIds = null;
+}
+
+function __ggCollectNoteIdsInRange(range){
+  var ids = [];
+  if (!range || !contentInnerEl) return ids;
+
+  var idSet = {};
+  var root = contentInnerEl;
+
+  var walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, {
+    acceptNode: function(node){
+      return (node.classList && node.classList.contains('user-highlight'))
+        ? NodeFilter.FILTER_ACCEPT
+        : NodeFilter.FILTER_SKIP;
+    }
+  });
+
+  var node;
+  while ((node = walker.nextNode())) {
+    try{
+      if (!range.intersectsNode(node)) continue;
+      var nid = node.getAttribute && node.getAttribute('data-note-id');
+      if (nid) {
+        nid = parseInt(nid, 10);
+        if (!idSet[nid]) { idSet[nid] = true; ids.push(nid); }
+      }
+    }catch(e){}
+  }
+
+  return ids;
+}
+
+function __ggCreateSelectionPreview(range){
+  if (!range) return null;
+
+  // καθάρισε τυχόν παλιό preview
+  __ggClearSelectionPreview();
+
+  var clone = range.cloneContents();
+  if (!clone || !clone.textContent || !clone.textContent.trim()) return null;
+
+  // κρατάμε ποια notes/highlights τέμνονται (για το “Αφαίρεση”)
+  __ggSelectionPreviewNoteIds = __ggCollectNoteIdsInRange(range);
+
+  var wrapper = document.createElement('span');
+  wrapper.className = 'gg-selection-preview';
+
+  var contents = range.extractContents();
+  wrapper.appendChild(contents);
+  range.insertNode(wrapper);
+
+  __ggSelectionPreviewEl = wrapper;
+  return wrapper;
+}
+
+function __ggCommitSelectionPreview(commentText){
+  var wrapper = __ggSelectionPreviewEl;
+  if (!wrapper) return false;
+
+  // μετατροπή preview → μόνιμο highlight
+  wrapper.className = commentText ? 'user-highlight user-highlight-comment' : 'user-highlight';
+  if (commentText) wrapper.setAttribute('data-comment', commentText);
+  else wrapper.removeAttribute('data-comment');
+
+  // καταχώρηση σημείωσης (ίδια λογική με applyHighlight)
+  if (currentLessonId && currentTabId) {
+    var snippet = (wrapper.textContent || '').trim().replace(/\s+/g, ' ');
+    if (snippet.length > 150) snippet = snippet.slice(0, 147) + '...';
+
+    notesState.lastId = (notesState.lastId || 0) + 1;
+    var noteId = notesState.lastId;
+
+    wrapper.setAttribute('data-note-id', String(noteId));
+
+    var note = {
+      id: noteId,
+      lessonId: currentLessonId,
+      tabId: currentTabId,
+      snippet: snippet,
+      comment: commentText ? commentText : '',
+      done: false
+    };
+
+    notesState.notes.push(note);
+    updateTabHtmlSnapshot();
+    saveNotesState();
+    rebuildNotesList();
+  }
+
+  __ggSelectionPreviewEl = null;
+  __ggSelectionPreviewNoteIds = null;
+  return true;
+}
+
+function __ggGetRangeForPreview(){
+  if (!__ggSelectionPreviewEl) return null;
+  try{
+    var r = document.createRange();
+    r.selectNodeContents(__ggSelectionPreviewEl);
+    return r;
+  }catch(e){
+    return null;
+  }
+}
+
 
 // Popup για εισαγωγή σχολίου
 var commentEditorEl = null;
@@ -7388,6 +7688,22 @@ window.addEventListener('resize', function () {
   selectionToolbarEl.style.maxWidth = '';
   selectionToolbarEl.style.transform = '';
 }
+
+// Κλείσιμο selection toolbar όταν πατάμε εκτός (χρήσιμο ειδικά σε Android όπου "σβήνουμε" το native selection)
+document.addEventListener('click', function (ev) {
+  try {
+    if (!selectionToolbarEl || selectionToolbarEl.style.display === 'none') return;
+    if (selectionToolbarEl.contains(ev.target)) return;
+
+    // Αν υπάρχει ενεργή επιλογή (desktop), μην το κλείνεις ακόμη
+    var sel = window.getSelection && window.getSelection();
+    if (sel && !sel.isCollapsed) return;
+
+    hideSelectionToolbar();
+    __ggClearSelectionPreview();
+  } catch (e) {}
+}, true);
+
 
 
 function openNotesModal() {
@@ -7460,51 +7776,290 @@ function toggleNotesModalFullscreen() {
     return;
   }
 
-  // ✅ non-iOS: κλασικό “πάνω από την επιλογή”
+  // ✅ Android: dock κάτω (δεν επικαλύπτει την επιλογή και είναι σταθερό σε WebView/Emulator)
+  var androidLike = /Android/i.test(navigator.userAgent || '');
+  if (androidLike) {
+    selectionToolbarEl.style.position = 'fixed';
+    selectionToolbarEl.style.left = '50%';
+    selectionToolbarEl.style.right = 'auto';
+    selectionToolbarEl.style.top = 'auto';
+    selectionToolbarEl.style.bottom = '12px';
+    selectionToolbarEl.style.transform = 'translateX(-50%)';
+    selectionToolbarEl.style.maxWidth = 'calc(100vw - 16px)';
+    selectionToolbarEl.style.zIndex = '9999';
+
+    // Αν η επιλογή είναι πολύ χαμηλά, κάνε μικρό scroll ώστε να μην πατάει το toolbar πάνω της
+    try {
+      var rr = null;
+      try { rr = range.getBoundingClientRect && range.getBoundingClientRect(); } catch(e) { rr = null; }
+      var vh = (window.innerHeight || document.documentElement.clientHeight || 0);
+      var tbH = selectionToolbarEl.offsetHeight || 40;
+      if (rr && vh && (rr.bottom > (vh - tbH - 22))) {
+        var dy = (rr.bottom - (vh - tbH - 22)) + 12;
+        var sc = contentInnerEl || document.scrollingElement || document.documentElement;
+        if (sc && sc.scrollTop != null) sc.scrollTop += dy;
+        else window.scrollBy(0, dy);
+      }
+    } catch(e){}
+
+    return;
+  }
+
+  // ✅ non-iOS: τοποθέτηση ΧΩΡΙΣ να επικαλύπτει την επιλογή
   selectionToolbarEl.style.bottom = '';
   selectionToolbarEl.style.transform = '';
   selectionToolbarEl.style.maxWidth = '';
+  selectionToolbarEl.style.position = 'fixed';
 
-  var rect = range.getBoundingClientRect();
+  function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
+
+  // Υπολόγισε “ένωση” rects (πολύ πιο σταθερό για multi-line selections)
+  var rect = null;
+  try {
+    if (range.getClientRects) {
+      var rs = range.getClientRects();
+      if (rs && rs.length) {
+        var left = rs[0].left, top = rs[0].top, right = rs[0].right, bottom = rs[0].bottom;
+        for (var i=1;i<rs.length;i++){
+          var r = rs[i];
+          if (!r) continue;
+          if (r.left < left) left = r.left;
+          if (r.top < top) top = r.top;
+          if (r.right > right) right = r.right;
+          if (r.bottom > bottom) bottom = r.bottom;
+        }
+        rect = { left:left, top:top, right:right, bottom:bottom, width:(right-left), height:(bottom-top) };
+      }
+    }
+  } catch(e){ rect = null; }
+
+  if (!rect) {
+    try { rect = range.getBoundingClientRect(); } catch(e){ rect = null; }
+  }
 
   if (!rect || (rect.width === 0 && rect.height === 0)) {
-    var node = range.startContainer.nodeType === 3
-      ? range.startContainer.parentElement
-      : range.startContainer;
-    if (node && node.getBoundingClientRect) {
-      rect = node.getBoundingClientRect();
+    var node = null;
+    try {
+      node = range.startContainer && range.startContainer.nodeType === 3
+        ? range.startContainer.parentElement
+        : range.startContainer;
+    } catch(e){}
+    if (node && node.getBoundingClientRect) rect = node.getBoundingClientRect();
+  }
+
+  if (!rect) return;
+
+  var vw = (window.innerWidth || document.documentElement.clientWidth || 0);
+  var vh = (window.innerHeight || document.documentElement.clientHeight || 0);
+
+  // Διάσταση toolbar
+  var tbW = selectionToolbarEl.offsetWidth || 160;
+  var tbH = selectionToolbarEl.offsetHeight || 34;
+
+  var pad = 8;
+  var gap = 10;
+
+  // Κεντράρισμα οριζόντια (με clamp)
+  var leftCentered = rect.left + (rect.width/2) - (tbW/2);
+  leftCentered = clamp(leftCentered, pad, vw - tbW - pad);
+
+  // Υποψήφιες θέσεις πάνω/κάτω (ΔΕΝ επικαλύπτουν την επιλογή)
+  var aboveTop = rect.top - tbH - gap;
+  var belowTop = rect.bottom + gap;
+
+  var fitsAbove = aboveTop >= pad;
+  var fitsBelow = (belowTop + tbH) <= (vh - pad);
+
+  var finalLeft = leftCentered;
+  var finalTop = 0;
+  var placed = '';
+
+  if (fitsAbove) {
+    finalTop = aboveTop;
+    placed = 'above';
+  } else if (fitsBelow) {
+    finalTop = belowTop;
+    placed = 'below';
+  } else {
+    // Αν δεν χωράει πάνω/κάτω, δοκίμασε ΠΛΑΪ (δεξιά ή αριστερά) ώστε να μην καλύπτει την επιλογή
+    var sideTop = clamp(rect.top + (rect.height/2) - (tbH/2), pad, vh - tbH - pad);
+
+    var rightLeft = rect.right + gap;
+    if ((rightLeft + tbW) <= (vw - pad)) {
+      finalLeft = rightLeft;
+      finalTop = sideTop;
+      placed = 'right';
+    } else {
+      var leftLeft = rect.left - gap - tbW;
+      if (leftLeft >= pad) {
+        finalLeft = leftLeft;
+        finalTop = sideTop;
+        placed = 'left';
+      } else {
+        // Έσχατη λύση: dock κάτω ΚΑΙ κάνε μικρό scroll ώστε να μη πατάει την επιλογή
+        finalLeft = leftCentered;
+        finalTop = vh - tbH - 12;
+        placed = 'dock-bottom';
+
+        // Αν επικαλύπτει, σπρώξε το κείμενο προς τα πάνω με scroll
+        try{
+          var desiredBottom = rect.bottom + gap;
+          if (finalTop < desiredBottom) {
+            var dy = (desiredBottom - finalTop) + 6;
+            var sc = document.querySelector('.content-inner') || document.querySelector('.content') || document.scrollingElement || document.documentElement;
+            if (sc && typeof sc.scrollTop === 'number') sc.scrollTop += dy;
+            else window.scrollBy(0, dy);
+            // επαναμέτρηση μετά το scroll
+            setTimeout(function(){
+              try{
+                var rr = null;
+                if (__ggSelectionPreviewEl && __ggSelectionPreviewEl.getBoundingClientRect) rr = __ggSelectionPreviewEl.getBoundingClientRect();
+                else rr = (range.getBoundingClientRect ? range.getBoundingClientRect() : null);
+                if (!rr) return;
+                showSelectionToolbar(range);
+              }catch(e){}
+            }, 50);
+          }
+        }catch(e){}
+      }
     }
   }
 
-  var toolbarWidth = selectionToolbarEl.offsetWidth || 160;
-  var left = rect.left + rect.width / 2 - toolbarWidth / 2;
-  var top  = rect.top - 36;
-
-  if (top < 8) top = rect.bottom + 8;
-
-  if (left < 8) left = 8;
-  var maxLeft = (window.innerWidth || document.documentElement.clientWidth) - toolbarWidth - 8;
-  if (left > maxLeft) left = maxLeft;
-
-  selectionToolbarEl.style.left = left + 'px';
-  selectionToolbarEl.style.top  = top + 'px';
+  selectionToolbarEl.style.left = finalLeft + 'px';
+  selectionToolbarEl.style.top  = finalTop + 'px';
 }
+
+
+
+
+// --- Android WebView: απόκρυψη του OS popup επιλογής (Copy/Select All/Share κλπ)
+// Στόχος: κρατάμε το δικό μας toolbar, αλλά «σβήνουμε» γρήγορα το native selection
+// ώστε να μην εμφανίζεται/μένει το ActionMode του Android πάνω από το UI μας.
+var __ggAndroidKeepToolbar = false;
+
+// Android WebView: αφήνουμε τον χρήστη να "απλώσει" την επιλογή (handles) και
+// ΜΟΝΟ όταν σταθεροποιηθεί (debounce) μετατρέπουμε την επιλογή σε δικό μας preview
+// και σβήνουμε το native selection για να φύγει το OS pop-up.
+var __ggAndroidFinalizeT = 0;
+var __ggAndroidPendingRange = null;
+var __ggAndroidSelectionStamp = 0;
+
+function __ggAndroidCancelFinalize(){
+  try { clearTimeout(__ggAndroidFinalizeT); } catch(e) {}
+  __ggAndroidFinalizeT = 0;
+  __ggAndroidPendingRange = null;
+  __ggAndroidSelectionStamp++;
+}
+
+function __ggAndroidScheduleFinalize(range){
+  try{
+    if (!range) return;
+    __ggAndroidPendingRange = (range.cloneRange ? range.cloneRange() : range);
+    __ggAndroidSelectionStamp++;
+    var stamp = __ggAndroidSelectionStamp;
+
+    try { clearTimeout(__ggAndroidFinalizeT); } catch(e) {}
+    __ggAndroidFinalizeT = setTimeout(function(){
+      try{
+        if (stamp !== __ggAndroidSelectionStamp) return;
+        var r = __ggAndroidPendingRange;
+        if (!r) return;
+
+        // δημιουργία preview highlight πάνω στο τελικό εύρος επιλογής
+        var prev = __ggCreateSelectionPreview(r);
+        if (prev) {
+          var pr = __ggGetRangeForPreview();
+          if (pr) showSelectionToolbar(pr);
+          else if (lastSelectionRange) showSelectionToolbar(lastSelectionRange);
+          else showSelectionToolbar(r);
+        } else {
+          if (lastSelectionRange) showSelectionToolbar(lastSelectionRange);
+          else showSelectionToolbar(r);
+        }
+
+        // τώρα σβήνουμε το native selection ώστε να φύγει το OS popup
+        __ggDismissAndroidSelectionMenu();
+      }catch(e){}
+    }, 900); // περισσότερο περιθώριο για Android handles (επιλογή μεγαλύτερου κειμένου)
+  }catch(e){}
+}
+
+function __ggDismissAndroidSelectionMenu() {
+  try {
+    if (!isAndroidWebView || !isAndroidWebView()) return;
+    var sel = window.getSelection && window.getSelection();
+    if (!sel || sel.isCollapsed) return;
+
+    __ggAndroidKeepToolbar = true;
+
+    // Κάνουμε collapse το native selection άμεσα (μειώνει δραστικά το OS popup)
+    try { sel.removeAllRanges(); } catch (e) {}
+
+    // Δώσε λίγο χρόνο για το επόμενο selectionchange που πυροδοτείται από το removeAllRanges
+    setTimeout(function () {
+      __ggAndroidKeepToolbar = false;
+    }, 80);
+  } catch (e) {}
+}
+
+
+// Android WebView: μπλοκάρουμε και το contextmenu (long-press) όπου υποστηρίζεται
+document.addEventListener('contextmenu', function (e) {
+  try { if (isAndroidWebView && isAndroidWebView()) e.preventDefault(); } catch (err) {}
+}, true);
 
 
     function handleTextSelection() {
   var range = getSelectionInContent();
-  
-  // Αν δεν υπάρχει ενεργή επιλογή, απλά κρύψε το toolbar
-  // αλλά ΜΗΝ μηδενίζεις το lastSelectionRange.
+
+  // Αν δεν υπάρχει ενεργή επιλογή:
+  // - σε Android WebView μπορεί να την "σβήσαμε" επίτηδες για να μην εμφανίζεται
+  //   το OS popup (Copy/Select All/Share κλπ). Σε αυτή την περίπτωση κρατάμε
+  //   το δικό μας toolbar ανοιχτό.
   if (!range) {
+    try { if (__ggIsAndroidWV && __ggIsAndroidWV()) __ggAndroidCancelFinalize(); } catch(e) {}
+    if (__ggSelectionPreviewEl) return;
+    if (__ggAndroidKeepToolbar && (lastSelectionRange || __ggSelectionPreviewEl)) return;
     hideSelectionToolbar();
+    __ggClearSelectionPreview();
     return;
   }
 
-  // Κρατάμε αντίγραφο της τελευταίας καλής επιλογής
+  // Αν είναι κενή επιλογή (π.χ. απλό tap), κλείσε
+  try{
+    var t = (range.toString ? range.toString() : '');
+    if (!t || !t.trim()) {
+      hideSelectionToolbar();
+      __ggClearSelectionPreview();
+      return;
+    }
+  }catch(e){}
+
+  // νέα επιλογή → καθάρισε τυχόν παλιό preview
+  __ggClearSelectionPreview();
+
+  // Κρατάμε αντίγραφο της τελευταίας καλής επιλογής (desktop/iOS)
   lastSelectionRange = range.cloneRange ? range.cloneRange() : range;
+
+  // Android WebView:
+  // - αφήνουμε πρώτα τον χρήστη να επεκτείνει την επιλογή (handles)
+  // - όταν σταθεροποιηθεί (debounce), κάνουμε δικό μας preview highlight και τότε
+  //   σβήνουμε το native selection ώστε να φύγει το OS popup (Copy/Share κλπ).
+  if (__ggIsAndroidWV()) {
+    // Android WebView (π.χ. Pixel Tablet emulator / Galaxy Tab):
+    // Δείχνουμε το toolbox ΑΜΕΣΑ (dock) για να μη φαίνεται “χαμένο”,
+    // αλλά το preview/finalize θα γίνει όταν σταθεροποιηθεί η επιλογή.
+    showSelectionToolbar(range);
+
+    // Προγραμμάτισε finalize αφού σταματήσει να αλλάζει το selection (handles)
+    __ggAndroidScheduleFinalize(lastSelectionRange || range);
+    return;
+  }
+
+  // non-Android: κλασικό toolbar πάνω από την επιλογή
   showSelectionToolbar(range);
 }
+
 
 
  function applyHighlight(range, commentText) {
@@ -7642,6 +8197,44 @@ function saveNotesState() {
   }
 }
 
+
+/* ===== Snapshot compatibility helpers =====
+   Στόχος: όταν αλλάζει το βασικό περιεχόμενο μιας καρτέλας (EmApp.html update),
+   να ΜΗΝ “σκεπάζεται” από παλιό αποθηκευμένο snapshot (notesState.tabsHtml)
+   — κάτι που φαίνεται κυρίως σε file:// (Safari/Opera) επειδή εκεί το localStorage
+   μπορεί να κρατά παλιότερα snapshots από προηγούμενες εκδόσεις.
+   Το snapshot θα χρησιμοποιείται ΜΟΝΟ όταν ταιριάζει με το τρέχον baseHash.
+   ======================================== */
+function ggHash32(str){
+  str = String(str || '');
+  var h = 2166136261; // FNV-1a
+  for (var i=0; i<str.length; i++){
+    h ^= str.charCodeAt(i);
+    // h *= 16777619 (με bit ops για 32-bit)
+    h = (h + (h<<1) + (h<<4) + (h<<7) + (h<<8) + (h<<24)) >>> 0;
+  }
+  return ('00000000' + h.toString(16)).slice(-8);
+}
+
+function ggGetTabByIds(lessonId, tabId){
+  try{
+    var lesson = lessons && lessons[lessonId];
+    if (!lesson || !lesson.tabs) return null;
+    for (var i=0; i<lesson.tabs.length; i++){
+      if (lesson.tabs[i] && lesson.tabs[i].id === tabId) return lesson.tabs[i];
+    }
+  }catch(e){}
+  return null;
+}
+
+function ggGetTabBaseHash(lessonId, tabId){
+  var tab = ggGetTabByIds(lessonId, tabId);
+  if (!tab) return '';
+  // Προσοχή: περιλαμβάνουμε ΚΑΙ afterIframeHtml, γιατί snapshot κρατά και τα δύο
+  var base = String(tab.htmlText || '') + '\n<!--AFTER-->' + '\n' + String(tab.afterIframeHtml || '');
+  return ggHash32(base);
+}
+
 function updateTabHtmlSnapshot() {
   // Χωρίς ενεργή ενότητα/καρτέλα δεν έχουμε “σημείο” να αποθηκεύσουμε
   if (!currentLessonId || !currentTabId) return;
@@ -7666,7 +8259,11 @@ function updateTabHtmlSnapshot() {
     lessonId: currentLessonId,
     tabId: currentTabId,
     textHTML: textHTML,
-    postHTML: postHTML
+    postHTML: postHTML,
+    // ✅ hash του “βασικού” περιεχομένου (χωρίς highlights/σχόλια)
+    baseHash: (function(){
+      try{ return ggGetTabBaseHash(currentLessonId, currentTabId); }catch(e){ return ''; }
+    })()
   };
 
   // Persist στο localStorage
@@ -8042,8 +8639,9 @@ function focusNoteInContent(noteId) {
       var lesson = lessons[lessonId];
       if (!lesson) return;
 
-      try{ if (typeof ggStopAllNarrations === 'function') ggStopAllNarrations('lesson'); }catch(e){}
 
+      // 🔇 stop any narration from previous tab/lesson
+      try{ if (typeof ggStopAllNarrations === 'function') ggStopAllNarrations('lesson'); }catch(e){}
       currentLessonId = lessonId;
       currentTabId = null;
 
@@ -8086,19 +8684,34 @@ function renderTab(lessonId, tabId) {
   var tab = lesson.tabs.find(function (t) { return t.id === tabId; });
   if (!tab) return;
 
-  try{ if (typeof ggStopAllNarrations === 'function') ggStopAllNarrations('tab'); }catch(e){}
 
+  // 🔇 stop narration when leaving a tab / before loading new content
+  try{ if (typeof ggStopAllNarrations === 'function') ggStopAllNarrations('tab'); }catch(e){}
   currentTabId = tabId;
 
   var storageKey = lessonId + '::' + tabId;
-  var storedTab = notesState.tabsHtml[storageKey] || null;
+  var storedTab = (notesState && notesState.tabsHtml) ? (notesState.tabsHtml[storageKey] || null) : null;
+
+  // ✅ Χρησιμοποιούμε snapshot ΜΟΝΟ αν ταιριάζει με το τρέχον “base” περιεχόμενο.
+  // (Αλλιώς μπορεί να κρύψει νέες αφηγήσεις / reveal blocks όταν τρέχεις file://)
+  var __baseHashNow = '';
+  try{ __baseHashNow = ggGetTabBaseHash(lessonId, tabId); }catch(e){ __baseHashNow = ''; }
+
+  var useStored = false;
+  if (storedTab && storedTab.textHTML != null) {
+    try{
+      var bh = storedTab.baseHash ? String(storedTab.baseHash) : '';
+      if (bh && __baseHashNow && bh === String(__baseHashNow)) useStored = true;
+    }catch(e){ useStored = false; }
+  }
 
   // για την Ενότητα 1 / "Μαγνήτες" αγνοούμε snapshot
   if (lessonId === 'ch1' && tabId === 'magnets') {
+    useStored = false;
     storedTab = null;
   }
 
-  if (storedTab && storedTab.textHTML != null) {
+  if (useStored) {
     contentTextEl.innerHTML = storedTab.textHTML;
   } else {
     contentTextEl.innerHTML = tab.htmlText || '';
@@ -8117,7 +8730,7 @@ function renderTab(lessonId, tabId) {
     contentIframeEl.src     = 'about:blank';
   }
 
-  if (storedTab && storedTab.postHTML != null) {
+  if (useStored && storedTab && storedTab.postHTML != null) {
     postIframeBlockEl.innerHTML = storedTab.postHTML;
   } else {
     postIframeBlockEl.innerHTML = tab.afterIframeHtml || '';
@@ -8164,7 +8777,28 @@ xpRequestStateFromIframes();
  // ===== Fullscreen για όλα τα iframe-box =====
 var currentFsBox = null; // ποιο iframe-box είναι τώρα fullscreen
 
+function isAndroidWebView() {
+  var ua = navigator.userAgent || '';
+  var isAndroid = /Android/i.test(ua);
+  if (!isAndroid) return false;
+
+  // Κλασικοί δείκτες WebView
+  var isWv = /\bwv\b/.test(ua) || /; wv\)/.test(ua) || /Version\/\d+\.\d+/.test(ua);
+
+  // Capacitor / Cordova (στο Pixel Tablet emulator μπορεί να λείπει το "wv" από το UA)
+  var isCap = (typeof window.Capacitor !== 'undefined') || (typeof window.cordova !== 'undefined') ||
+              (typeof window.__CAPACITOR__ !== 'undefined') || (location && /^capacitor:/i.test(location.protocol || ''));
+
+  // Fallback: σε Android μέσα σε app shell → θεωρούμε WebView
+  return !!(isWv || isCap);
+}
+
 function shouldUseNativeFullscreen() {
+  // ✅ Android (WebView ή browser): κρατάμε ΜΟΝΟ pseudo fullscreen (CSS) για σταθερότητα.
+  // Το native fullscreen σε Android WebView (ιδίως σε emulator/API 34) μπορεί να “χάνει” overlay controls.
+  var ua = navigator.userAgent || '';
+  if (/Android/i.test(ua)) return false;
+
   var w = window.innerWidth || document.documentElement.clientWidth || 0;
   return w >= 900; // ίδιο breakpoint με το CSS
 }
@@ -8203,16 +8837,15 @@ function enterFullscreenFor(box) {
 
   // Native fullscreen μόνο σε μεγάλη οθόνη
   if (shouldUseNativeFullscreen()) {
-    var wrap = box.querySelector('.iframe-wrapper');
-    if (wrap) {
-      try {
-        if (wrap.requestFullscreen) {
-          wrap.requestFullscreen();
-        } else if (wrap.webkitRequestFullscreen) {
-          wrap.webkitRequestFullscreen();
-        }
-      } catch (e) {}
-    }
+    // ✅ Κάνουμε fullscreen στο *ίδιο το iframe-box* ώστε να περιλαμβάνει και τα controls (⤢ Έξοδος)
+    var target = box;
+    try {
+      if (target.requestFullscreen) {
+        target.requestFullscreen();
+      } else if (target.webkitRequestFullscreen) {
+        target.webkitRequestFullscreen();
+      }
+    } catch (e) {}
   }
 
   updateFullscreenButtons();
@@ -8545,14 +9178,22 @@ document.addEventListener('click', function (e) {
       });
     }
     // Εμφάνιση toolbar όταν ο χρήστης τελειώνει την επιλογή
+    // ✅ Android/WebView: η επιλογή κειμένου γίνεται με handles και δεν δίνει πάντα "touchend" στο ίδιο node,
+    // οπότε ακούμε και selectionchange (με throttle).
+    var __selCheckT = 0;
+    function __scheduleSelectionCheck() {
+      clearTimeout(__selCheckT);
+      __selCheckT = setTimeout(handleTextSelection, 40);
+    }
+    document.addEventListener('selectionchange', __scheduleSelectionCheck);
+
     if (contentInnerEl) {
-      contentInnerEl.addEventListener('mouseup', function () {
-        handleTextSelection();
-      });
+      contentInnerEl.addEventListener('mouseup', __scheduleSelectionCheck);
+      contentInnerEl.addEventListener('pointerup', __scheduleSelectionCheck);
 
       contentInnerEl.addEventListener('touchend', function () {
         // μικρή καθυστέρηση για να "σταθεροποιηθεί" η επιλογή σε mobile
-        setTimeout(handleTextSelection, 0);
+        setTimeout(__scheduleSelectionCheck, 0);
       });
     }
 
@@ -8567,6 +9208,7 @@ document.addEventListener('click', function (e) {
         openFooterModal(key);
       });
     });
+
     
     // ===== Άνοιγμα / κλείσιμο modal «Σημειώσεις μου» =====
 if (notesBtn && notesModalEl) {
@@ -9519,25 +10161,71 @@ function evaluateAnswer(answer, keywordSpec){
   return { percent: pct, totalWeight: totalW, matchedWeight: matchedW, items: out };
 }
 
+function __ggSafeId(s){
+  return String(s || '')
+    .replace(/[^a-zA-Z0-9_\-]+/g, '_')
+    .slice(0, 80);
+}
+
 function renderChecklist(block, items){
   var wrap = block.querySelector('.reveal-checklist');
   if (!wrap) return;
 
-  var html = '<div class="reveal-checklist-title">Λίστα λέξεων</div>';
-  html += '<div class="reveal-checklist-grid">';
+  items = Array.isArray(items) ? items : [];
 
-  for (var i=0; i<items.length; i++){
-    var it = items[i];
-    var cls = 'reveal-kw' + (it.hit ? '' : ' is-missing');
-    html +=
-      '<label class="'+cls+'">' +
-        '<input type="checkbox" ' + (it.hit ? 'checked' : '') + ' disabled>' +
-        '<span class="reveal-kw-label">' + escapeHtml(it.label) + '</span>' +
-      '</label>';
+  var built = (wrap.getAttribute('data-gg-built') === '1');
+  var prevCount = Number(wrap.getAttribute('data-gg-count') || 0);
+
+  // (Re)build only if needed (keeps animation only for newly checked keywords)
+  if (!built || prevCount !== items.length){
+    var key = '';
+    try{ key = __ggSafeId(getRevealKey(block) || block.getAttribute('data-qid') || 'q'); }
+    catch(e){ key = __ggSafeId(block.getAttribute('data-qid') || 'q'); }
+
+    var html = '<div class="reveal-checklist-title">Λίστα λέξεων</div>';
+    html += '<div class="reveal-checklist-grid">';
+
+    for (var i=0; i<items.length; i++){
+      var it = items[i] || {};
+      var rid = 'gg_kw_' + key + '_' + i;
+      var cls = 'reveal-kw-item' + (it.hit ? '' : ' is-missing');
+
+      html +=
+        '<div class="' + cls + '" data-kw-i="' + i + '">' +
+          '<div class="gg-radio-12" aria-hidden="true">' +
+            '<div class="cbx">' +
+              '<input type="checkbox" id="' + rid + '" ' + (it.hit ? 'checked' : '') + ' disabled>' +
+              '<label for="' + rid + '"></label>' +
+              '<svg fill="none" viewBox="0 0 15 14" height="14" width="15" aria-hidden="true">' +
+                '<path d="M2 8.36364L6.23077 12L13 2"></path>' +
+              '</svg>' +
+            '</div>' +
+          '</div>' +
+          '<label class="reveal-kw-label" for="' + rid + '">' + escapeHtml(it.label || '') + '</label>' +
+        '</div>';
+    }
+
+    html += '</div>';
+    wrap.innerHTML = html;
+    wrap.setAttribute('data-gg-built', '1');
+    wrap.setAttribute('data-gg-count', String(items.length));
+    return;
   }
 
-  html += '</div>';
-  wrap.innerHTML = html;
+  // Update states without rebuilding (so animation plays only when a keyword becomes covered)
+  for (var j=0; j<items.length; j++){
+    var it2 = items[j] || {};
+    var row = wrap.querySelector('[data-kw-i="' + j + '"]');
+    if (!row) continue;
+
+    var inp = row.querySelector('input');
+    if (inp){
+      inp.checked = !!it2.hit;
+    }
+
+    if (it2.hit) row.classList.remove('is-missing');
+    else row.classList.add('is-missing');
+  }
 }
 
 function updateRevealUI(block){
@@ -9687,11 +10375,18 @@ function buildSearchIndex(){
         var tab = lesson.tabs[ti];
         var key = lessonId + '::' + tab.id;
 
-        // snapshot (αν υπάρχει) υπερισχύει
+        // snapshot (αν υπάρχει) υπερισχύει ΜΟΝΟ αν ταιριάζει με το τρέχον baseHash
         var snap = (notesState && notesState.tabsHtml && notesState.tabsHtml[key]) ? notesState.tabsHtml[key] : null;
 
-        var textHTML = snap ? (snap.textHTML || '') : (tab.htmlText || '');
-        var postHTML = snap ? (snap.postHTML || '') : (tab.afterIframeHtml || '');
+        var useSnap = false;
+        try{
+          var bhNow = ggGetTabBaseHash(lessonId, tab.id);
+          var bhSnap = (snap && snap.baseHash) ? String(snap.baseHash) : '';
+          if (bhNow && bhSnap && bhNow === bhSnap) useSnap = true;
+        }catch(e){ useSnap = false; }
+
+        var textHTML = useSnap ? (snap.textHTML || '') : (tab.htmlText || '');
+        var postHTML = useSnap ? (snap.postHTML || '') : (tab.afterIframeHtml || '');
 
         // ✅ ΜΟΝΟ περιεχόμενο (χωρίς lesson.title, sectionLabel, tab.label)
         var contentText = [
@@ -10972,7 +11667,7 @@ if (!restored) {
     });
     
         // Click στα κουμπιά του selection toolbar
- if (selectionToolbarEl) {
+if (selectionToolbarEl) {
   selectionToolbarEl.addEventListener('click', function (evt) {
     var btn = __closest(evt.target, 'button');
     if (!btn) return;
@@ -10980,37 +11675,84 @@ if (!restored) {
     var action = btn.getAttribute('data-action');
     if (!action) return;
 
-    // Κρατάμε ένα snapshot του range πριν κλείσει το toolbar
+    var isAWV = __ggIsAndroidWV && __ggIsAndroidWV();
+
+    // Αν ο χρήστης πατήσει κουμπί ΠΡΙΝ δημιουργηθεί preview (π.χ. αμέσως μετά την επιλογή),
+    // ακύρωσε το pending finalize για να μην “ξανα-μπει” preview μετά το commit.
+    if (isAWV && !__ggSelectionPreviewEl) {
+      try { if (typeof __ggAndroidCancelFinalize === 'function') __ggAndroidCancelFinalize(); } catch(e){}
+      try { __ggAndroidPendingRange = null; } catch(e){}
+    }
+
+
+    // === Android preview path ===
+    if (isAWV && __ggSelectionPreviewEl) {
+      if (action === 'highlight') {
+        __ggCommitSelectionPreview(null);
+        hideSelectionToolbar();
+        var sel0 = window.getSelection && window.getSelection();
+        if (sel0) sel0.removeAllRanges();
+        return;
+      }
+
+      if (action === 'comment') {
+        // Κρύβουμε το toolbar για να μην ενοχλεί το dialog
+        hideSelectionToolbar();
+        openCommentDialog(function (commentText) {
+          try{
+            if (commentText && commentText.trim()) {
+              __ggCommitSelectionPreview(commentText.trim());
+            } else {
+              __ggClearSelectionPreview();
+            }
+          }catch(e){}
+          var sel1 = window.getSelection && window.getSelection();
+          if (sel1) sel1.removeAllRanges();
+        });
+        return;
+      }
+
+      if (action === 'clear') {
+        // ❗ Σημαντικό: πρώτα αφαιρούμε το preview ώστε να ΜΗΝ αποθηκευτεί σε snapshot
+        var ids = (__ggSelectionPreviewNoteIds && __ggSelectionPreviewNoteIds.length)
+          ? __ggSelectionPreviewNoteIds.slice()
+          : [];
+        __ggClearSelectionPreview();
+
+        if (ids.length && typeof deleteNotesByIds === 'function') {
+          deleteNotesByIds(ids);
+        }
+
+        hideSelectionToolbar();
+        var sel2 = window.getSelection && window.getSelection();
+        if (sel2) sel2.removeAllRanges();
+        return;
+      }
+    }
+
+    // === Default (non-preview) path ===
+    // Κρατάμε ένα snapshot του range
     var range = lastSelectionRange ? lastSelectionRange.cloneRange() : null;
 
     if (action === 'highlight') {
-      if (range) {
-        applyHighlight(range, null); // μόνο χρώμα
-      }
+      if (range) applyHighlight(range, null);
     } else if (action === 'comment') {
       if (!range) return;
 
-      // Ανοίγουμε το δικό μας modal αντί για window.prompt
       openCommentDialog(function (commentText) {
         if (commentText && commentText.trim()) {
           applyHighlight(range, commentText.trim());
         }
       });
 
-      // Σημαντικό: ΔΕΝ κλείνουμε εδώ το range – το κρατάει η κλειστότητα
-      // για όταν ο χρήστης πατήσει "Αποθήκευση".
-      return; // για να μην σβήσουμε την επιλογή αμέσως
+      return; // δεν σβήνουμε την επιλογή πριν το dialog
     } else if (action === 'clear') {
-      if (range) {
-        clearSelectionHighlights(range);
-      }
+      if (range) clearSelectionHighlights(range);
     }
 
     hideSelectionToolbar();
-    var sel = window.getSelection();
-    if (sel) {
-      sel.removeAllRanges();
-    }
+    var sel = window.getSelection && window.getSelection();
+    if (sel) sel.removeAllRanges();
   });
 }
 
@@ -11101,6 +11843,10 @@ function lbSaveDemoStore(store){
 // ----- Backend: Firestore (με fallback σε demo/localStorage) -----
 var LB_COL_USERS = 'lb_users';
 var LB_COL_NICKS = 'lb_nicks';
+
+// Modular Firestore helpers (injected by the Firebase module initializer)
+var FS = (window.__LB_FS__ || {});
+
 
 // helpers
 function lbFB(){
@@ -11228,18 +11974,23 @@ function lbUpsertScore(nick, totalXp){
 
   var fb = lbFB();
   var db = fb.db;
-  var FieldValue = fb.firebase.firestore.FieldValue;
+  var FS = window.__LB_FS__ || {};
 
+  
   return lbFBReady().then(function(user){
     var uid = user.uid;
-    var userRef = db.collection(LB_COL_USERS).doc(uid);
+    var userRef = (FS.doc && FS.collection) ? FS.doc(FS.collection(db, LB_COL_USERS), uid) : null;
 
-    return db.runTransaction(function(tx){
+    if (!FS.runTransaction || !userRef){
+      return Promise.reject(new Error('FIRESTORE_NOT_READY'));
+    }
+
+    return FS.runTransaction(db, function(tx){
       return tx.get(userRef).then(function(snap){
         var data = snap.exists ? (snap.data() || {}) : {};
         var curXp = Math.max(0, Math.floor(Number(data.xp || 0)));
         var newXp = Math.max(curXp, totalXp);
-        var now = FieldValue.serverTimestamp();
+        var now = (FS.serverTimestamp ? FS.serverTimestamp() : null);
 
         tx.set(userRef, {
           uid: uid,
@@ -11254,7 +12005,6 @@ function lbUpsertScore(nick, totalXp){
     });
   });
 }
-
 function lbFetchTop(limit){
   limit = Math.max(5, Math.min(100, Math.floor(limit || 20)));
 
@@ -11268,12 +12018,11 @@ function lbFetchTop(limit){
 
   var fb = lbFB();
   var db = fb.db;
+  var FS = window.__LB_FS__ || {};
 
   return lbFBReady().then(function(){
-    return db.collection(LB_COL_USERS)
-      .orderBy('xp', 'desc')
-      .limit(limit)
-      .get()
+    var q = (FS.query && FS.collection && FS.orderBy && FS.limit) ? FS.query(FS.collection(db, LB_COL_USERS), FS.orderBy('xp','desc'), FS.limit(limit)) : null;
+    return (FS.getDocs ? FS.getDocs(q) : Promise.reject(new Error('FIRESTORE_NOT_READY')))
       .then(function(qs){
         var out = [];
         qs.forEach(function(docSnap){
@@ -11302,20 +12051,23 @@ function lbFetchTop(limit){
 }
 
 function lbCountQuery(q){
-  // Prefer server-side count aggregation if available (Firebase Firestore v9+ compat)
+  // Server-side count aggregation (modular)
   try{
-    if (q && typeof q.count === 'function'){
-      return q.count().get().then(function(snap){
-        try{
-          var d = (snap && typeof snap.data === 'function') ? (snap.data() || {}) : {};
-          if (typeof d.count === 'number') return d.count;
-        }catch(e){}
-        return 0;
+    var FS = window.__LB_FS__ || {};
+    if (FS && FS.getCountFromServer){
+      return FS.getCountFromServer(q).then(function(snap){
+        try{ return (snap && typeof snap.data === 'function') ? (snap.data().count || 0) : 0; }catch(e){ return 0; }
       });
     }
   }catch(e){}
   // Fallback: fetch docs (ok for small leaderboards)
-  return q.get().then(function(qs){ return (qs && typeof qs.size === 'number') ? qs.size : 0; });
+  try{
+    var FS2 = window.__LB_FS__ || {};
+    if (FS2 && FS2.getDocs){
+      return FS2.getDocs(q).then(function(qs){ return (qs && typeof qs.size === 'number') ? qs.size : 0; });
+    }
+  }catch(e){}
+  return Promise.resolve(0);
 }
 
 function lbDemoFetchMyRank(myNick){
@@ -11354,10 +12106,11 @@ function lbFetchMyRank(myNick, myXp){
 
   var fb = lbFB();
   var db = fb.db;
+  var FS = window.__LB_FS__ || {};
 
   return lbFBReady().then(function(){
-    var col = db.collection(LB_COL_USERS);
-    var higherQ = col.where('xp','>', myXp);
+    var FS = window.__LB_FS__ || {};
+    var higherQ = (FS.query && FS.collection && FS.where) ? FS.query(FS.collection(db, LB_COL_USERS), FS.where('xp','>', myXp)) : null;
     // Dense ranking: rank = number of users with strictly higher XP + 1 (ties share same rank)
 return lbCountQuery(higherQ).then(function(higher){
   higher = Math.max(0, Math.floor(Number(higher || 0)));
@@ -11440,7 +12193,7 @@ function lbRender(){
       if (lbIsFirebase()){
         lbFootEl.innerHTML = '<span class="lb-foot-dot"></span><span>Η κατάταξη ενημερώνεται όταν ανοίγεις την κάρτα.</span>';
       } else {
-        lbFootEl.innerHTML = '<span class="lb-foot-dot"></span><span></span>';
+        lbFootEl.innerHTML = '<span class="lb-foot-dot"></span><span>Τοπική λειτουργία (demo). Δεν θα δεις άλλους χρήστες μέχρι να ενεργοποιηθεί το Firebase config.</span>';
       }
       lbFootEl.style.display = '';
     }
@@ -11476,8 +12229,8 @@ function lbRender(){
   var isDemo = !lbIsFirebase();
   if (isDemo){
     lbBodyEl.innerHTML = '' +
-      '<div class="lb-err" style="margin-bottom:10px">⚠️ ' +
-      '</div>' +
+      '<div class="lb-err" style="margin-bottom:10px">⚠️ Το Leaderboard είναι σε <strong>demo/local mode</strong> (δεν θα δεις άλλους χρήστες). ' +
+      'Συμπλήρωσε το <code>FIREBASE_CONFIG</code> (apiKey/authDomain/appId) και έλεγξε ότι τα Firestore Rules επιτρέπουν read.</div>' +
       '<div class="xp-section"><div class="xp-section-title">Δοκιμαστική κατάταξη (τοπικά)</div></div>';
   } else {
     lbBodyEl.innerHTML = '<div class="xp-section"><div class="xp-section-title">Φορτώνει η κατάταξη…</div></div>';
@@ -11500,8 +12253,8 @@ function lbRender(){
         var onlyMe = (top.length === 1 && top[0] && String(top[0].nick||'') === String(nick||''));
         var onlyMeMsg = '';
         if (onlyMe){
-          onlyMeMsg = '<div class="lb-ok" style="margin-bottom:10px">Η κατάταξη δεν είναι διαθέσιμη στην επίδειξη της εφαρμογής.' +
-            '';
+          onlyMeMsg = '<div class="lb-ok" style="margin-bottom:10px">Είσαι (προς το παρόν) ο μοναδικός χρήστης. ' +
+            'Για δοκιμή: άνοιξε την εφαρμογή σε Incognito/άλλη συσκευή και δες αν εμφανίζεται δεύτερος χρήστης.</div>';
         }
 
         // ✅ Δείξε άμεσα τον πίνακα χωρίς να περιμένεις το "Η θέση σου"
@@ -11808,361 +12561,18 @@ if (lbChangeNickBtn){
 
 
   </script>
-
-<!-- =========================
-     Guided Tour (Demo)
-     ========================= -->
-<button class="gg-tour-fab" id="ggTourStart" type="button" aria-label="Ξενάγηση">
-  ✨ Ξενάγηση
-</button>
-
-<div class="gg-tour" id="ggTour" aria-hidden="true">
-  <div class="gg-tour-backdrop" data-gg-tour-close></div>
-  <div class="gg-tour-highlight pulse" id="ggTourHighlight" aria-hidden="true"></div>
-
-  <div class="gg-tour-card" id="ggTourCard" role="dialog" aria-modal="true" aria-labelledby="ggTourTitle">
-    <div class="gg-tour-card-inner">
-      <div class="gg-tour-head">
-        <div class="gg-tour-step" id="ggTourStep">1/7</div>
-        <button class="gg-tour-x" type="button" aria-label="Κλείσιμο" data-gg-tour-close>×</button>
-      </div>
-
-      <div class="gg-tour-title" id="ggTourTitle"></div>
-      <div class="gg-tour-body" id="ggTourBody"></div>
-
-      <div class="gg-tour-actions">
-        <button class="gg-tour-btn ghost" type="button" id="ggTourPrev">← Πίσω</button>
-        <div class="gg-tour-actions-right">
-          <button class="gg-tour-btn" type="button" id="ggTourNext">Επόμενο →</button>
-        </div>
-      </div>
-
-      <div class="gg-tour-foot">
-        <button class="gg-tour-skip" type="button" id="ggTourSkip">Παράλειψη</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-/* Guided Tour (Demo) — iPedia / EmAppDemo
-   - Χωρίς εξάρτηση, δεν πειράζει τη λογική της εφαρμογής
-   - Στοχεύει τα κουμπιά/controls: Search, Notes, Bookmarks, Glossary, XP, Quiz Results, Leaderboard
-*/
-(function(){
-  'use strict';
-
-  var $ = function(sel, root){ return (root || document).querySelector(sel); };
-  var $$ = function(sel, root){ return Array.prototype.slice.call((root || document).querySelectorAll(sel)); };
-
-  var startBtn = $('#ggTourStart');
-  var tourEl   = $('#ggTour');
-  var hiEl     = $('#ggTourHighlight');
-  var cardEl   = $('#ggTourCard');
-  var stepEl   = $('#ggTourStep');
-  var titleEl  = $('#ggTourTitle');
-  var bodyEl   = $('#ggTourBody');
-  var prevBtn  = $('#ggTourPrev');
-  var nextBtn  = $('#ggTourNext');
-  var skipBtn  = $('#ggTourSkip');
-
-  if (!startBtn || !tourEl || !hiEl || !cardEl) return;
-
-  // SFX (χρησιμοποιεί τον ήδη υπάρχοντα ήχο tick.m4a)
-  function playClick(){
-    try{
-      var a = document.getElementById('clickSound');
-      if (!a) return;
-      a.currentTime = 0;
-      var p = a.play();
-      if (p && p.catch) p.catch(function(){});
-    }catch(e){}
-  }
-
-  function isVisible(el){
-    if (!el) return false;
-    var cs = window.getComputedStyle(el);
-    if (!cs || cs.display === 'none' || cs.visibility === 'hidden' || cs.opacity === '0') return false;
-    var r = el.getBoundingClientRect();
-    return (r.width > 0 && r.height > 0);
-  }
-
-  var steps = [
-    {
-      sel: '.header-search',
-      title: 'Μπάρα Αναζήτησης',
-      html: [
-        '<p>Βρες γρήγορα λέξεις/έννοιες μέσα στο βιβλίο (κεφάλαια, κείμενα και όρους).</p>',
-        '<ul>',
-          '<li>Γράφεις στο πεδίο <strong>Αναζήτηση…</strong> και εμφανίζονται τα αποτελέσματα.</li>',
-          '<li>Πατάς ένα αποτέλεσμα και μεταφέρεσαι αυτόματα στο σημείο του κειμένου.</li>',
-          '<li>Με το <strong>×</strong> καθαρίζεις άμεσα την αναζήτηση.</li>',
-        '</ul>'
-      ].join('')
-    },
-    {
-      sel: '#notesBtn',
-      title: 'Σημειώσεις',
-      html: [
-        '<p>Κράτα προσωπικές σημειώσεις πάνω στο κείμενο.</p>',
-        '<ul>',
-          '<li>Επίλεξε μια φράση: εμφανίζεται μπάρα εργαλείων (Χρώμα / Σχόλιο / Αφαίρεση).</li>',
-          '<li>Όλες οι σημειώσεις συγκεντρώνονται σε κάρτα από το κουμπί <strong>📝</strong>.</li>',
-          '<li>Μπορείς να διαγράψεις επιλεγμένες σημειώσεις από τον συγκεντρωτικό πίνακα.</li>',
-        '</ul>'
-      ].join('')
-    },
-    {
-      sel: '#bookmarksBtn',
-      title: 'Σελιδοδείκτες',
-      html: [
-        '<p>Φτιάξε «γρήγορες στάσεις» για να επιστρέφεις άμεσα σε σημαντικά σημεία.</p>',
-        '<ul>',
-          '<li>Από το κουμπί <strong>🔖</strong> ανοίγει η κάρτα Σελιδοδεικτών.</li>',
-          '<li>Πρόσθεσε τον τρέχοντα τίτλο/καρτέλα και γύρνα σε 1 tap.</li>',
-          '<li>Μπορείς να καθαρίσεις όλους τους σελιδοδείκτες.</li>',
-        '</ul>'
-      ].join('')
-    },
-    {
-      sel: '#glossaryBtn',
-      title: 'Γλωσσάρι',
-      html: [
-        '<p>Άμεσες επεξηγήσεις σε βασικές έννοιες του ηλεκτρομαγνητισμού.</p>',
-        '<ul>',
-          '<li>Πατάς το <strong>📚</strong> για να δεις όλους τους όρους.</li>',
-          '<li>Οι έντονοι όροι μέσα στο κείμενο εμφανίζουν παράθυρο με ορισμό.</li>',
-          '<li>Υπάρχει αναζήτηση μέσα στο γλωσσάρι για γρήγορο εντοπισμό.</li>',
-        '</ul>'
-      ].join('')
-    },
-    {
-      sel: '#xpBtn',
-      title: 'Κερδισμένη XP',
-      html: [
-        '<p>Το σύστημα προόδου μετατρέπει τη μελέτη σε «παιχνίδι».</p>',
-        '<ul>',
-          '<li>Κερδίζεις <strong>XP</strong> ολοκληρώνοντας δραστηριότητες, εφαρμογές και τεστ.</li>',
-          '<li>Η κάρτα <strong>🏆</strong> δείχνει σύνολο, επίπεδα/ορόσημα και αναλυτική πρόοδο.</li>',
-          '<li>Η εμπειρία αποθηκεύεται ώστε να συνεχίζεις από εκεί που σταμάτησες.</li>',
-        '</ul>'
-      ].join('')
-    },
-    {
-      sel: '#quizStatsButton',
-      title: 'Αποτελέσματα τεστ',
-      html: [
-        '<p>Δες την εξέλιξη της επίδοσής σου με μετρήσιμα στοιχεία.</p>',
-        '<ul>',
-          '<li>Το κουμπί <strong>📈</strong> ανοίγει την κάρτα αποτελεσμάτων.</li>',
-          '<li>Πίνακας με προσπάθειες/σκορ/ποσοστά και διάγραμμα προόδου.</li>',
-          '<li>Υπάρχει επιλογή καθαρισμού των αποθηκευμένων αποτελεσμάτων.</li>',
-        '</ul>'
-      ].join('')
-    },
-    {
-      sel: '#leaderboardBtn',
-      title: 'Κατάταξη',
-      html: [
-        '<p>Δες τη θέση σου σε σχέση με άλλους μαθητές (σύνολο XP).</p>',
-        '<ul>',
-          '<li>Το κουμπί <strong>🏅 Κατάταξη</strong> βρίσκεται στο κάτω μέρος.</li>',
-          '<li>Εμφανίζει <strong>TOP 10</strong> και τη δική σου θέση.</li>',
-        '</ul>'
-      ].join('')
-    }
-  ];
-
-  var state = {
-    open: false,
-    i: 0,
-    lastTarget: null
-  };
-
-  function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
-
-  function placeHighlight(rect){
-    var pad = 6;
-    var top  = rect.top  - pad;
-    var left = rect.left - pad;
-    var w = rect.width  + pad*2;
-    var h = rect.height + pad*2;
-    hiEl.style.top = top + 'px';
-    hiEl.style.left = left + 'px';
-    hiEl.style.width = w + 'px';
-    hiEl.style.height = h + 'px';
-    hiEl.style.borderRadius = Math.max(10, Math.min(16, Math.round(Math.min(w,h)/5))) + 'px';
-  }
-
-  function placeCard(rect){
-    // υπολογισμός θέσης ώστε να χωράει πάντα στο viewport
-    var vw = window.innerWidth;
-    var vh = window.innerHeight;
-    var margin = 12;
-
-    // δώσε μια default θέση (πάνω-δεξιά) αν δεν έχουμε rect
-    if (!rect){
-      cardEl.style.left = margin + 'px';
-      cardEl.style.top  = margin + 'px';
-      return;
-    }
-
-    // Πρώτα: βάζουμε προσωρινά στο (0,0) για σωστό measure
-    cardEl.style.left = margin + 'px';
-    cardEl.style.top  = margin + 'px';
-
-    var cardRect = cardEl.getBoundingClientRect();
-    var cw = cardRect.width;
-    var ch = cardRect.height;
-
-    var topSpace = rect.top;
-    var bottomSpace = vh - rect.bottom;
-    var preferBelow = bottomSpace >= ch + 18;
-    var preferAbove = topSpace >= ch + 18;
-
-    var top;
-    if (preferBelow) top = rect.bottom + 14;
-    else if (preferAbove) top = rect.top - ch - 14;
-    else top = clamp(rect.bottom + 12, margin, vh - ch - margin);
-
-    var cx = rect.left + rect.width/2;
-    var left = clamp(cx - cw/2, margin, vw - cw - margin);
-
-    cardEl.style.left = Math.round(left) + 'px';
-    cardEl.style.top  = Math.round(top) + 'px';
-  }
-
-  function findTarget(step){
-    if (!step || !step.sel) return null;
-    try{ return $(step.sel); }catch(e){ return null; }
-  }
-
-  function updateUI(){
-    var n = steps.length;
-    var i = state.i;
-
-    stepEl.textContent = (i+1) + '/' + n;
-    titleEl.textContent = steps[i].title || '';
-    bodyEl.innerHTML = steps[i].html || '';
-
-    prevBtn.disabled = (i === 0);
-    prevBtn.style.opacity = prevBtn.disabled ? '0.55' : '1';
-
-    nextBtn.textContent = (i === n-1) ? 'Τέλος' : 'Επόμενο →';
-
-    // target + highlight
-    var target = findTarget(steps[i]);
-    state.lastTarget = target;
-
-    if (target && isVisible(target)){
-      var r = target.getBoundingClientRect();
-      placeHighlight(r);
-      placeCard(r);
-      hiEl.style.display = 'block';
-    } else {
-      // fallback: κρύψε highlight και κέντραρε την κάρτα
-      hiEl.style.display = 'none';
-      hiEl.style.width = '0px';
-      hiEl.style.height = '0px';
-      var vw = window.innerWidth, vh = window.innerHeight;
-      var cr = cardEl.getBoundingClientRect();
-      var left = Math.round((vw - cr.width)/2);
-      var top  = Math.round((vh - cr.height)/2);
-      cardEl.style.left = clamp(left, 12, vw - cr.width - 12) + 'px';
-      cardEl.style.top  = clamp(top, 12, vh - cr.height - 12) + 'px';
-    }
-  }
-
-  function openTour(){
-    if (state.open) return;
-    state.open = true;
-    state.i = 0;
-
-    tourEl.classList.add('is-open');
-    tourEl.setAttribute('aria-hidden', 'false');
-    startBtn.setAttribute('aria-hidden', 'true');
-    startBtn.style.opacity = '0';
-    startBtn.style.pointerEvents = 'none';
-
-    // Μικρή βοήθεια: αν υπάρχει fullscreen της εφαρμογής, ενημέρωσε.
-    if (document.body.classList.contains('app-fs')){
-      bodyEl.innerHTML = '<p><strong>Σημείωση:</strong> Για να δεις όλα τα κουμπιά του demo, βγες από την Πλήρη οθόνη (⤢) και ξεκίνα ξανά την ξενάγηση.</p>';
-    }
-
-    updateUI();
-  }
-
-  function closeTour(){
-    if (!state.open) return;
-    state.open = false;
-
-    tourEl.classList.remove('is-open');
-    tourEl.setAttribute('aria-hidden', 'true');
-
-    startBtn.setAttribute('aria-hidden', 'false');
-    startBtn.style.opacity = '1';
-    startBtn.style.pointerEvents = 'auto';
-  }
-
-  function next(){
-    playClick();
-    if (state.i >= steps.length - 1){
-      closeTour();
-      return;
-    }
-    state.i++;
-    updateUI();
-  }
-
-  function prev(){
-    playClick();
-    if (state.i <= 0) return;
-    state.i--;
-    updateUI();
-  }
-
-  function skip(){
-    playClick();
-    closeTour();
-  }
-
-  // Events
-  startBtn.addEventListener('click', function(){
-    playClick();
-    openTour();
-  });
-
-  prevBtn.addEventListener('click', prev);
-  nextBtn.addEventListener('click', next);
-  skipBtn.addEventListener('click', skip);
-
-  // close on backdrop / X
-  $$('#ggTour [data-gg-tour-close]').forEach(function(el){
-    el.addEventListener('click', function(){
-      playClick();
-      closeTour();
-    });
-  });
-
-  // keyboard
-  window.addEventListener('keydown', function(ev){
-    if (!state.open) return;
-    if (ev.key === 'Escape'){ ev.preventDefault(); closeTour(); }
-    if (ev.key === 'ArrowRight'){ ev.preventDefault(); next(); }
-    if (ev.key === 'ArrowLeft'){ ev.preventDefault(); prev(); }
-  });
-
-  // keep positioned on resize/scroll
-  function onReflow(){
-    if (!state.open) return;
-    updateUI();
-  }
-  window.addEventListener('resize', onReflow, { passive:true });
-  // Scroll happens mainly inside panes; still safe to reflow on any scroll
-  window.addEventListener('scroll', onReflow, { passive:true, capture:true });
-
-})();
-</script>
+<!-- Gooey filter defs for GG keyword radios (invisible) -->
+<svg class="gg-goo-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"
+     style="position:absolute;width:0;height:0;overflow:hidden;left:-9999px;top:-9999px;">
+  <defs>
+    <filter id="goo-12">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"></feGaussianBlur>
+      <feColorMatrix in="blur" mode="matrix"
+        values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -7" result="goo-12"></feColorMatrix>
+      <feBlend in="SourceGraphic" in2="goo-12"></feBlend>
+    </filter>
+  </defs>
+</svg>
 
 </body>
 </html>
