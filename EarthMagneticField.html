@@ -35,24 +35,57 @@
     overflow-y:auto;
     transform-origin: top left; /* για να δουλεύει σωστά το scale στα media queries */
   }
-  #ui button{
-    border:none;
-    padding:6px 10px;
-    border-radius:8px;
+  button{
+    appearance:none;
+    -webkit-appearance:none;
+    border:none !important;
+    outline:none;
+    padding:8px 14px;
+    border-radius:999px !important;
     cursor:pointer;
-    background:#1f2937;
-    color:#e5e7eb;
     font-size:inherit;
+    font-weight:600;
+    letter-spacing:.01em;
+    color:#ffffff !important;
+    background:linear-gradient(180deg, rgba(255,255,255,.20), rgba(255,255,255,.08)) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.28),
+      0 8px 20px rgba(0,0,0,.22),
+      0 0 0 1px rgba(255,255,255,.08);
+    backdrop-filter: blur(14px) saturate(1.2);
+    -webkit-backdrop-filter: blur(14px) saturate(1.2);
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, opacity .18s ease;
   }
-  #ui button:hover{background:#374151}
+  button:hover{
+    transform:translateY(-1px);
+    background:linear-gradient(180deg, rgba(255,255,255,.26), rgba(255,255,255,.11)) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.32),
+      0 12px 24px rgba(0,0,0,.24),
+      0 0 0 1px rgba(255,255,255,.10);
+  }
+  button:active{ transform:translateY(1px) scale(.985); }
+  button.is-active{
+    background:linear-gradient(180deg, rgba(255,126,121,.95), rgba(255,126,121,.70)) !important;
+    color:#ffffff !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.35),
+      0 10px 26px rgba(255,126,121,.26),
+      0 0 0 1px rgba(255,126,121,.30),
+      0 0 16px rgba(255,126,121,.28);
+  }
+  #ui button{ min-height:34px; }
   #ui .group{
     display:flex;
     align-items:center;
     gap:6px;
-    background:rgba(31,41,55,.6);
-    padding:6px 8px;
-    border-radius:8px;
-    backdrop-filter: blur(4px);
+    background:rgba(255,255,255,.09);
+    padding:8px 10px;
+    border-radius:16px;
+    border:1px solid rgba(255,255,255,.08);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
   }
   #ui label{opacity:.9}
   input[type="range"]{ accent-color:#60a5fa; }
@@ -82,15 +115,9 @@
   }
   #infoCard button{
     margin-top:8px;
-    background:#334155;
-    color:#FF7E79;
-    border:none;
-    border-radius:8px;
-    padding:6px 10px;
-    cursor:pointer;
+    color:#ffffff !important;
     font-size:inherit;
   }
-  #infoCard button:hover{ background:#475569 }
 
   /* Modal • Πρόβλεψη */
   #predModal{
@@ -144,27 +171,12 @@
     gap:8px;
     flex-wrap:wrap;
   }
-  #predBtns button{
-    background:#1f2937;
-    color:#FF7E79;
-    border:none;
-    border-radius:8px;
-    padding:8px 12px;
-    cursor:pointer;
-    font-size:inherit;
-  }
-  #predBtns button:hover{ background:#374151 }
+  #predBtns button{ color:#ffffff !important; }
   #predClose{
     float:right;
-    background:#334155;
-    border:none;
-    color:#FF7E79;
-    border-radius:8px;
-    padding:6px 10px;
-    cursor:pointer;
+    color:#ffffff !important;
     font-size:inherit;
   }
-  #predClose:hover{ background:#475569 }
 
   /* Footer */
   footer{
@@ -198,18 +210,13 @@
     right:12px;
     bottom:12px;
     z-index:12;
-    width:42px;
-    height:42px;
+    width:46px;
+    height:46px;
     display:grid;
     place-items:center;
-    border:none;
-    border-radius:10px;
-    background:rgba(0,0,0,.45);
-    color:#e5e7eb;
-    cursor:pointer;
-    box-shadow:0 8px 24px rgba(0,0,0,.35);
+    padding:0;
+    font-size:18px;
   }
-  #btnMute:hover{ background:rgba(0,0,0,.6) }
 
   /* --- UI πιο «μαζεμένο» σε μικρά iframes (μικρό height) --- */
 
@@ -222,12 +229,11 @@
       max-width: min(100%, 480px);
     }
     #ui button{
-      padding:4px 8px;
-      border-radius:6px;
+      padding:6px 10px;
     }
     #ui .group{
-      padding:4px 6px;
-      border-radius:6px;
+      padding:6px 8px;
+      border-radius:14px;
     }
   }
 
@@ -254,7 +260,7 @@
       gap:6px;
     }
     #ui button{
-      padding:4px 7px;
+      padding:5px 9px;
     }
     #predCard,
     #shieldCard{
@@ -269,24 +275,16 @@
 <body>
 <div id="ui">
   <button id="btnAxis">Γεωμαγνητικό Πεδίο: OFF</button>
-  <button id="btnGeoAxis">Γεωγραφικός Άξονας: ON</button>
-  <button id="btnAxesAngle">Σχέση Αξόνων: ON</button>
+  <button id="btnGeoAxis">Γεωγραφικός Άξονας: OFF</button>
+  <button id="btnAxesAngle">Σχέση Αξόνων: OFF</button>
   <button id="btnUTC">Περιστροφή: ON</button>
   <button id="btnCompass">Πυξίδα: OFF</button>
+  <button id="btnStrongMP">Ισχυρό ΜΠ</button>
+  <button id="btnWeakMP">Ασθενές ΜΠ</button>
   <button id="btnPredict">Χαρακτηριστικά και προβλέψεις</button>
   <button id="btnShield">Αόρατη Ασπίδα</button>
 
   <button id="btnReset">Επαναφορά</button>
-  <div class="group">
-    <label for="slScale">Σύννεφα</label>
-    <input id="slScale" type="range" min="0.25" max="0.45" step="0.01" value="0.35"/>
-    <span id="slScaleVal">0.35</span>
-  </div>
-  <div class="group" id="linesGroup">
-    <label for="slLines">Δυναμικές Γραμμές Γεωμαγνητικού Πεδίου</label>
-    <input id="slLines" type="range" min="4" max="50" step="2" value="15"/>
-    <span id="slLinesVal">15</span>
-  </div>
 </div>
 
 <div id="infoCard">
@@ -350,14 +348,17 @@ document.getElementById('btnMute').onclick = ()=>{ bgMusic.muted = !bgMusic.mute
 /* ---------- Three.js ---------- */
 let renderer, scene, camera, controls;
 let worldGroup, earth, earthTiltGroup, earthSpinGroup, cloudsGroup, geomagGroup, geogGroup, starfield, atmosphereGlow;
-let rotateOn = true, showAxesAngle = true;
+let rotateOn = true, showAxesAngle = false;
 let compassGroup = null, compassNeedle = null, compassOn = false;
 const RADIUS = 100;
 let axesArc = null, angleLabel = null;
 const raycaster = new THREE.Raycaster(); const mouse = new THREE.Vector2();
 const INTERACTIVE_SPRITES = []; let activeSprite = null;
 const SPRITE_COLOR_INACTIVE = new THREE.Color(0xffffff), SPRITE_COLOR_ACTIVE = new THREE.Color(0xffd166);
-let linesPhiCount = 44; let initialMagDir = null; let predPhase = 0;
+let linesPhiCount = 10; let initialMagDir = null; let predPhase = 0;
+let polarStrengthGroup = null, weakEquatorGroup = null;
+let strongMagneticPolesOn = false, weakMagneticEquatorOn = false;
+const IOS_NEON = 0xFF7E79;
 
 // ===== Αόρατη Ασπίδα: Ηλιακός άνεμος με εκτροπή από διπολικό πεδίο =====
 let shieldOn = false;
@@ -673,6 +674,325 @@ function getInfoText(key){
   return dyn[key]?.() ?? INFO_TEXTS[key] ?? '';
 }
 
+
+function setButtonActive(id, on){
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('is-active', !!on);
+}
+
+function syncToggleButtons(){
+  setButtonActive('btnAxis', !!geomagGroup?.visible);
+  setButtonActive('btnGeoAxis', !!geogGroup?.visible);
+  setButtonActive('btnAxesAngle', !!showAxesAngle);
+  setButtonActive('btnUTC', !!rotateOn);
+  setButtonActive('btnCompass', !!compassOn);
+  setButtonActive('btnStrongMP', !!strongMagneticPolesOn);
+  setButtonActive('btnWeakMP', !!weakMagneticEquatorOn);
+}
+
+function makeNeonCloudTexture(color='#FF7E79'){
+  const size = 256;
+  const cnv = document.createElement('canvas');
+  cnv.width = cnv.height = size;
+  const ctx = cnv.getContext('2d');
+  ctx.clearRect(0,0,size,size);
+
+  const blobs = [
+    [size*0.34,size*0.52,size*0.18],
+    [size*0.48,size*0.42,size*0.21],
+    [size*0.60,size*0.54,size*0.19],
+    [size*0.48,size*0.60,size*0.22]
+  ];
+
+  for (const [x,y,r] of blobs){
+    const g = ctx.createRadialGradient(x,y,0,x,y,r*size);
+    g.addColorStop(0.0, 'rgba(255,255,255,0.95)');
+    g.addColorStop(0.18, 'rgba(255,126,121,0.92)');
+    g.addColorStop(0.55, 'rgba(255,126,121,0.34)');
+    g.addColorStop(1.0, 'rgba(255,126,121,0.0)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(x,y,r*size,0,Math.PI*2);
+    ctx.fill();
+  }
+
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.strokeStyle = 'rgba(255,126,121,0.55)';
+  ctx.lineWidth = 8;
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 22;
+  ctx.beginPath();
+  ctx.arc(size*0.50,size*0.50,size*0.28,0,Math.PI*2);
+  ctx.stroke();
+  ctx.globalCompositeOperation = 'source-over';
+
+  const tex = new THREE.CanvasTexture(cnv);
+  tex.needsUpdate = true;
+  tex.anisotropy = renderer?.capabilities?.getMaxAnisotropy?.() || 1;
+  return tex;
+}
+
+function makePoleCloudSprite(scale, opacity){
+  const tex = makeNeonCloudTexture('#FF7E79');
+  const mat = new THREE.SpriteMaterial({
+    map: tex,
+    transparent: true,
+    opacity,
+    depthWrite: false,
+    depthTest: true,
+    blending: THREE.AdditiveBlending,
+    color: IOS_NEON
+  });
+  const spr = new THREE.Sprite(mat);
+  spr.scale.set(scale, scale, 1);
+  spr.userData.baseScale = new THREE.Vector3(scale, scale, 1);
+  spr.userData.baseOpacity = opacity;
+  return spr;
+}
+
+function buildPoleCloud(localDir){
+  const g = new THREE.Group();
+  const sprites = [
+    [28, 0.88, new THREE.Vector3(0,0,0)],
+    [38, 0.52, new THREE.Vector3(2.6, -1.2, 1.2)],
+    [48, 0.28, new THREE.Vector3(-2.3, 1.8, -1.0)]
+  ];
+  for (const [scale, opacity, offset] of sprites){
+    const s = makePoleCloudSprite(scale, opacity);
+    s.position.copy(offset);
+    g.add(s);
+  }
+  g.position.copy(localDir.clone().normalize().multiplyScalar(RADIUS + 8));
+  g.userData.localDir = localDir.clone().normalize();
+  return g;
+}
+
+/* ---------- Ισχυρό ΜΠ (πόλοι): σφαιρικό neon overlay πάνω στην επιφάνεια ---------- */
+function makePolarCapMaterial(params={}){
+  const cap     = params.cap     ?? 0.78; // πότε «ξεκινά» να φαίνεται το καπάκι (με βάση abs(dot))
+  const power   = params.power   ?? 3.2;  // πόσο «σφιχτό» είναι γύρω από τον πόλο
+  const opacity = params.opacity ?? 0.80;
+  const noise   = params.noise   ?? 0.28; // 0..1: πόσο «aurora»/ζωντανό
+
+  const vsh = `
+    varying vec3 vDir;
+    void main(){
+      vDir = normalize(position);
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `;
+
+  // WebGL1-friendly, ελαφρύ «aurora» χωρίς βαριά fbm
+  const fsh = `
+    precision mediump float;
+    varying vec3 vDir;
+
+    uniform vec3  uMagDir;
+    uniform vec3  uColor;
+    uniform float uTime;
+    uniform float uCap;
+    uniform float uPower;
+    uniform float uOpacity;
+    uniform float uNoise;
+
+    void main(){
+      vec3 dir = normalize(vDir);
+      vec3 m   = normalize(uMagDir);
+
+      // 1 στους πόλους, 0 στον ισημερινό
+      float d = abs(dot(dir, m));
+
+      // ομαλό καπάκι γύρω από τους πόλους
+      float cap = smoothstep(uCap, 1.0, d);
+      cap = pow(cap, uPower);
+
+      // aurora-like μπάντες (lon/lat)
+      float lon = atan(dir.z, dir.x);
+      float lat = asin(clamp(dir.y, -1.0, 1.0));
+
+      float bands = 0.5 + 0.5*sin(lon*12.0 + uTime*1.7 + sin(lat*6.0 + uTime*0.7)*2.0);
+      bands = pow(bands, 1.55);
+
+      // λεπτό «grain»
+      float grain = 0.6 + 0.4*sin(dot(dir, vec3(12.7, 7.9, 15.3)) + uTime*3.2);
+
+      float tex = mix(1.0, 0.72 + 0.28*bands, uNoise);
+      tex *= (0.78 + 0.22*grain);
+
+      float a = cap * tex * uOpacity;
+
+      // neon glow χρώμα
+      vec3 glow = uColor * (0.80 + 0.70*bands);
+      // μικρή λευκή «λάμψη» στο κέντρο
+      glow += vec3(1.0, 0.92, 0.98) * (0.06 * cap);
+
+      gl_FragColor = vec4(glow, a);
+      if (a < 0.01) discard;
+    }
+  `;
+
+  const mat = new THREE.ShaderMaterial({
+    uniforms: {
+      uMagDir:  { value: new THREE.Vector3(0,1,0) },
+      uColor:   { value: new THREE.Color(IOS_NEON) },
+      uTime:    { value: 0 },
+      uCap:     { value: cap },
+      uPower:   { value: power },
+      uOpacity: { value: opacity },
+      uNoise:   { value: noise }
+    },
+    vertexShader: vsh,
+    fragmentShader: fsh,
+    transparent: true,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    depthTest: true,
+    side: THREE.FrontSide
+  });
+
+  mat.userData.baseOpacity = opacity;
+  return mat;
+}
+
+function buildPolarCapOverlay(R, magDir){
+  const g = new THREE.Group();
+
+  // 2 στρώσεις για πιο «3D» εντύπωση γύρω από την επιφάνεια
+  const outerGeo = new THREE.SphereGeometry(R + 3.8, 128, 128);
+  const outerMat = makePolarCapMaterial({ cap: 0.72, power: 2.1, opacity: 0.34, noise: 0.18 });
+  outerMat.uniforms.uMagDir.value.copy(magDir);
+  const outer = new THREE.Mesh(outerGeo, outerMat);
+  outer.name = "polarCapOuter";
+  outer.renderOrder = 5;
+
+  const innerGeo = new THREE.SphereGeometry(R + 1.8, 128, 128);
+  const innerMat = makePolarCapMaterial({ cap: 0.79, power: 3.4, opacity: 0.78, noise: 0.34 });
+  innerMat.uniforms.uMagDir.value.copy(magDir);
+  const inner = new THREE.Mesh(innerGeo, innerMat);
+  inner.name = "polarCapInner";
+  inner.renderOrder = 6;
+
+  // για ασφάλεια: μην κόβεται από frustum culling (είναι λεπτό shell γύρω από τη Γη)
+  outer.frustumCulled = false;
+  inner.frustumCulled = false;
+
+  g.add(outer, inner);
+  return g;
+}
+
+
+function createMagneticStrengthOverlays(R){
+  if (!earth || !geomagGroup) return;
+
+  if (polarStrengthGroup){
+    earth.remove(polarStrengthGroup);
+    polarStrengthGroup.traverse(o=>{ if (o.geometry) o.geometry.dispose?.(); if (o.material?.map) o.material.map.dispose?.(); if (o.material) o.material.dispose?.(); });
+  }
+  polarStrengthGroup = new THREE.Group();
+  polarStrengthGroup.name = 'polarStrengthGroup';
+  polarStrengthGroup.visible = strongMagneticPolesOn;
+  earth.add(polarStrengthGroup);
+
+  const magDir = (geomagGroup.userData.magDir || new THREE.Vector3(0,1,0)).clone().normalize();
+
+  // ΝΕΟ: σφαιρικό «aurora» overlay που αγκαλιάζει ομαλά τους πόλους (όχι billboard τετράγωνο)
+  const polarCaps = buildPolarCapOverlay(R, magDir);
+  polarCaps.name = 'polarCapOverlay';
+  polarStrengthGroup.add(polarCaps);
+
+  if (weakEquatorGroup){
+    earth.remove(weakEquatorGroup);
+    weakEquatorGroup.traverse(o=>{ if (o.geometry) o.geometry.dispose?.(); if (o.material) o.material.dispose?.(); });
+  }
+  weakEquatorGroup = new THREE.Group();
+  weakEquatorGroup.name = 'weakEquatorGroup';
+  weakEquatorGroup.visible = weakMagneticEquatorOn;
+  earth.add(weakEquatorGroup);
+
+  const segs = 320;
+  const makeEquatorPts = (radius)=>{
+    const pts = [];
+    for (let i=0;i<=segs;i++){
+      const a = (i / segs) * Math.PI * 2;
+      pts.push(new THREE.Vector3(Math.cos(a)*radius, 0, Math.sin(a)*radius));
+    }
+    return pts;
+  };
+  const addEquatorRing = (radius, opacity, dashSize, gapSize, name)=>{
+    const g = new THREE.BufferGeometry().setFromPoints(makeEquatorPts(radius));
+    const m = new THREE.LineDashedMaterial({
+      color: IOS_NEON,
+      transparent: true,
+      opacity,
+      dashSize,
+      gapSize,
+      linewidth: 1
+    });
+    const line = new THREE.Line(g, m);
+    line.computeLineDistances();
+    line.name = name;
+    weakEquatorGroup.add(line);
+    return line;
+  };
+
+  addEquatorRing(R + 0.78, 0.18, 5.8, 2.7, 'weakEquatorGlowOuter');
+  addEquatorRing(R + 0.90, 0.34, 5.2, 2.5, 'weakEquatorGlowMid');
+  addEquatorRing(R + 1.02, 0.92, 4.8, 2.2, 'weakEquatorLine');
+
+  refreshMagneticStrengthOverlays();
+  syncToggleButtons();
+}
+
+function refreshMagneticStrengthOverlays(){
+  if (!earth || !geomagGroup || !polarStrengthGroup) return;
+  const magDir = (geomagGroup.userData.magDir || new THREE.Vector3(0,1,0)).clone().normalize();
+
+  // ενημέρωση διεύθυνσης διπόλου για το shader overlay (ώστε να ακολουθεί τις μεταβολές/προβλέψεις)
+  polarStrengthGroup.traverse(o=>{
+    const uni = o.material?.uniforms;
+    if (uni?.uMagDir?.value) uni.uMagDir.value.copy(magDir);
+  });
+}
+
+function animateMagneticStrengthOverlays(nowMs){
+  // ΝΕΟ: animate το σφαιρικό neon overlay (aurora-like) στους πόλους
+  if (polarStrengthGroup?.visible){
+    const t = nowMs * 0.001; // seconds
+    polarStrengthGroup.traverse(o=>{
+      const uni = o.material?.uniforms;
+      if (!uni) return;
+      if (uni.uTime) uni.uTime.value = t;
+      if (uni.uOpacity){
+        const base = (o.material.userData.baseOpacity ?? uni.uOpacity.value);
+        if (o.material.userData.baseOpacity === undefined) o.material.userData.baseOpacity = base;
+        const wobble = 0.90 + 0.10*Math.sin(t*2.4 + (o.id % 17) * 0.35);
+        uni.uOpacity.value = base * wobble;
+      }
+    });
+  }
+  if (weakEquatorGroup?.visible){
+    const outer = weakEquatorGroup.getObjectByName('weakEquatorGlowOuter');
+    const mid   = weakEquatorGroup.getObjectByName('weakEquatorGlowMid');
+    const core  = weakEquatorGroup.getObjectByName('weakEquatorLine');
+    const pulse = 0.5 + 0.5*Math.sin(nowMs * 0.0022);
+    if (outer?.material) outer.material.opacity = 0.12 + 0.12 * pulse;
+    if (mid?.material)   mid.material.opacity   = 0.24 + 0.16 * pulse;
+    if (core?.material)  core.material.opacity  = 0.80 + 0.16 * pulse;
+  }
+}
+
+function toggleStrongMagneticPoles(){
+  strongMagneticPolesOn = !strongMagneticPolesOn;
+  if (polarStrengthGroup) polarStrengthGroup.visible = strongMagneticPolesOn;
+  syncToggleButtons();
+}
+
+function toggleWeakMagneticEquator(){
+  weakMagneticEquatorOn = !weakMagneticEquatorOn;
+  if (weakEquatorGroup) weakEquatorGroup.visible = weakMagneticEquatorOn;
+  syncToggleButtons();
+}
+
 /* ---------- Εκκίνηση ---------- */
 init();
 animate();
@@ -759,15 +1079,20 @@ function init(){
     atmosphereGlow = addAtmosphereGlow(earth, RADIUS);
     createProceduralClouds(RADIUS, sun);
     addGeomagneticFieldLines(RADIUS);
+    createMagneticStrengthOverlays(RADIUS);
     addPoleSprites(); addAxisSprites(); updateSpritesVisibility();
     if (geomagGroup?.userData?.magDir) initialMagDir = geomagGroup.userData.magDir.clone().normalize();
 
-    updateAxesAngleVisual(RADIUS); setAxesAngleVisible(true);
-
+    updateAxesAngleVisual(RADIUS);
     geomagGroup.visible = false;
+    geogGroup.visible = false;
+    showAxesAngle = false;
     document.getElementById('btnAxis').textContent = 'Γεωμαγνητικό Πεδίο: OFF';
-    document.getElementById('linesGroup').style.display = 'none';
-    updateSpritesVisibility(); setAxesAngleVisible(showAxesAngle);
+    document.getElementById('btnGeoAxis').textContent = 'Γεωγραφικός Άξονας: OFF';
+    document.getElementById('btnAxesAngle').textContent = 'Σχέση Αξόνων: OFF';
+    updateSpritesVisibility();
+    setAxesAngleVisible(false);
+    syncToggleButtons();
 
     createSunAndMoon(sun);
   }).catch(()=>{
@@ -781,19 +1106,25 @@ function init(){
       atmosphereGlow = addAtmosphereGlow(earth, RADIUS);
       createProceduralClouds(RADIUS, null);
       addGeomagneticFieldLines(RADIUS);
+      createMagneticStrengthOverlays(RADIUS);
       addPoleSprites(); addAxisSprites(); updateSpritesVisibility();
       if (geomagGroup?.userData?.magDir) initialMagDir = geomagGroup.userData.magDir.clone().normalize();
-      updateAxesAngleVisual(RADIUS); setAxesAngleVisible(true);
+      updateAxesAngleVisual(RADIUS);
       geomagGroup.visible = false;
+      geogGroup.visible = false;
+      showAxesAngle = false;
       document.getElementById('btnAxis').textContent = 'Γεωμαγνητικό Πεδίο: OFF';
-      document.getElementById('linesGroup').style.display = 'none';
-      updateSpritesVisibility(); setAxesAngleVisible(showAxesAngle);
+      document.getElementById('btnGeoAxis').textContent = 'Γεωγραφικός Άξονας: OFF';
+      document.getElementById('btnAxesAngle').textContent = 'Σχέση Αξόνων: OFF';
+      updateSpritesVisibility();
+      setAxesAngleVisible(false);
+      syncToggleButtons();
 
       createSunAndMoon(sun);
     });
   });
 
-  ["btnAxis","btnGeoAxis","btnAxesAngle","btnUTC","btnReset","btnCompass","btnPredict","infoClose"].forEach(id=>{
+  ["btnAxis","btnGeoAxis","btnAxesAngle","btnUTC","btnReset","btnCompass","btnStrongMP","btnWeakMP","btnPredict","infoClose"].forEach(id=>{
     const el = document.getElementById(id); if (el) el.addEventListener('click', playClick);
   });
 
@@ -803,8 +1134,10 @@ function init(){
     document.getElementById('btnAxis').textContent = `Γεωμαγνητικό Πεδίο: ${geomagGroup.visible?'ON':'OFF'}`;
     updateAxesAngleVisual(RADIUS);
     updateSpritesVisibility();
-    document.getElementById('linesGroup').style.display = geomagGroup.visible ? '' : 'none';
+    const linesGroupEl = document.getElementById('linesGroup');
+    if (linesGroupEl) linesGroupEl.style.display = geomagGroup.visible ? '' : 'none';
     if (activeSprite?.userData?.axisType === 'geomag' && !geomagGroup.visible){ toggleInfo(false); clearActiveSprite(); }
+    syncToggleButtons();
   };
   document.getElementById('btnGeoAxis').onclick = ()=>{
     if (!geogGroup) return;
@@ -813,47 +1146,37 @@ function init(){
     updateAxesAngleVisual(RADIUS); 
     updateSpritesVisibility();
     if (activeSprite?.userData?.axisType === 'geog' && !geogGroup.visible){ toggleInfo(false); clearActiveSprite(); }
+    syncToggleButtons();
   };
   document.getElementById('btnAxesAngle').onclick = ()=>{
     showAxesAngle = !showAxesAngle;
     document.getElementById('btnAxesAngle').textContent = `Σχέση Αξόνων: ${showAxesAngle?'ON':'OFF'}`;
     setAxesAngleVisible(showAxesAngle);
+    syncToggleButtons();
   };
   document.getElementById('btnUTC').onclick = ()=>{
     rotateOn = !rotateOn;
     document.getElementById('btnUTC').textContent = `Περιστροφή: ${rotateOn?'ON':'OFF'}`;
+    syncToggleButtons();
   };
   document.getElementById('btnCompass').onclick = ()=>{
     if (!compassGroup) createCompass();
     compassOn = !compassOn;
     document.getElementById('btnCompass').textContent = `Πυξίδα: ${compassOn?'ON':'OFF'}`;
     compassGroup.visible = compassOn;
+    syncToggleButtons();
   };
+  document.getElementById('btnStrongMP').onclick = ()=>{ toggleStrongMagneticPoles(); };
+  document.getElementById('btnWeakMP').onclick = ()=>{ toggleWeakMagneticEquator(); };
   document.getElementById('btnPredict').onclick = ()=>{ togglePredictModal(true); };
   document.getElementById('btnReset').onclick   = resetToToday;
+  syncToggleButtons();
   document.getElementById('infoClose').onclick  = ()=>{ toggleInfo(false); };
   document.getElementById('btnShield').onclick = ()=>{ toggleShieldModal(true); };
   document.getElementById('shieldClose').onclick = ()=> toggleShieldModal(false);
   document.getElementById('shieldStart').onclick = ()=> { startShieldSequence(); };
   document.getElementById('shieldStop').onclick  = ()=> { stopShieldSequence();  };
 
-  const sl = document.getElementById('slScale');
-  const slVal = document.getElementById('slScaleVal');
-  sl.addEventListener('input', ()=>{
-    const v = parseFloat(sl.value);
-    slVal.textContent = v.toFixed(2);
-    if (cloudsGroup?.userData?.shells){
-      for (const shell of cloudsGroup.userData.shells){ shell.material.uniforms.uScale.value = v; }
-    }
-  });
-
-  const slLines = document.getElementById('slLines');
-  const slLinesVal = document.getElementById('slLinesVal');
-  slLines.addEventListener('input', ()=>{
-    linesPhiCount = parseInt(slLines.value,10);
-    slLinesVal.textContent = String(linesPhiCount);
-    addGeomagneticFieldLines(RADIUS);
-  });
 
   document.getElementById('predClose').onclick = ()=>togglePredictModal(false);
   document.querySelectorAll('#predBtns button').forEach(b=>{
@@ -1053,8 +1376,8 @@ function createProceduralClouds(R, sunLight){
       float silver = pow(sun_nd, 6.0);
       vec3 base = mix(uTintDay, uTintSun, sun_nd*0.85) * (0.90 + 0.25*silver);
 
-      float alpha = edge * uDensity;
-      alpha = clamp(alpha, 0.0, 0.95);
+      float alpha = edge * uDensity * 0.42;
+      alpha = clamp(alpha, 0.0, 0.42);
 
       gl_FragColor = vec4(base, alpha);
       if (alpha < 0.015) discard;
@@ -1173,30 +1496,60 @@ function addAtmosphereGlow(earthMesh, R){
 function addGeomagneticFieldLines(R){
   if (!geomagGroup) return;
   const old = geomagGroup.getObjectByName("magFieldLines");
-  if (old){ geomagGroup.remove(old); old.traverse(o=>{ if(o.geometry) o.geometry.dispose?.(); if(o.material) o.material.dispose?.(); }); }
+  if (old){
+    geomagGroup.remove(old);
+    old.traverse(o=>{ if(o.geometry) o.geometry.dispose?.(); if(o.material) o.material.dispose?.(); });
+  }
 
   const linesGroup = new THREE.Group();
   linesGroup.name = "magFieldLines";
   geomagGroup.add(linesGroup);
 
   const magDir = (geomagGroup.userData.magDir || new THREE.Vector3(0,1,0)).clone().normalize();
-  const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,1,0), magDir);
+  const ref = Math.abs(magDir.y) > 0.985 ? new THREE.Vector3(1,0,0) : new THREE.Vector3(0,1,0);
+  const u = ref.clone().cross(magDir).normalize();
+  const v = magDir.clone().cross(u).normalize();
 
-  const lineMat = new THREE.LineBasicMaterial({ color: 0x66e0ff, transparent:true, opacity:0.6 });
-  const maxR = R * 3.2;
-  const Ls   = [1.15*R, 1.30*R, 1.55*R, 1.90*R, 2.40*R, 3.00*R];
-  const nPhi = linesPhiCount;
+  const lineMat = new THREE.LineBasicMaterial({
+    color: 0x66e0ff,
+    transparent: true,
+    opacity: 0.72,
+    depthWrite: false
+  });
+
+  // Πραγματικότερα dipole field lines:
+  // ξεκινούν από μικρή πολική περιοχή γύρω από τα pole markers,
+  // πυκνώνουν πολύ κοντά στους πόλους/στην επιφάνεια
+  // και αραιώνουν σταδιακά προς μεγαλύτερα πλάτη.
+  const theta0Degs = [2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5, 11, 12.5, 14, 15.5];
+  const thetaConfigs = theta0Degs.map(deg=>{
+    const theta0 = THREE.Math.degToRad(deg);
+    const L = R / Math.max(1e-6, Math.sin(theta0) * Math.sin(theta0));
+    const poleWeight = 1 - (deg / 60); // περίπου 1 πολύ κοντά στους πόλους
+    const phiLocal = Math.max(6, Math.round(linesPhiCount * (0.30 + 1.05 * Math.max(0.08, poleWeight))));
+    return { theta0, L, poleWeight: Math.max(0.08, poleWeight), phiLocal };
+  });
+
+  const samples = 320;
+  const surfaceLiftBase = Math.max(0.0005, R * 0.00002);
 
   const arrowRadius = 0.30;
   const arrowHeight = 1.20;
   const coneGeo = new THREE.ConeGeometry(arrowRadius, arrowHeight, 12);
   coneGeo.translate(0, arrowHeight*0.5, 0);
-  const coneMat = new THREE.MeshBasicMaterial({ color: 0xffd166, transparent:true, opacity:0.95, depthTest:true });
+  const coneMat = new THREE.MeshBasicMaterial({
+    color: 0xffd166,
+    transparent: true,
+    opacity: 0.95,
+    depthTest: true,
+    depthWrite: false
+  });
 
-  const arrowFracPos  = [0.2, 0.5, 0.8];
-  const totalArrows = nPhi * Ls.length * arrowFracPos.length;
+  const arrowFracPos = [0.18, 0.50, 0.82];
+  const totalArrows = thetaConfigs.reduce((sum, cfg)=> sum + cfg.phiLocal * arrowFracPos.length, 0);
   const arrowsIM = new THREE.InstancedMesh(coneGeo, coneMat, totalArrows);
   arrowsIM.name = "magFieldArrows";
+  arrowsIM.renderOrder = 2;
   linesGroup.add(arrowsIM);
 
   let arrowIndex = 0;
@@ -1204,22 +1557,41 @@ function addGeomagneticFieldLines(R){
   const quat = new THREE.Quaternion();
   const up = new THREE.Vector3(0,1,0);
 
-  for (let i=0;i<nPhi;i++){
-    const phi = i * (Math.PI*2 / nPhi);
-    for (const L of Ls){
-      const pts = [];
-      const samples = 260;
+  for (const cfg of thetaConfigs){
+    const { theta0, L, poleWeight, phiLocal } = cfg;
+    const theta1 = Math.PI - theta0;
 
-      for (let j=0;j<=samples;j++){
+    for (let i=0; i<phiLocal; i++){
+      const phi = i * (Math.PI * 2 / phiLocal);
+      const radialDir = u.clone().multiplyScalar(Math.cos(phi)).add(v.clone().multiplyScalar(Math.sin(phi))).normalize();
+      const pts = [];
+
+      for (let j=0; j<=samples; j++){
         const t = j / samples;
-        const thetaDeg = 172 - t*(172-8);
-        const theta = THREE.Math.degToRad(thetaDeg);
-        let r = L * Math.pow(Math.sin(theta), 2.0);
-        r = Math.max(R + 0.2, Math.min(maxR, r));
-        const x = r * Math.sin(theta) * Math.cos(phi);
-        const y = r * Math.cos(theta);
-        const z = r * Math.sin(theta) * Math.sin(phi);
-        pts.push(new THREE.Vector3(x,y,z).applyQuaternion(q));
+        const theta = theta0 + (theta1 - theta0) * t;
+        const s = Math.sin(theta);
+        const c = Math.cos(theta);
+
+        // Dipole equation: r = L sin^2(theta)
+        let r = L * s * s;
+
+        // Συμπίεση της απόστασης από την επιφάνεια ώστε οι γραμμές
+        // να μη φεύγουν υπερβολικά πολύ πάνω/κάτω από τη Γη.
+        // Η συμπίεση είναι ισχυρότερη κοντά στους πόλους και ηπιότερη
+        // όσο πλησιάζουμε προς τις πιο πλατιές καμπύλες.
+        const excursion = Math.max(0, r - R);
+const excursionScale = 0.0075 + 0.00025 * Math.pow(s, 3.35);
+ // ~0.54 στους πόλους, ~0.80 κοντά στον ισημερινό
+        r = R + excursion * excursionScale;
+
+        // Πολύ μικρή ανύψωση μόνο στο ενδιάμεσο της καμπύλης, ώστε τα άκρα
+        // να παραμένουν οπτικά κολλημένα στην επιφάνεια της Γης.
+        const endFade = Math.sin(Math.PI * t);
+        const localLift = surfaceLiftBase * endFade * (0.42 + 0.70 * (1 - poleWeight));
+        r += localLift;
+
+        const p = radialDir.clone().multiplyScalar(r * s).add(magDir.clone().multiplyScalar(r * c));
+        pts.push(p);
       }
 
       const g = new THREE.BufferGeometry().setFromPoints(pts);
@@ -1231,13 +1603,15 @@ function addGeomagneticFieldLines(R){
         const idx = Math.max(1, Math.min(pts.length-2, Math.floor(frac*(pts.length-1))));
         const pPrev = pts[idx-1];
         const pNext = pts[idx+1];
-        const dir = pPrev.clone().sub(pNext).normalize();
+        const dir = pNext.clone().sub(pPrev).normalize();
         quat.setFromUnitVectors(up, dir);
         m4.compose(pts[idx], quat, new THREE.Vector3(1,1,1));
         arrowsIM.setMatrixAt(arrowIndex++, m4);
       }
     }
   }
+
+  arrowsIM.count = arrowIndex;
   arrowsIM.instanceMatrix.needsUpdate = true;
 }
 
@@ -1543,6 +1917,7 @@ function animateGeomagneticPrediction(t, duration=900){
     const axisLine = new THREE.Line(axisGeo, axisMat); axisLine.name = "magAxisLine"; geomagGroup.add(axisLine);
 
     addGeomagneticFieldLines(RADIUS);
+    refreshMagneticStrengthOverlays();
     updateMagSpritesPositions();
     updateAxesAngleVisual(RADIUS);
 
@@ -1586,6 +1961,7 @@ function resetToToday(){
   const axisLine = new THREE.Line(axisGeo, axisMat); axisLine.name = "magAxisLine"; geomagGroup.add(axisLine);
 
   addGeomagneticFieldLines(RADIUS);
+  refreshMagneticStrengthOverlays();
   updateMagSpritesPositions();
   updateAxesAngleVisual(RADIUS);
 
@@ -1594,6 +1970,7 @@ function resetToToday(){
   worldGroup.position.y = 0;
 
   closeAllPopups();
+  syncToggleButtons();
 }
 
 /* ---------- Camera focus + εφέ ---------- */
@@ -1876,6 +2253,8 @@ function animate(){
 
   followMagneticSpritesEachFrame();
   followGeographicSpritesEachFrame();
+  refreshMagneticStrengthOverlays();
+  animateMagneticStrengthOverlays(performance.now());
 
   controls.update();
   renderer.render(scene, camera);

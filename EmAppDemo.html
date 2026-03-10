@@ -4200,6 +4200,424 @@ color:#FF7E79
   transform: scale(1.06);
 }
 
+
+
+/* ===== Guided Tour / Ξενάγηση ===== */
+.tour-fab{
+  position: fixed;
+  right: max(12px, calc(env(safe-area-inset-right, 0px) + 12px));
+  bottom: max(60px, calc(env(safe-area-inset-bottom, 0px) + 60px));
+  z-index: 21950;
+  border: 1px solid rgba(255,126,121,0.42);
+  background: rgba(255,255,255,0.96);
+  color: var(--accent);
+  border-radius: 999px;
+  box-shadow: 0 14px 32px rgba(15,23,42,0.18);
+  padding: 0.55rem 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 0.86em;
+  white-space: nowrap;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+.tour-fab:hover{
+  background: #fff7f5;
+  transform: translateY(-1px);
+  box-shadow: 0 18px 38px rgba(15,23,42,0.22);
+}
+.tour-fab:active{
+  transform: translateY(0);
+}
+.tour-fab:focus-visible{
+  outline: 3px solid rgba(255,126,121,0.30);
+  outline-offset: 2px;
+}
+.tour-fab .tour-fab-icon{
+  font-size: 1em;
+  line-height: 1;
+}
+.tour-fab .tour-fab-text{
+  line-height: 1;
+}
+
+.gg-tour{
+  position: fixed;
+  inset: 0;
+  z-index: 130000;
+  display: none;
+  pointer-events: none;
+
+  /* Spotlight hole (for mask) — keeps UI targets 100% crisp (no blur/dim on target) */
+  --spot-x: 50vw;
+  --spot-y: 50vh;
+  --spot-r: 120px;
+}
+.gg-tour.is-open{
+  display: block;
+  pointer-events: auto;
+}
+
+.gg-tour-backdrop{
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+
+  /* Neon atmosphere, but with a real "hole" so the active UI target stays crystal clear */
+  background:
+    radial-gradient(circle at 18% 18%, rgba(255,126,121,0.14), transparent 26%),
+    radial-gradient(circle at 82% 10%, rgba(255,184,177,0.12), transparent 22%),
+    linear-gradient(180deg, rgba(9,15,28,0.62), rgba(15,23,42,0.72));
+
+  /* IMPORTANT: no blur ever */
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  /* Cut-out around spotlight (keeps target undimmed + unblurred) */
+  -webkit-mask-image: radial-gradient(circle at var(--spot-x) var(--spot-y),
+    transparent 0,
+    transparent calc(var(--spot-r) - 1px),
+    rgba(0,0,0,1) var(--spot-r)
+  );
+          mask-image: radial-gradient(circle at var(--spot-x) var(--spot-y),
+    transparent 0,
+    transparent calc(var(--spot-r) - 1px),
+    rgba(0,0,0,1) var(--spot-r)
+  );
+  -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+          mask-size: 100% 100%;
+
+  opacity: 0;
+  transition: opacity 0.2s ease-out;
+}
+.gg-tour.is-open .gg-tour-backdrop{
+  opacity: 1;
+}
+
+.gg-tour-spotlight{
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 18px;
+  border: 0;
+  z-index: 1;
+
+  /* Only the ring + glow (the backdrop handles dimming with a hole) */
+  box-shadow:
+    0 0 0 4px rgba(255,126,121,0.62),
+    0 0 34px rgba(255,126,121,0.30),
+    0 14px 34px rgba(15,23,42,0.28);
+
+  background: transparent;
+  opacity: 0;
+  transition:
+    left 0.22s cubic-bezier(.2,.9,.2,1),
+    top 0.22s cubic-bezier(.2,.9,.2,1),
+    width 0.22s cubic-bezier(.2,.9,.2,1),
+    height 0.22s cubic-bezier(.2,.9,.2,1),
+    opacity 0.16s ease-out,
+    box-shadow 0.2s ease-out;
+  pointer-events: none;
+}
+.gg-tour.is-open .gg-tour-spotlight{
+  opacity: 1;
+}
+
+.gg-tour-card{
+  position: fixed;
+  left: 16px;
+  top: 16px;
+  width: min(390px, calc(100vw - 24px));
+  max-width: calc(100vw - 24px);
+  max-height: none;
+  overflow: visible;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,246,244,0.96) 52%, rgba(255,240,236,0.94));
+  color: var(--ink);
+  border-radius: 24px;
+  border: 1px solid rgba(255,126,121,0.30);
+  box-shadow:
+    0 28px 74px rgba(15,23,42,0.38),
+    0 0 0 1px rgba(255,255,255,0.32) inset,
+    0 0 0 6px rgba(255,126,121,0.05),
+    0 0 34px rgba(255,126,121,0.18);
+  padding: 1rem 1rem 0.95rem;
+  opacity: 0;
+  transform: translateY(10px) scale(0.98);
+  transition:
+    left 0.22s cubic-bezier(.2,.9,.2,1),
+    top 0.22s cubic-bezier(.2,.9,.2,1),
+    opacity 0.18s ease-out,
+    transform 0.18s ease-out,
+    box-shadow 0.2s ease-out;
+  isolation: isolate;
+}
+.gg-tour-card::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background:
+    linear-gradient(140deg, rgba(255,255,255,0.85), rgba(255,126,121,0.52), rgba(255,209,204,0.88));
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  opacity: 0.9;
+  pointer-events: none;
+}
+.gg-tour-card::after{
+  content: "";
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  top: 10px;
+  height: 84px;
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 0% 50%, rgba(255,255,255,0.55), transparent 32%),
+    linear-gradient(90deg, rgba(255,126,121,0.16), rgba(255,201,194,0.09), rgba(255,255,255,0));
+  filter: blur(0.4px);
+  pointer-events: none;
+  z-index: -1;
+}
+.gg-tour.is-open .gg-tour-card{
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+
+.gg-tour-label{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.7em;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: #ff7e79;
+  margin-bottom: 0.35rem;
+  padding: 0.34rem 0.58rem;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,232,228,0.95));
+  border: 1px solid rgba(255,126,121,0.24);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.55) inset,
+    0 10px 24px rgba(255,126,121,0.10),
+    0 0 18px rgba(255,126,121,0.12);
+}
+.gg-tour-label::before{
+  content: "✦";
+  font-size: 0.9em;
+  line-height: 1;
+  color: #ff7e79;
+  text-shadow: 0 0 10px rgba(255,126,121,0.35);
+}
+
+.gg-tour-title{
+  margin: 0;
+  padding-right: 34px;
+  font-size: 1.08em;
+  line-height: 1.18;
+  color: var(--accent);
+  text-shadow: 0 0 16px rgba(255,126,121,0.16);
+}
+
+.gg-tour-close{
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border: 1px solid rgba(255,126,121,0.18);
+  background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,241,238,0.92));
+  color: #fb6d67;
+  font-size: 1.18em;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.24rem 0.42rem;
+  border-radius: 999px;
+  box-shadow:
+    0 8px 18px rgba(255,126,121,0.10),
+    0 0 0 1px rgba(255,255,255,0.42) inset;
+}
+.gg-tour-close:hover{
+  color: #fff;
+  background: linear-gradient(180deg, #ff8f89, #ff7e79);
+  border-color: rgba(255,126,121,0.40);
+  box-shadow:
+    0 12px 24px rgba(255,126,121,0.20),
+    0 0 18px rgba(255,126,121,0.24);
+}
+
+.gg-tour-body{
+  margin-top: 0.6rem;
+  font-size: 0.89em;
+  line-height: 1.62;
+  color: #544c4c;
+}
+.gg-tour-body p{
+  margin: 0 0 0.5rem;
+}
+.gg-tour-body strong{
+  color: #ff6f69;
+  text-shadow: 0 0 10px rgba(255,126,121,0.12);
+}
+.gg-tour-body::-webkit-scrollbar{
+  width: 10px;
+}
+.gg-tour-body::-webkit-scrollbar-thumb{
+  background: linear-gradient(180deg, rgba(255,126,121,0.45), rgba(255,170,165,0.65));
+  border-radius: 999px;
+  border: 2px solid rgba(255,245,243,0.85);
+}
+
+.gg-tour-step{
+  margin-top: 0.82rem;
+  font-size: 0.76em;
+  color: #f9736c;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 14px rgba(255,126,121,0.10);
+}
+
+.gg-tour-actions{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
+  margin-top: 0.85rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid rgba(255,126,121,0.12);
+}
+.gg-tour-actions-left,
+.gg-tour-actions-right{
+  display: flex;
+  align-items: center;
+  gap: 0.34rem;
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+.gg-tour-btn{
+  border: 1px solid rgba(255,126,121,0.18);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,243,240,0.92));
+  color: #7a6766;
+  border-radius: 999px;
+  min-height: 28px;
+  line-height: 1.08;
+  white-space: nowrap;
+  flex: 0 0 auto;
+  letter-spacing: -0.01em;
+  padding: 0.22rem 0.50rem;
+  font-size: 0.70em;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow:
+    0 10px 22px rgba(15,23,42,0.08),
+    0 0 0 1px rgba(255,255,255,0.42) inset;
+  transition:
+    transform 0.14s ease,
+    box-shadow 0.14s ease,
+    background 0.14s ease,
+    color 0.14s ease;
+}
+.gg-tour-btn:hover{
+  background: linear-gradient(180deg, rgba(255,246,244,1), rgba(255,233,228,0.96));
+  color: #5f4f4e;
+  transform: translateY(-1px);
+  box-shadow:
+    0 14px 28px rgba(255,126,121,0.13),
+    0 0 18px rgba(255,126,121,0.10);
+}
+.gg-tour-btn.primary{
+  border-color: rgba(255,126,121,0.42);
+  background:
+    linear-gradient(135deg, #ff928d, #ff7e79 58%, #ff726b);
+  color: #fff;
+  font-weight: 800;
+  box-shadow:
+    0 16px 30px rgba(255,126,121,0.26),
+    0 0 22px rgba(255,126,121,0.24),
+    0 0 0 1px rgba(255,255,255,0.16) inset;
+}
+.gg-tour-btn.primary:hover{
+  background: linear-gradient(135deg, #ffa39e, #ff7e79 56%, #ff6a63);
+  box-shadow:
+    0 18px 34px rgba(255,126,121,0.30),
+    0 0 28px rgba(255,126,121,0.28);
+}
+.gg-tour-btn[disabled]{
+  opacity: 0.45;
+  cursor: default;
+  box-shadow: none;
+}
+.gg-tour-btn[disabled]:hover{
+  background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,243,240,0.92));
+  transform: none;
+  box-shadow: none;
+}
+
+body.gg-tour-active{
+  overflow: hidden;
+}
+
+@media (min-width: 760px){
+  /* Keep buttons compact even on large iframes — single row, no scroll */
+  .gg-tour-actions{
+    flex-wrap: nowrap;
+    gap: 0.44rem;
+  }
+  .gg-tour-actions-left,
+  .gg-tour-actions-right{
+    flex-wrap: nowrap;
+    gap: 0.30rem;
+    min-width: 0;
+  }
+  .gg-tour-actions-right{
+    margin-left: auto;
+  }
+  .gg-tour-btn{
+    padding: 0.20rem 0.46rem;
+    font-size: 0.69em;
+    min-height: 26px;
+  }
+}
+
+@media (max-width: 980px){
+  .tour-fab{
+    padding-inline: 0.78rem;
+  }
+}
+@media (max-width: 520px){
+  .tour-fab{
+    right: max(10px, calc(env(safe-area-inset-right, 0px) + 10px));
+    bottom: max(56px, calc(env(safe-area-inset-bottom, 0px) + 56px));
+    padding: 0.58rem 0.72rem;
+  }
+  .tour-fab .tour-fab-text{ display:none; }
+}
+
+
+@media (max-width: 600px){
+  .gg-tour-card{
+    width: calc(100vw - 20px);
+    max-width: calc(100vw - 20px);
+    max-height: none;
+    border-radius: 20px;
+  }
+  .gg-tour-spotlight{
+    border-radius: 14px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -4238,6 +4656,10 @@ color:#FF7E79
 </button>
 </div>
 </header>
+<button aria-label="Ξενάγηση" class="tour-fab" id="tourBtn" title="Ξενάγηση" type="button">
+  <span class="tour-fab-icon">🌟</span>
+  <span class="tour-fab-text">Ξενάγηση</span>
+</button>
 <main>
 <!-- ========== ΑΡΙΣΤΕΡΑ: ΛΙΣΤΑ ΚΑΤΗΓΟΡΙΩΝ ========== -->
 <aside class="sidebar">
@@ -4362,7 +4784,7 @@ color:#FF7E79
 
     <div class="lb-modal-foot" id="lbFootNote">
       <span class="lb-foot-dot"></span>
-      <span>Προσωρινά λειτουργεί τοπικά (local demo). Στο επόμενο βήμα το συνδέουμε με Firebase.</span>
+      <span>Η κατάταξη λειτουργεί τοπικά σε αυτή τη συσκευή, χωρίς Firebase.</span>
     </div>
   </div>
 </div>
@@ -4555,237 +4977,37 @@ color:#FF7E79
 </div>
 </div>
 
-<!-- =========================================================
-     🔥 Firebase (Firestore) — Leaderboard XP
-     1) Συμπλήρωσε το FIREBASE_CONFIG από: Firebase Console → Project settings → Your apps → Web app
-     2) Ενεργοποίησε Anonymous Auth: Authentication → Sign-in method → Anonymous
-     3) Ενεργοποίησε Firestore: Firestore Database → Create database (Production)
-========================================================== -->
+<!-- Guided Tour / Ξενάγηση -->
+<div aria-hidden="true" class="gg-tour" id="tourOverlay">
+  <div class="gg-tour-backdrop"></div>
+  <div class="gg-tour-spotlight" id="tourSpotlight"></div>
+  <div aria-labelledby="tourTitle" aria-modal="true" class="gg-tour-card" id="tourCard" role="dialog">
+    <button aria-label="Κλείσιμο" class="gg-tour-close" id="tourCloseBtn" type="button">×</button>
+    <div class="gg-tour-label">Ξενάγηση</div>
+    <h3 class="gg-tour-title" id="tourTitle"></h3>
+    <div class="gg-tour-body" id="tourBody"></div>
+    <div class="gg-tour-step" id="tourStep"></div>
+    <div class="gg-tour-actions">
+      <div class="gg-tour-actions-left">
+        <button class="gg-tour-btn" id="tourPrevBtn" type="button">← Προηγούμενο</button>
+      </div>
+      <div class="gg-tour-actions-right">
+        <button class="gg-tour-btn" id="tourCloseBtn2" type="button">Κλείσιμο</button>
+        <button class="gg-tour-btn primary" id="tourNextBtn" type="button">Επόμενο →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Leaderboard: local-only mode (Firebase removed) -->
 <script>
-  // ΠΡΟΣΟΧΗ: Αν δεις "PASTE_..." στην κονσόλα, πρέπει να κάνεις paste το πραγματικό config.
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyDmu2vTU6Cv6iwUOYanlDfFF-TvSVVS6Tg",
-  authDomain: "ggemlboard.firebaseapp.com",
-  projectId: "ggemlboard",
-  storageBucket: "ggemlboard.firebasestorage.app",
-  messagingSenderId: "807575352026",
-  appId: "1:807575352026:web:aaedbf6f6ecf189cf02be3",
-  measurementId: "G-JWYN9CQZGV"
-};
+  window.__LB_FIREBASE_ENABLED__ = false;
+  window.__LB_FIREBASE_READY__ = Promise.resolve(false);
+  window.__LB_FIREBASE__ = null;
+  window.__LB_USE_REST__ = false;
+  window.__LB_REST__ = null;
+  window.__LB_FS__ = {};
 </script>
-<script type="module">
-  import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-  import {
-    getAuth,
-    setPersistence,
-    indexedDBLocalPersistence,
-    browserLocalPersistence,
-    browserSessionPersistence,
-    inMemoryPersistence,
-    signInAnonymously,
-    onAuthStateChanged
-  } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-  import {
-    initializeFirestore,
-    memoryLocalCache,
-    persistentLocalCache,
-    persistentSingleTabManager,
-    serverTimestamp,
-    runTransaction,
-    doc,
-    collection,
-    query,
-    where,
-    orderBy,
-    limit,
-    getDocs,
-    getCountFromServer
-  } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
-
-  (function(){
-    try{
-      const cfg = window.FIREBASE_CONFIG || (typeof firebaseConfig !== 'undefined' ? firebaseConfig : null) || {};
-      const missing = (!cfg.apiKey || String(cfg.apiKey).indexOf("PASTE_") === 0);
-      if (missing){
-        console.warn("[Firebase] FIREBASE_CONFIG δεν έχει συμπληρωθεί ακόμη. Το Leaderboard θα μείνει σε demo/local mode.");
-        window.__LB_FIREBASE_ENABLED__ = false;
-        window.__LB_FIREBASE_READY__ = Promise.resolve(false);
-        return;
-      }
-
-      window.__LB_FIREBASE_ENABLED__ = true;
-      window.__LB_USE_REST__ = false; // διατηρείται ως flag για συμβατότητα (REST fallback απενεργοποιημένο στο modular setup)
-
-      // Small helpers (avoid "hanging" promises on some Android WebViews)
-      function __lbWait(ms){ return new Promise(res => setTimeout(res, ms)); }
-      function __lbWithTimeout(p, ms, code){
-        ms = Math.max(500, ms || 9000);
-        return Promise.race([
-          p,
-          __lbWait(ms).then(function(){
-            const e = new Error(String(code || 'LB_TIMEOUT'));
-            e.code = String(code || 'LB_TIMEOUT');
-            throw e;
-          })
-        ]);
-      }
-
-      // Init App (idempotent)
-      const app = (getApps && getApps().length) ? getApps()[0] : initializeApp(cfg);
-
-      // Auth
-      const auth = getAuth(app);
-
-      // Firestore (NEW approach: FirestoreSettings.localCache via initializeFirestore)
-      const ua = (navigator && navigator.userAgent) ? navigator.userAgent : '';
-      const isAndroid = /Android/i.test(ua);
-
-
-       // Περιβάλλοντα τύπου file:// (Hype Reflect / offline preview) ή WebViews με απενεργοποιημένο storage
-       // μπορεί να απορρίψουν IndexedDB / localStorage. Σε αυτή την περίπτωση ΔΕΝ επιχειρούμε persistent cache/persistence.
-       const __isFileProtocol = (typeof location !== 'undefined' && location && location.protocol === 'file:');
-       function __storageWritable(){
-         try{
-           if (typeof localStorage === 'undefined') return false;
-           const k = '__lb_t_' + Math.random().toString(16).slice(2);
-           localStorage.setItem(k, '1');
-           localStorage.removeItem(k);
-           return true;
-         }catch(e){
-           return false;
-         }
-       }
-       const __storageOK = (!__isFileProtocol) && __storageWritable();
-
-      let db = null;
-      try{
-        // Νέα προσέγγιση (future-proof): FirestoreSettings.localCache
-        // Αν το storage δεν είναι διαθέσιμο (π.χ. file://), πάμε κατευθείαν σε memory cache.
-        const opts = __storageOK
-          ? { localCache: persistentLocalCache({ tabManager: persistentSingleTabManager() }) }
-          : { localCache: memoryLocalCache() };
-        if (isAndroid){
-          opts.experimentalForceLongPolling = true;
-          opts.useFetchStreams = false;
-        }
-        db = initializeFirestore(app, opts);
-      }catch(e){
-        // Fallback to memory cache if persistent cache isn't supported in this environment
-        try{
-          const opts2 = { localCache: memoryLocalCache() };
-          if (isAndroid){
-            opts2.experimentalForceLongPolling = true;
-            opts2.useFetchStreams = false;
-          }
-          db = initializeFirestore(app, opts2);
-        }catch(e2){
-          // As a last resort, try default init (memory cache)
-          db = initializeFirestore(app);
-        }
-      }
-
-      // Expose Firestore modular helpers to non-module scripts
-      window.__LB_FS__ = {
-        serverTimestamp,
-        runTransaction,
-        doc,
-        collection,
-        query,
-        where,
-        orderBy,
-        limit,
-        getDocs,
-        getCountFromServer
-      };
-
-      // Auth persistence (keep your previous "bulletproof" behavior, but in modular)
-      function __setAuthPersistence(mode){
-        if (!mode) return Promise.resolve(true);
-        return __lbWithTimeout(setPersistence(auth, mode), 2500, 'LB_PERSIST_TIMEOUT');
-      }
-
-      // Auth persistence (future-proof & safe):
-      // - Σε http/https με διαθέσιμο storage: IndexedDB → Local → Session → Memory
-      // - Σε file:// ή όταν storage δεν είναι διαθέσιμο: ΜΟΝΟ in-memory (για να μη βγαίνουν warnings/σφάλματα)
-      (async function(){
-        if (!__storageOK){
-          try{ await __setAuthPersistence(inMemoryPersistence); }catch(e0){}
-          return;
-        }
-        try{
-          await __setAuthPersistence(indexedDBLocalPersistence);
-        }catch(e1){
-          try{ await __setAuthPersistence(browserLocalPersistence); }
-          catch(e2){
-            try{ await __setAuthPersistence(browserSessionPersistence); }
-            catch(e3){
-              try{ await __setAuthPersistence(inMemoryPersistence); }catch(e4){}
-            }
-          }
-        }
-      })();
-
-      function __signInAnonBulletproof(){
-        const timeoutMs = isAndroid ? 20000 : 12000;
-
-        return new Promise(function(resolve, reject){
-          let done = false;
-          let unsub = null;
-          const finish = (ok, payload)=>{
-            if (done) return;
-            done = true;
-            try{ if (unsub) unsub(); }catch(e){}
-            ok ? resolve(payload) : reject(payload);
-          };
-
-          try{
-            if (auth.currentUser){
-              finish(true, auth.currentUser);
-              return;
-            }
-          }catch(e){}
-
-          try{
-            unsub = onAuthStateChanged(auth, function(u){
-              if (u) finish(true, u);
-            });
-          }catch(e){}
-
-          // Start sign-in
-          __lbWithTimeout(signInAnonymously(auth), timeoutMs, 'LB_AUTH_TIMEOUT')
-            .then(function(cred){
-              const u = (cred && cred.user) ? cred.user : auth.currentUser;
-              if (u) finish(true, u);
-              else __lbWait(50).then(()=>finish(true, auth.currentUser));
-            })
-            .catch(function(err){
-              // 1 retry
-              __lbWithTimeout(signInAnonymously(auth), timeoutMs, 'LB_AUTH_TIMEOUT_RETRY')
-                .then(function(cred2){
-                  const u2 = (cred2 && cred2.user) ? cred2.user : auth.currentUser;
-                  finish(true, u2);
-                })
-                .catch(function(err2){
-                  console.warn("[Firebase] anonymous auth init failed", err2);
-                  finish(false, err2);
-                });
-            });
-        });
-      }
-
-      window.__LB_FIREBASE__ = { app, auth, db };
-
-      window.__LB_FIREBASE_READY__ = __signInAnonBulletproof();
-
-    }catch(err){
-      console.warn("[Firebase] init failed; fallback to local demo mode.", err);
-      window.__LB_FIREBASE_ENABLED__ = false;
-      window.__LB_FIREBASE_READY__ = Promise.resolve(false);
-    }
-  })();
-</script>
-
 <script>
     // =========================================================
     // ✅ Robust helpers for Safari/iOS: event.target may be TextNode
@@ -5378,7 +5600,8 @@ const firebaseConfig = {
             htmlText: `
               <div class="callout">
               <!-- Ερώτηση 1 -->
-             
+                   <strong>Ερωτήσεις Ανάπτυξης</strong><br>
+
   <p>
     <strong style="color:#FF7E79;">1.</strong>
     Να αναλύσεις τη διαδικασία μετατροπής της αιολικής ενέργειας σε ηλεκτρική μέσω μιας ανεμογεννήτριας, περιγράφοντας τα κύρια μέρη της (φτερωτή - πτερύγια, κιβώτιο μετάδοσης κίνησης, φρένο, ηλεκτρογεννήτρια) και τη λειτουργία τους.
@@ -5416,161 +5639,6 @@ const firebaseConfig = {
   </div>
 
 
-  <!-- Ερώτηση 2 -->
-  <p>
-    <strong style="color:#FF7E79;">2.</strong>
-    Ποια είναι τα πλεονεκτήματα και οι προκλήσεις της εγκατάστασης παράκτιων αιολικών πάρκων σε σύγκριση με τα χερσαία, και πώς αυτά επηρεάζουν την παραγωγή ενέργειας;
-  </p>
-
-  <div class="reveal-block">
-    <button type="button" class="reveal-toggle">Υπόδειξη</button>
-    <div class="reveal-content">
-      <p>
-        Γράψε <strong>πλεονεκτήματα υπεράκτιων/παράκτιων</strong> (συνήθως <strong>πιο ισχυροί και σταθεροί άνεμοι</strong>, μεγαλύτερη παραγωγή)
-        και <strong>προκλήσεις</strong> (υψηλότερο <strong>κόστος</strong>, δύσκολη <strong>εγκατάσταση/συντήρηση</strong>, <strong>διασύνδεση</strong> με υποθαλάσσια καλώδια, <strong>διάβρωση</strong>).
-        Σύνδεσέ τα με την <strong>παραγωγή</strong> και τη <strong>διαθεσιμότητα</strong> ενέργειας.
-      </p>
-    </div>
-  </div>
-
-  <div class="reveal-block1"
-       data-qid="windTurb_q2"
-       data-keywords="2:παράκτια|παρακτια|υπεράκτια|υπερακτια|offshore;2:χερσαία|χερσαια|onshore;2:άνεμος|ανεμος|ισχυρότεροι άνεμοι|ισχυροτεροι ανεμοι|σταθερότεροι άνεμοι|σταθεροτεροι ανεμοι;2:παραγωγή|παραγωγη|περισσότερη ενέργεια|περισσοτερη ενεργεια|συντελεστής φορτίου|συντελεστης φορτιου;2:κόστος|κοστος;1:εγκατάσταση|εγκατασταση|συντήρηση|συντηρηση;1:διασύνδεση|διασυνδεση|υποθαλάσσια καλώδια|υποθαλασσια καλωδια;1:διάβρωση|διαβρωση|θαλάσσιο περιβάλλον|θαλασσιο περιβαλλον;1:προκλήσεις|προκλησεις|πλεονεκτήματα|πλεονεκτηματα">
-    <button type="button" class="reveal-toggle">Απάντηση</button>
-    <div class="reveal-content">
-      <p class="reveal1-hint">
-        Κάνε σύγκριση σε 2 λίστες: πλεονεκτήματα (άνεμοι/παραγωγή) και προκλήσεις (κόστος/συντήρηση/διασύνδεση). Μετά εξήγησε πώς αυτό αλλάζει την παραγωγή ενέργειας.
-      </p>
-      <textarea class="reveal-answer" rows="7" placeholder="Γράψε εδώ την απάντησή σου…"></textarea>
-
-      <div class="reveal-actions">
-        <button type="button" class="reveal-eval-btn">Αξιολόγηση</button>
-        <button type="button" class="reveal-clear-btn">Καθαρισμός</button>
-      </div>
-
-      <div class="reveal-score" aria-live="polite"></div>
-      <div class="reveal-checklist" aria-label="Checklist λέξεων-κλειδιών"></div>
-    </div>
-  </div>
-
-
-  <!-- Ερώτηση 3 -->
-  <p>
-    <strong style="color:#FF7E79;">3.</strong>
-    Να εξηγήσεις το «πρόβλημα της αποθήκευσης», και να προτείνεις πιθανές λύσεις που μπορούν να βοηθήσουν στην αντιμετώπισή του, με βάση τις τεχνολογίες που αναφέρονται στο εδάφιο.
-  </p>
-
-  <div class="reveal-block">
-    <button type="button" class="reveal-toggle">Υπόδειξη</button>
-    <div class="reveal-content">
-      <p>
-        Εξήγησε ότι οι ΑΠΕ (άνεμος/ήλιος) είναι <strong class="gloss-term" data-gloss-key="intermittent_energy">διαλείπουσες</strong>, άρα δεν ταιριάζει πάντα η <strong>παραγωγή</strong> με τη <strong>ζήτηση</strong>.
-        Πρότεινε λύσεις: <strong>μπαταρίες</strong>, <strong>αντλησιοταμίευση</strong>, <strong>υδρογόνο (ηλεκτρόλυση)</strong>,
-        <strong>διασυνδέσεις/έξυπνα δίκτυα</strong> και <strong>διαχείριση ζήτησης</strong>.
-      </p>
-    </div>
-  </div>
-
-  <div class="reveal-block1"
-       data-qid="windTurb_q3"
-       data-keywords="2:πρόβλημα αποθήκευσης|προβλημα αποθηκευσης|αποθήκευση|αποθηκευση;2:διαλείπουσα παραγωγή|διαλειπουσα παραγωγη|αστάθεια|ασταθεια|μεταβλητότητα|μεταβλητοτητα;2:ζήτηση|ζητηση|κατανάλωση|καταναλωση;2:πλεόνασμα|πλεονασμα|έλλειμμα|ελλειμμα;2:μπαταρίες|μπαταριες|συσσωρευτές|συσσωρευτες;1:έξυπνο δίκτυο|εξυπνο δικτυο|διασύνδεση|διασυνδεση;1:διαχείριση ζήτησης|διαχειριση ζητησης|demand response">
-    <button type="button" class="reveal-toggle">Απάντηση</button>
-    <div class="reveal-content">
-      <p class="reveal1-hint">
-        Πρώτα όρισε το πρόβλημα (παραγωγή ≠ ζήτηση λόγω διαλείπουσας ΑΠΕ) και μετά γράψε 3–5 λύσεις (μπαταρίες, αντλησιοταμίευση, υδρογόνο, δίκτυα, διαχείριση ζήτησης).
-      </p>
-      <textarea class="reveal-answer" rows="7" placeholder="Γράψε εδώ την απάντησή σου…"></textarea>
-
-      <div class="reveal-actions">
-        <button type="button" class="reveal-eval-btn">Αξιολόγηση</button>
-        <button type="button" class="reveal-clear-btn">Καθαρισμός</button>
-      </div>
-
-      <div class="reveal-score" aria-live="polite"></div>
-      <div class="reveal-checklist" aria-label="Checklist λέξεων-κλειδιών"></div>
-    </div>
-  </div>
-
-
-  <!-- Ερώτηση 4 -->
-  <p>
-    <strong style="color:#FF7E79;">4.</strong>
-    Ποια τεχνικά χαρακτηριστικά μιας ανεμογεννήτριας (όπως ύψος πυλώνα, διάμετρος πτερυγίων, παραγόμενη ισχύς) επηρεάζουν την αποδοτικότητά της, και γιατί είναι σημαντική η επιλογή κατάλληλης τοποθεσίας για την εγκατάστασή της;
-  </p>
-
-  <div class="reveal-block">
-    <button type="button" class="reveal-toggle">Υπόδειξη</button>
-    <div class="reveal-content">
-      <p>
-        Σύνδεσε τα χαρακτηριστικά με την παραγωγή: <strong>ύψος πυλώνα</strong> (πιο δυνατοί άνεμοι ψηλότερα),
-        <strong>διάμετρος/εμβαδόν σάρωσης</strong> (πιάνει περισσότερο άνεμο), <strong>ονομαστική ισχύς</strong> και
-        «πότε ξεκινά/σταματά» (<strong>ταχύτητα έναρξης/διακοπής</strong>).
-        Για την τοποθεσία: <strong>μέση ταχύτητα ανέμου</strong>, <strong>εμπόδια</strong>, και <strong>κοντά στο δίκτυο</strong>.
-      </p>
-    </div>
-  </div>
-
-  <div class="reveal-block1"
-       data-qid="windTurb_q4"
-       data-keywords="2:ύψος πυλώνα|υψος πυλωνα|ύψος|υψος;2:διάμετρος πτερυγίων|διαμετρος πτερυγιων|διάμετρος ρότορα|διαμετρος ροτορα|εμβαδόν σάρωσης|εμβαδον σαρωσης;2:παραγόμενη ισχύς|παραγομενη ισχυς|ονομαστική ισχύς|ονομαστικη ισχυς;2:ταχύτητα ανέμου|ταχυτητα ανεμου|μέση ταχύτητα|μεση ταχυτητα;1:καμπύλη ισχύος|καμπυλη ισχυος|cut-in|cut in|cut-out|cut out;1:αποδοτικότητα|αποδοτικοτητα|συντελεστής φορτίου|συντελεστης φορτιου;1:τοποθεσία|τοποθεσια|ανεμολογικά δεδομένα|ανεμολογικα δεδομενα;1:εμπόδια|εμποδια|τύρβη|τυρβη|αναταράξεις|αναταραξεις;1:διασύνδεση δικτύου|διασυνδεση δικτυου|γραμμή μεταφοράς|γραμμη μεταφορας">
-    <button type="button" class="reveal-toggle">Απάντηση</button>
-    <div class="reveal-content">
-      <p class="reveal1-hint">
-        Γράψε 3–4 χαρακτηριστικά (ύψος, διάμετρος, ισχύς, ταχύτητα ανέμου) και μετά εξήγησε γιατί η τοποθεσία είναι κρίσιμη (άνεμος, εμπόδια/τύρβη, σύνδεση στο δίκτυο).
-      </p>
-      <textarea class="reveal-answer" rows="7" placeholder="Γράψε εδώ την απάντησή σου…"></textarea>
-
-      <div class="reveal-actions">
-        <button type="button" class="reveal-eval-btn">Αξιολόγηση</button>
-        <button type="button" class="reveal-clear-btn">Καθαρισμός</button>
-      </div>
-
-      <div class="reveal-score" aria-live="polite"></div>
-      <div class="reveal-checklist" aria-label="Checklist λέξεων-κλειδιών"></div>
-    </div>
-  </div>
-
-
-  <!-- Ερώτηση 5 -->
-  <p>
-    <strong style="color:#FF7E79;">5.</strong>
-    Να συγκρίνεις τις ενεργειακές μετατροπές που συμβαίνουν σε έναν ηλεκτρικό κινητήρα, μια ηλεκτρογεννήτρια και μια ανεμογεννήτρια, και να εξηγήσεις πώς η καθεμία συμβάλλει στη βιώσιμη παραγωγή και χρήση ενέργειας.
-  </p>
-
-  <div class="reveal-block">
-    <button type="button" class="reveal-toggle">Υπόδειξη</button>
-    <div class="reveal-content">
-      <p>
-        Κάνε καθαρά τις μετατροπές:
-        <strong>κινητήρας: ηλεκτρική → μηχανική</strong>,
-        <strong>γεννήτρια: μηχανική → ηλεκτρική</strong>,
-        <strong>ανεμογεννήτρια: αιολική → μηχανική → ηλεκτρική</strong>.
-        Μετά σύνδεσε με βιωσιμότητα: <strong>ΑΠΕ</strong>, <strong>μείωση εκπομπών</strong>, και γιατί βοηθούν
-        <strong>αποδοτικότητα</strong> και <strong>αποθήκευση/δίκτυο</strong>.
-      </p>
-    </div>
-  </div>
-
-  <div class="reveal-block1"
-       data-qid="windTurb_q5"
-       data-keywords="2:μετατροπή ενέργειας|μετατροπη ενεργειας|ενεργειακές μετατροπές|ενεργειακες μετατροπες;2:ηλεκτρικός κινητήρας|ηλεκτρικος κινητηρας|κινητήρας|κινητηρας;2:ηλεκτρογεννήτρια|ηλεκτρογεννητρια|γεννήτρια|γεννητρια;2:ανεμογεννήτρια|ανεμογεννητρια;2:ηλεκτρική σε μηχανική|ηλεκτρικη σε μηχανικη;2:μηχανική σε ηλεκτρική|μηχανικη σε ηλεκτρικη;2:αιολική σε μηχανική|αιολικη σε μηχανικη|αιολική σε ηλεκτρική|αιολικη σε ηλεκτρικη;1:ΑΠΕ|ανανεώσιμες|ανανεωσιμες|ανανεώσιμες πηγές|ανανεωσιμες πηγες;1:βιωσιμότητα|βιωσιμοτητα|βιώσιμη|βιωσιμη;1:εκπομπές|εκπομπες|CO2|διοξείδιο|διοξειδιο;1:απόδοση|αποδοση|εξοικονόμηση|εξοικονομηση;1:αποθήκευση|αποθηκευση|δίκτυο|δικτυο">
-    <button type="button" class="reveal-toggle">Απάντηση</button>
-    <div class="reveal-content">
-      <p class="reveal1-hint">
-        Γράψε 1–2 γραμμές για κάθε συσκευή (τι ενέργεια μπαίνει/βγαίνει) και μετά σύνδεσε με βιώσιμη ενέργεια (ΑΠΕ, λιγότερες εκπομπές, καλύτερη χρήση μέσω απόδοσης/αποθήκευσης).
-      </p>
-      <textarea class="reveal-answer" rows="7" placeholder="Γράψε εδώ την απάντησή σου…"></textarea>
-
-      <div class="reveal-actions">
-        <button type="button" class="reveal-eval-btn">Αξιολόγηση</button>
-        <button type="button" class="reveal-clear-btn">Καθαρισμός</button>
-      </div>
-
-      <div class="reveal-score" aria-live="polite"></div>
-      <div class="reveal-checklist" aria-label="Checklist λέξεων-κλειδιών"></div>
-    </div>
-  </div>
-    </div>
  
             `,
             iframeTitle: 'Διαδραστική δοκιμασία - Κινητήρες, Γεννήτριες και Ανεμογεννήτριες',
@@ -7856,7 +7924,7 @@ function toggleNotesModalFullscreen() {
   var tbW = selectionToolbarEl.offsetWidth || 160;
   var tbH = selectionToolbarEl.offsetHeight || 34;
 
-  var pad = 8;
+  var pad = (typeof padOverride === 'number' && isFinite(padOverride)) ? padOverride : 10;
   var gap = 10;
 
   // Κεντράρισμα οριζόντια (με clamp)
@@ -11758,8 +11826,7 @@ if (selectionToolbarEl) {
 
 
 // =========================================================
-// 🏅 Leaderboard (UI + local demo backend)
-// Στο επόμενο βήμα: αντικατάσταση backend με Firebase (Firestore).
+// 🏅 Leaderboard (UI + τοπική αποθήκευση στη συσκευή)
 // =========================================================
 var LB_NICK_KEY = 'gg_leaderboard_nick_v1';
 var LB_NICK_LOCK_KEY = 'gg_leaderboard_nick_locked_v1';
@@ -11840,37 +11907,11 @@ function lbSaveDemoStore(store){
 }
 
 
-// ----- Backend: Firestore (με fallback σε demo/localStorage) -----
-var LB_COL_USERS = 'lb_users';
-var LB_COL_NICKS = 'lb_nicks';
-
-// Modular Firestore helpers (injected by the Firebase module initializer)
-var FS = (window.__LB_FS__ || {});
-
-
-// helpers
-function lbFB(){
-  try{
-    if (window.__LB_FIREBASE_ENABLED__ && window.__LB_FIREBASE__ && window.__LB_FIREBASE__.db) return window.__LB_FIREBASE__;
-  }catch(e){}
-  return null;
-}
-function lbFBReady(){
-  // επιστρέφει Promise<User>
-  try{
-    if (window.__LB_FIREBASE_ENABLED__ && window.__LB_FIREBASE_READY__) return window.__LB_FIREBASE_READY__;
-  }catch(e){}
-  return Promise.reject(new Error('FIREBASE_NOT_READY'));
-}
-function lbUseRest(){
-  try{ return !!(window.__LB_USE_REST__ && window.__LB_REST__); }catch(e){ return false; }
-}
-function lbIsFirebase(){
-  try{
-    if (lbUseRest() && window.__LB_REST__) return true;
-  }catch(e){}
-  return !!lbFB();
-}
+// ----- Backend: localStorage only -----
+function lbFB(){ return null; }
+function lbFBReady(){ return Promise.reject(new Error('LOCAL_ONLY_MODE')); }
+function lbUseRest(){ return false; }
+function lbIsFirebase(){ return false; }
 
 var __lbClaimState = { nick:'', ok:false, checkedAt:0 };
 
@@ -11881,22 +11922,10 @@ function lbSetDiag(html, isErr){
 }
 
 function lbDiagSnapshot(){
-  try{
-    var fb = lbFB();
-    if (!fb) return 'Firebase: OFF · <code>local</code>';
-    var pid = (fb.app && fb.app.options && fb.app.options.projectId) ? String(fb.app.options.projectId) : '';
-    var uid = (fb.user && fb.user.uid) ? String(fb.user.uid) : '';
-    uid = uid ? (uid.slice(0,6) + '…' + uid.slice(-4)) : '';
-    return 'Firebase: ON' + (pid ? (' · projectId: <code>' + escapeHtml(pid) + '</code>') : '') + (uid ? (' · uid: <code>' + escapeHtml(uid) + '</code>') : '');
-  }catch(e){
-    return 'Firebase: ?';
-  }
+  return 'Τοπική κατάταξη σε αυτή τη συσκευή';
 }
 
-// Αν έχεις nickname από παλιά (local) αλλά ΔΕΝ έχει κατοχυρωθεί στο Firestore, το κατοχυρώνουμε αυτόματα.
 function lbEnsureClaimed(nick){
-  // ✅ Καταργήθηκε ο έλεγχος/claim μοναδικότητας nickname.
-  // Διατηρείται ως no-op για συμβατότητα με παλιότερο κώδικα.
   nick = lbNormalizeNick(nick);
   if (!nick) return Promise.resolve(false);
   return Promise.resolve(true);
@@ -11963,110 +11992,14 @@ function lbCheckNicknameAvailable(nick){
 function lbUpsertScore(nick, totalXp){
   nick = lbNormalizeNick(nick);
   totalXp = Math.max(0, Math.floor(Number(totalXp || 0)));
-
-  // ✅ Σε Android (ή όταν έχει ενεργοποιηθεί REST mode), χρησιμοποιούμε Firestore REST API αντί για το SDK.
-  try{
-    if (lbUseRest() && window.__LB_REST__ && window.__LB_REST__.upsertScore){
-      return window.__LB_REST__.upsertScore(nick, totalXp);
-    }
-  }catch(e){}
-  if (!lbIsFirebase()) return lbDemoUpsertScore(nick, totalXp);
-
-  var fb = lbFB();
-  var db = fb.db;
-  var FS = window.__LB_FS__ || {};
-
-  
-  return lbFBReady().then(function(user){
-    var uid = user.uid;
-    var userRef = (FS.doc && FS.collection) ? FS.doc(FS.collection(db, LB_COL_USERS), uid) : null;
-
-    if (!FS.runTransaction || !userRef){
-      return Promise.reject(new Error('FIRESTORE_NOT_READY'));
-    }
-
-    return FS.runTransaction(db, function(tx){
-      return tx.get(userRef).then(function(snap){
-        var data = snap.exists ? (snap.data() || {}) : {};
-        var curXp = Math.max(0, Math.floor(Number(data.xp || 0)));
-        var newXp = Math.max(curXp, totalXp);
-        var now = (FS.serverTimestamp ? FS.serverTimestamp() : null);
-
-        tx.set(userRef, {
-          uid: uid,
-          nick: nick,
-          xp: newXp,
-          updatedAt: now,
-          createdAt: data.createdAt || now
-        }, { merge: true });
-
-        return { nick: nick, xp: newXp, updatedAt: Date.now() };
-      });
-    });
-  });
+  return lbDemoUpsertScore(nick, totalXp);
 }
 function lbFetchTop(limit){
   limit = Math.max(5, Math.min(100, Math.floor(limit || 20)));
-
-  // ✅ REST mode (Android): query μέσω Firestore REST API
-  try{
-    if (lbUseRest() && window.__LB_REST__ && window.__LB_REST__.fetchTop){
-      return window.__LB_REST__.fetchTop(limit);
-    }
-  }catch(e){}
-  if (!lbIsFirebase()) return lbDemoFetchTop(limit);
-
-  var fb = lbFB();
-  var db = fb.db;
-  var FS = window.__LB_FS__ || {};
-
-  return lbFBReady().then(function(){
-    var q = (FS.query && FS.collection && FS.orderBy && FS.limit) ? FS.query(FS.collection(db, LB_COL_USERS), FS.orderBy('xp','desc'), FS.limit(limit)) : null;
-    return (FS.getDocs ? FS.getDocs(q) : Promise.reject(new Error('FIRESTORE_NOT_READY')))
-      .then(function(qs){
-        var out = [];
-        qs.forEach(function(docSnap){
-          var d = docSnap.data() || {};
-          var t = d.updatedAt;
-          var updatedAtMs = 0;
-          try{
-            if (t && typeof t.toMillis === 'function') updatedAtMs = t.toMillis();
-          }catch(e){}
-          out.push({
-            uid: docSnap.id,
-            nick: d.nick || '—',
-            xp: Math.max(0, Math.floor(Number(d.xp || 0))),
-            updatedAt: updatedAtMs || 0
-          });
-        });
-        // extra stable sort (optional)
-        out.sort(function(a,b){
-          var dx = (Number(b.xp||0) - Number(a.xp||0));
-          if (dx) return dx;
-          return (Number(b.updatedAt||0) - Number(a.updatedAt||0));
-        });
-        return out;
-      });
-  });
+  return lbDemoFetchTop(limit);
 }
 
 function lbCountQuery(q){
-  // Server-side count aggregation (modular)
-  try{
-    var FS = window.__LB_FS__ || {};
-    if (FS && FS.getCountFromServer){
-      return FS.getCountFromServer(q).then(function(snap){
-        try{ return (snap && typeof snap.data === 'function') ? (snap.data().count || 0) : 0; }catch(e){ return 0; }
-      });
-    }
-  }catch(e){}
-  // Fallback: fetch docs (ok for small leaderboards)
-  try{
-    var FS2 = window.__LB_FS__ || {};
-    if (FS2 && FS2.getDocs){
-      return FS2.getDocs(q).then(function(qs){ return (qs && typeof qs.size === 'number') ? qs.size : 0; });
-    }
-  }catch(e){}
   return Promise.resolve(0);
 }
 
@@ -12095,29 +12028,7 @@ function lbDemoFetchMyRank(myNick){
 function lbFetchMyRank(myNick, myXp){
   myNick = String(myNick || '');
   myXp = Math.max(0, Math.floor(Number(myXp || 0)));
-
-  // ✅ REST mode (Android): rank μέσω Firestore REST aggregation (αν υποστηρίζεται)
-  try{
-    if (lbUseRest() && window.__LB_REST__ && window.__LB_REST__.fetchMyRank){
-      return window.__LB_REST__.fetchMyRank(myXp);
-    }
-  }catch(e){}
-  if (!lbIsFirebase()) return lbDemoFetchMyRank(myNick);
-
-  var fb = lbFB();
-  var db = fb.db;
-  var FS = window.__LB_FS__ || {};
-
-  return lbFBReady().then(function(){
-    var FS = window.__LB_FS__ || {};
-    var higherQ = (FS.query && FS.collection && FS.where) ? FS.query(FS.collection(db, LB_COL_USERS), FS.where('xp','>', myXp)) : null;
-    // Dense ranking: rank = number of users with strictly higher XP + 1 (ties share same rank)
-return lbCountQuery(higherQ).then(function(higher){
-  higher = Math.max(0, Math.floor(Number(higher || 0)));
-  var rank = Math.max(1, higher + 1);
-  return { rank: rank };
-});
-  });
+  return lbDemoFetchMyRank(myNick);
 }
 
 
@@ -12133,6 +12044,7 @@ var lbChangeNickBtn = document.getElementById('lbChangeNickBtn');
 var __lbLastRenderedTop = [];
 var __lbSyncTimer = 0;
 var __lbOpen = false;
+var __lbJoinFlashMsg = "";
 
 // ✅ Μείωση writes: αποφυγή επαναληπτικού upsert αν δεν άλλαξε το XP
 var __lbLastSyncedNick = '';
@@ -12190,18 +12102,13 @@ function lbRender(){
 
   try{
     if (lbFootEl){
-      if (lbIsFirebase()){
-        lbFootEl.innerHTML = '<span class="lb-foot-dot"></span><span>Η κατάταξη ενημερώνεται όταν ανοίγεις την κάρτα.</span>';
-      } else {
-        lbFootEl.innerHTML = '<span class="lb-foot-dot"></span><span>Τοπική λειτουργία (demo). Δεν θα δεις άλλους χρήστες μέχρι να ενεργοποιηθεί το Firebase config.</span>';
-      }
+      lbFootEl.innerHTML = '<span class="lb-foot-dot"></span><span>Η κατάταξη αποθηκεύεται τοπικά σε αυτή τη συσκευή.</span>';
       lbFootEl.style.display = '';
     }
   }catch(e){}
 
   var nick = lbGetNick();
 
-  // Αν έχει καταχωρηθεί όνομα, δεν επιτρέπεται αλλαγή (κρύψε το κουμπί ✎ Όνομα)
   try{
     if (lbChangeNickBtn){
       lbChangeNickBtn.style.display = (nick && lbIsNickLocked()) ? 'none' : '';
@@ -12211,32 +12118,20 @@ function lbRender(){
   var total = 0;
   try{ total = xpRecalcTotal(); }catch(e){ total = 0; }
 
-  // My line
   if (nick){
     lbMeEl.innerHTML = '👤 <span>' + escapeHtml(nick) + '</span> · <span style="font-weight:850;color:var(--accent)">' + Math.round(total) + ' XP</span>';
   } else {
     lbMeEl.innerHTML = '👤 <span>Δεν έχεις nickname</span> · <span style="font-weight:850;color:var(--accent)">' + Math.round(total) + ' XP</span>';
   }
 
-  // If no nick, show join panel
   if (!nick){
     lbBodyEl.innerHTML = lbJoinPanelHtml();
     lbBindJoinPanel();
     return;
   }
 
-  // Otherwise: show loading state
-  var isDemo = !lbIsFirebase();
-  if (isDemo){
-    lbBodyEl.innerHTML = '' +
-      '<div class="lb-err" style="margin-bottom:10px">⚠️ Το Leaderboard είναι σε <strong>demo/local mode</strong> (δεν θα δεις άλλους χρήστες). ' +
-      'Συμπλήρωσε το <code>FIREBASE_CONFIG</code> (apiKey/authDomain/appId) και έλεγξε ότι τα Firestore Rules επιτρέπουν read.</div>' +
-      '<div class="xp-section"><div class="xp-section-title">Δοκιμαστική κατάταξη (τοπικά)</div></div>';
-  } else {
-    lbBodyEl.innerHTML = '<div class="xp-section"><div class="xp-section-title">Φορτώνει η κατάταξη…</div></div>';
-  }
+  lbBodyEl.innerHTML = '<div class="xp-section"><div class="xp-section-title">Ενημέρωση τοπικής κατάταξης…</div></div>';
 
-  // ✅ Γρήγορη φόρτωση: δοκίμασε γρήγορο upsert (με μικρό timeout), αλλά ΜΗΝ μπλοκάρεις το fetch αν κολλήσει.
   var __lbChain =
     lbWithTimeout(lbUpsertScoreIfNeeded(nick, total), 2500)
       .catch(function(){ /* ignore */ })
@@ -12245,24 +12140,28 @@ function lbRender(){
         __lbLastRenderedTop = top;
 
         if (!top || !top.length){
-          lbBodyEl.innerHTML = '<div class="lb-err">Δεν υπάρχουν ακόμη αποτελέσματα στο Leaderboard.</div>';
+          lbBodyEl.innerHTML = '<div class="lb-err">Δεν υπάρχουν ακόμη συμμετοχές στην τοπική κατάταξη.</div>';
           return;
         }
 
-        // Αν βλέπεις μόνο εσένα, πιθανότατα είσαι ο πρώτος χρήστης.
         var onlyMe = (top.length === 1 && top[0] && String(top[0].nick||'') === String(nick||''));
         var onlyMeMsg = '';
         if (onlyMe){
-          onlyMeMsg = '<div class="lb-ok" style="margin-bottom:10px">Είσαι (προς το παρόν) ο μοναδικός χρήστης. ' +
-            'Για δοκιμή: άνοιξε την εφαρμογή σε Incognito/άλλη συσκευή και δες αν εμφανίζεται δεύτερος χρήστης.</div>';
+          onlyMeMsg = '<div class="lb-ok" style="margin-bottom:10px">Στο Demo ο πίνακας κατάταξης δεν είναι συνδεδεμένος με τους υπόλοιπους χρήστες.</div>';
         }
 
-        // ✅ Δείξε άμεσα τον πίνακα χωρίς να περιμένεις το "Η θέση σου"
-        lbBodyEl.innerHTML = onlyMeMsg + lbTableHtml(top, nick, null);
+        var flashMsg = '';
+        try{
+          if (__lbJoinFlashMsg){
+            flashMsg = '<div class="lb-ok" style="margin-bottom:10px">' + escapeHtml(__lbJoinFlashMsg) + '</div>';
+            __lbJoinFlashMsg = '';
+          }
+        }catch(e){}
 
-        // Προσπάθησε να βρεις θέση στο background
-        lbWithTimeout(lbFetchMyRank(nick, total), 7000).then(function(pos){
-          lbBodyEl.innerHTML = onlyMeMsg + lbTableHtml(top, nick, pos);
+        lbBodyEl.innerHTML = flashMsg + onlyMeMsg + lbTableHtml(top, nick, null);
+
+        lbWithTimeout(lbFetchMyRank(nick, total), 2500).then(function(pos){
+          lbBodyEl.innerHTML = flashMsg + onlyMeMsg + lbTableHtml(top, nick, pos);
         }).catch(function(){
           // keep as-is
         });
@@ -12271,46 +12170,14 @@ function lbRender(){
   lbWithTimeout(__lbChain)
     .catch(function(err){
       console.warn('[Leaderboard] render failed', err);
-
-      try{
-        var c2 = String((err && err.code) || '');
-        var m2 = String((err && err.message) || '');
-        if (c2 === 'LB_TIMEOUT' || m2.indexOf('LB_TIMEOUT') !== -1){
-          var txt = 'Η κατάταξη δεν απάντησε εγκαίρως (timeout). Σε ορισμένες Android συσκευές αυτό μπορεί να συμβεί. Πάτησε Ξαναφόρτωση.';
-          lbBodyEl.innerHTML = '<div class="lb-err">' + escapeHtml(txt) + '</div>' +
-            '<div class="lb-retry-row"><button type="button" class="lb-retry-btn" id="lbRetryBtn">Ξαναφόρτωση</button></div>';
-
-          // ✅ Αυτόματο 1ο retry σε Android (μερικές φορές το Firebase «ξυπνάει» στη 2η προσπάθεια)
-          try{
-            var __uaT = (navigator && navigator.userAgent) ? navigator.userAgent : '';
-            if (/Android/i.test(__uaT) && !window.__lbAndroidAutoRetryDone){
-              window.__lbAndroidAutoRetryDone = 1;
-              try{ if (window.__LB_FIREBASE_RETRY__) window.__LB_FIREBASE_RETRY__(); }catch(e){}
-              setTimeout(function(){ if (__lbOpen) { try{ lbRender(); }catch(e){} } }, 550);
-            }
-          }catch(e){}
-
-          var b = document.getElementById('lbRetryBtn');
-          if (b){
-            b.addEventListener('click', function(){
-              try{ if (window.__LB_FIREBASE_RETRY__) window.__LB_FIREBASE_RETRY__(); }catch(e){}
-              try{ lbRender(); }catch(e){}
-            }, false);
-          }
-          return;
-        }
-      }catch(e){}
-
-      var msg = 'Κάτι πήγε στραβά. Δοκίμασε ξανά.';
-      try{
-        var s = String((err && (err.code || err.message)) || '');
-        if (s.indexOf('permission') !== -1 || s.indexOf('PERMISSION') !== -1){
-          msg = 'Δεν επιτρέπεται πρόσβαση στο Firestore (permission denied). Έλεγξε τα Firestore Rules.';
-        } else if (s.indexOf('FIREBASE_CONFIG') !== -1){
-          msg = 'Λείπει το FIREBASE_CONFIG. Συμπλήρωσέ το από το Firebase Console.';
-        }
-      }catch(e){}
-      lbBodyEl.innerHTML = '<div class="lb-err">' + escapeHtml(msg) + '</div>';
+      lbBodyEl.innerHTML = '<div class="lb-err">Δεν μπόρεσα να ενημερώσω την τοπική κατάταξη. Δοκίμασε ξανά.</div>' +
+        '<div class="lb-retry-row"><button type="button" class="lb-retry-btn" id="lbRetryBtn">Ξαναφόρτωση</button></div>';
+      var b = document.getElementById('lbRetryBtn');
+      if (b){
+        b.addEventListener('click', function(){
+          try{ lbRender(); }catch(e){}
+        }, false);
+      }
     });
 }
 
@@ -12318,7 +12185,7 @@ function lbJoinPanelHtml(errMsg, okMsg){
   return '' +
   '<div class="lb-join">' +
     '<h4>Συμμετοχή στο Leaderboard</h4>' +
-    '<p>Διάλεξε ένα nickname (θα φαίνεται στην κατάταξη). <strong>Δεν χρειάζεται να είναι μοναδικό</strong>.</p>' +
+    '<p>Διάλεξε ένα nickname για την τοπική κατάταξη αυτής της συσκευής. <strong>Δεν χρειάζεται να είναι μοναδικό</strong>.</p>' +
     '<div class="lb-join-row">' +
       '<input class="lb-input" id="lbNickInput" placeholder="π.χ. Kostas_17" maxlength="18" />' +
       '<button type="button" class="lb-pill lb-ghost" id="lbJoinBtn">✓ Συμμετοχή</button>' +
@@ -12343,7 +12210,7 @@ function lbBindJoinPanel(){
       lbBodyEl.innerHTML = '' +
         '<div class="lb-join">' +
           '<h4>Όνομα κλειδωμένο</h4>' +
-          '<p>Το όνομα σου είναι <strong>' + escapeHtml(curNick) + '</strong> και δεν μπορεί να αλλάξει.</p>' +
+          '<p>Το nickname σου είναι <strong>' + escapeHtml(curNick) + '</strong> και δεν μπορεί να αλλάξει.</p>' +
         '</div>';
       return;
     }
@@ -12374,53 +12241,19 @@ function lbBindJoinPanel(){
 
     var total = 0;
     try{ total = xpRecalcTotal(); }catch(e){ total = 0; }
-
-    // ✅ Δεν κάνουμε πλέον έλεγχο διαθεσιμότητας/μοναδικότητας nickname
     Promise.resolve()
       .then(function(){
         return lbUpsertScore(nick, total);
       })
       .then(function(){
-        lbSetNick(nick); // κλειδώνει στην 1η επιτυχημένη καταχώρηση
-
-        showMsg('Έτοιμο! Συμμετέχεις στην κατάταξη ως "' + nick + '".', true);
-        // μικρή καθυστέρηση για να δει μήνυμα, μετά render table
-        setTimeout(function(){ if (__lbOpen) lbRender(); }, 350);
+        lbSetNick(nick);
+        __lbJoinFlashMsg = 'Καλώς ήρθες, "' + nick + '"! Η συμμετοχή σου καταχωρήθηκε επιτυχώς.';
+        showMsg('Η συμμετοχή σου καταχωρήθηκε με επιτυχία ως "' + nick + '".', true);
+        setTimeout(function(){ if (__lbOpen) lbRender(); }, 500);
       })
       .catch(function(err){
         console.warn('[Leaderboard] join failed', err);
-
-        // ✅ Αν κολλήσει η αρχικοποίηση Firebase/anonymous auth (συχνότερα σε Android), κάνε 1 αυτόματο retry
-        try{
-          var __s0 = String((err && (err.code || err.message)) || '');
-          if ((__s0 === 'LB_TIMEOUT' || __s0.indexOf('LB_TIMEOUT') !== -1) && window.__LB_FIREBASE_RETRY__){
-            setBusy(true);
-            Promise.resolve()
-              .then(function(){ return window.__LB_FIREBASE_RETRY__(); })
-              .then(function(){ return lbUpsertScore(nick, total); })
-              .then(function(){
-                lbSetNick(nick); // κλειδώνει στην 1η επιτυχημένη καταχώρηση
-                showMsg('Έτοιμο! Συμμετέχεις στην κατάταξη ως "' + nick + '".', true);
-                setTimeout(function(){ if (__lbOpen) lbRender(); }, 350);
-              })
-              .catch(function(err2){
-                console.warn('[Leaderboard] join retry failed', err2);
-                showMsg('Δεν μπόρεσα να σε καταχωρήσω αυτή τη στιγμή. Δοκίμασε ξανά.', false);
-              });
-            return;
-          }
-        }catch(e){}
-
-        var msg = 'Δεν μπόρεσα να σε καταχωρήσω αυτή τη στιγμή. Δοκίμασε ξανά.';
-        try{
-          var s = String((err && (err.code || err.message)) || '');
-          if (s.indexOf('permission') !== -1 || s.indexOf('PERMISSION') !== -1){
-            msg = 'Δεν επιτρέπεται πρόσβαση στο Firestore (permission denied). Έλεγξε τα Firestore Rules.';
-          } else if (s.indexOf('FIREBASE_CONFIG') !== -1 || s.indexOf('FIREBASE_NOT_READY') !== -1){
-            msg = 'Το Leaderboard δεν είναι έτοιμο αυτή τη στιγμή. Δοκίμασε ξανά.';
-          }
-        }catch(e){}
-        showMsg(msg, false);
+        showMsg('Δεν μπόρεσα να καταχωρήσω τη συμμετοχή σου. Δοκίμασε ξανά.', false);
       })
       .finally(function(){
         // (αν έγινε re-render, το κουμπί αντικαταστάθηκε)
@@ -12440,30 +12273,12 @@ function lbBindJoinPanel(){
 
 function lbTableHtml(top, myNick, pos){
   var rows = '';
-  var myUid = '';
-  try{
-    if (lbIsFirebase()){
-      var fb = lbFB();
-      if (fb && fb.auth && fb.auth.currentUser && fb.auth.currentUser.uid){
-        myUid = String(fb.auth.currentUser.uid || '');
-      }
-    }
-  }catch(e){ myUid = ''; }
-  // ✅ REST mode: uid από REST auth cache
-  try{
-    if (!myUid && window.__LB_UID__) myUid = String(window.__LB_UID__ || '');
-  }catch(e2){}
   if (!Array.isArray(top) || !top.length){
     rows = '<tr><td colspan="3">Δεν υπάρχουν ακόμη συμμετοχές.</td></tr>';
   } else {
     for (var i=0; i<top.length; i++){
       var p = top[i] || {};
-      var isMe = false;
-      if (myUid && p.uid){
-        isMe = (String(p.uid) === myUid);
-      } else {
-        isMe = (p.nick === myNick);
-      }
+      var isMe = (p.nick === myNick);
       rows += '<tr class="' + (isMe ? 'lb-row-me' : '') + '">';
       rows +=   '<td class="lb-rank">#' + (i+1) + '</td>';
       rows +=   '<td class="lb-nick">' + escapeHtml(p.nick || '—') + (isMe ? ' <span style="color:var(--accent);font-weight:850">• εσύ</span>' : '') + '</td>';
@@ -12558,6 +12373,424 @@ if (lbChangeNickBtn){
     });
   }
 }
+
+
+// =========================
+// Guided Tour / Ξενάγηση
+// =========================
+var tourBtnEl       = document.getElementById('tourBtn');
+var tourOverlayEl   = document.getElementById('tourOverlay');
+var tourSpotlightEl = document.getElementById('tourSpotlight');
+var tourCardEl      = document.getElementById('tourCard');
+var tourTitleEl     = document.getElementById('tourTitle');
+var tourBodyEl      = document.getElementById('tourBody');
+var tourStepEl      = document.getElementById('tourStep');
+var tourPrevBtnEl   = document.getElementById('tourPrevBtn');
+var tourNextBtnEl   = document.getElementById('tourNextBtn');
+var tourCloseBtnEl  = document.getElementById('tourCloseBtn');
+var tourCloseBtn2El = document.getElementById('tourCloseBtn2');
+
+var __tourState = {
+  open: false,
+  stepIndex: 0,
+  raf: 0,
+  scrollTimer: 0,
+  steps: []
+};
+
+function tourHideSearchDropdown(){
+  try{ if (typeof hideSearchDropdown === 'function') hideSearchDropdown(); }catch(e){}
+}
+
+function tourCloseTransientUi(){
+  try{ closeFooterModal(); }catch(e){}
+  try{ closeNotesModal(); }catch(e){}
+  try{ closeBookmarksModal(); }catch(e){}
+  try{ closeGlossaryModal(); }catch(e){}
+  try{ xpCloseModal(); }catch(e){}
+  try{
+    var q = document.getElementById('quizStatsModal');
+    if (q) q.classList.add('hidden');
+  }catch(e){}
+  tourHideSearchDropdown();
+}
+
+function tourEnsureLeaderboardOpen(){
+  try{ tourCloseTransientUi(); }catch(e){}
+  try{ lbOpenModal(); }catch(e){}
+}
+
+function tourEnsureLeaderboardClosed(){
+  try{ lbCloseModal(); }catch(e){}
+}
+
+function tourGetFirstVisibleElement(selectors){
+  if (!selectors) return null;
+  var list = Array.isArray(selectors) ? selectors : [selectors];
+  for (var i=0; i<list.length; i++){
+    var sel = list[i];
+    if (!sel) continue;
+    try{
+      var nodes = document.querySelectorAll(sel);
+      for (var j=0; j<nodes.length; j++){
+        var el = nodes[j];
+        if (!el) continue;
+        var cs = window.getComputedStyle ? window.getComputedStyle(el) : null;
+        if (cs && (cs.display === 'none' || cs.visibility === 'hidden' || Number(cs.opacity || 1) === 0)) continue;
+        var r = el.getBoundingClientRect();
+        if (r.width < 2 || r.height < 2) continue;
+        return el;
+      }
+    }catch(e){}
+  }
+  return null;
+}
+
+function tourSafeHtml(s){
+  return String(s || '')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+
+function tourBuildSteps(){
+  return [
+    {
+      selectors: '#notesBtn',
+      title: '📝 Σημειώσεις',
+      body: '<p>Με αυτό το κουμπί ανοίγεις τη συγκεντρωτική κάρτα <strong>Οι σημειώσεις μου</strong>. Εκεί φαίνονται όλα τα αποσπάσματα που έχεις χρωματίσει ή σχολιάσει.</p>'
+    },
+    {
+      selectors: '#quizStatsButton',
+      title: '📈 Αποτελέσματα τεστ',
+      body: '<p>Εδώ βλέπεις τα <strong>αποτελέσματα των τεστ</strong>, τις προσπάθειες, τον μέσο όρο σου και το σχετικό διάγραμμα προόδου.</p>'
+    },
+    {
+      selectors: '#xpBtn',
+      title: '🏆 Κερδισμένη XP',
+      body: '<p>Το κουμπί αυτό ανοίγει την κάρτα <strong>Κερδισμένη XP</strong>. Παρακολουθείς τη συνολική εμπειρία, τα επίπεδα, τα ορόσημα και την πρόοδό σου ανά εφαρμογή ή μάθημα.</p>'
+    },
+    {
+      selectors: '#toggleSidebarBtn',
+      title: '⟨⟩ Περιεχόμενα',
+      body: '<p>Με το κουμπί αυτό κρύβεις ή εμφανίζεις τα <strong>Περιεχόμενα</strong>, ώστε να έχεις περισσότερο χώρο για ανάγνωση.</p>'
+    },
+    {
+      selectors: '.header-search, #smartSearch, #smartSearchClear',
+      title: '🔎 Αναζήτηση',
+      body: '<p>Αυτή είναι η <strong>μπάρα αναζήτησης</strong>. Γράφεις λέξεις ή όρους και βρίσκεις γρήγορα τα σχετικά σημεία του βιβλίου χωρίς να ψάχνεις χειροκίνητα σε όλες τις καρτέλες.</p>'
+    },
+    {
+      selectors: '#glossaryBtn',
+      title: '📚 Γλωσσάρι',
+      body: '<p>Από εδώ ανοίγεις το <strong>Γλωσσάρι</strong> και βρίσκεις γρήγορα ορισμούς για δύσκολους όρους και έννοιες.</p>'
+    },
+    {
+      selectors: '#bookmarksBtn',
+      title: '🔖 Σελιδοδείκτες',
+      body: '<p>Το κουμπί αυτό σου επιτρέπει να αποθηκεύεις και να εμφανίζεις <strong>σελιδοδείκτες</strong> για γρήγορη επιστροφή σε σημαντικά σημεία.</p>'
+    },
+    {
+      selectors: '#leaderboardBtn',
+      spotPad: 14,
+      title: '🏅 Πίνακας Κατάταξης',
+      body: '<p>Εδώ ολοκληρώνεται η ξενάγηση. Από το κουμπί <strong>Κατάταξη</strong> ανοίγεις τον Πίνακα Κατάταξης και βλέπεις τη συνολική XP, το nickname σου, το <strong>TOP 10</strong> και τη θέση σου.</p>'
+    }
+  ];
+}
+
+function tourGetCurrentStep(){
+  return (__tourState.steps && __tourState.steps[__tourState.stepIndex]) ? __tourState.steps[__tourState.stepIndex] : null;
+}
+
+function tourScrollTargetIntoView(el){
+  if (!el || !el.scrollIntoView) return;
+  try{
+    el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+  }catch(e){
+    try{ el.scrollIntoView(true); }catch(err){}
+  }
+}
+
+function tourRectsOverlap(a, b){
+  if (!a || !b) return false;
+  return !(a.right <= b.left || a.left >= b.right || a.bottom <= b.top || a.top >= b.bottom);
+}
+
+function tourClamp(n, min, max){
+  return Math.max(min, Math.min(max, n));
+}
+
+function tourPositionCard(rect){
+  if (!tourCardEl || !rect) return;
+  var vw = window.innerWidth || document.documentElement.clientWidth || 0;
+  var vh = window.innerHeight || document.documentElement.clientHeight || 0;
+  var margin = 10;
+  var spacing = 14;
+  var maxCardW = Math.min(380, Math.max(220, vw - margin*2));
+
+  try{
+    tourCardEl.style.width = Math.round(maxCardW) + 'px';
+    tourCardEl.style.maxWidth = Math.max(220, vw - margin*2) + 'px';
+    tourCardEl.style.maxHeight = 'none';
+    tourCardEl.style.left = margin + 'px';
+    tourCardEl.style.top = margin + 'px';
+    tourCardEl.style.bottom = 'auto';
+  }catch(e){}
+
+  var actualW = maxCardW;
+  var actualH = 220;
+  try{
+    var cr = tourCardEl.getBoundingClientRect();
+    if (cr.width) actualW = Math.min(cr.width, vw - margin*2);
+    if (cr.height) actualH = Math.min(cr.height, vh - margin*2);
+  }catch(e){}
+
+  var forbidden = {
+    left: Math.max(margin, rect.left - spacing),
+    top: Math.max(margin, rect.top - spacing),
+    right: Math.min(vw - margin, rect.right + spacing),
+    bottom: Math.min(vh - margin, rect.bottom + spacing)
+  };
+
+  function buildCandidate(left, top){
+    return {
+      left: tourClamp(left, margin, vw - actualW - margin),
+      top: tourClamp(top, margin, vh - actualH - margin)
+    };
+  }
+
+  var candidates = [
+    buildCandidate(rect.right + spacing, rect.top + (rect.height - actualH)/2),
+    buildCandidate(rect.left - actualW - spacing, rect.top + (rect.height - actualH)/2),
+    buildCandidate(rect.left + (rect.width - actualW)/2, rect.bottom + spacing),
+    buildCandidate(rect.left + (rect.width - actualW)/2, rect.top - actualH - spacing),
+    buildCandidate(vw - actualW - margin, rect.bottom + spacing),
+    buildCandidate(margin, rect.bottom + spacing),
+    buildCandidate(vw - actualW - margin, rect.top - actualH - spacing),
+    buildCandidate(margin, rect.top - actualH - spacing)
+  ];
+
+  var i, cand, candRect, best = null;
+  for (i=0; i<candidates.length; i++){
+    cand = candidates[i];
+    candRect = { left:cand.left, top:cand.top, right:cand.left+actualW, bottom:cand.top+actualH };
+    if (!tourRectsOverlap(candRect, forbidden)){
+      best = cand;
+      break;
+    }
+  }
+
+  if (!best){
+    var topCandidate = buildCandidate((vw - actualW)/2, margin);
+    var topRect = { left:topCandidate.left, top:topCandidate.top, right:topCandidate.left+actualW, bottom:topCandidate.top+actualH };
+    var bottomCandidate = buildCandidate((vw - actualW)/2, vh - actualH - margin);
+    var bottomRect = { left:bottomCandidate.left, top:bottomCandidate.top, right:bottomCandidate.left+actualW, bottom:bottomCandidate.top+actualH };
+
+    if (!tourRectsOverlap(topRect, forbidden)) best = topCandidate;
+    else if (!tourRectsOverlap(bottomRect, forbidden)) best = bottomCandidate;
+    else {
+      var placeAbove = rect.top > (vh / 2);
+      best = buildCandidate((vw - actualW)/2, placeAbove ? margin : (vh - actualH - margin));
+    }
+  }
+
+  tourCardEl.style.bottom = 'auto';
+  tourCardEl.style.left = Math.round(best.left) + 'px';
+  tourCardEl.style.top = Math.round(best.top) + 'px';
+}
+
+function tourApplySpotlight(el, padOverride){
+  if (!tourSpotlightEl) return;
+  if (!el){
+    tourSpotlightEl.style.opacity = '0';
+    return;
+  }
+  var r = el.getBoundingClientRect();
+  var pad = (typeof padOverride === 'number' && isFinite(padOverride)) ? padOverride : 10;
+  var left = Math.max(6, r.left - pad);
+  var top  = Math.max(6, r.top - pad);
+  var width = Math.min((window.innerWidth || 0) - left - 6, r.width + pad*2);
+  var height = Math.min((window.innerHeight || 0) - top - 6, r.height + pad*2);
+  width = Math.max(26, width);
+  height = Math.max(26, height);
+  tourSpotlightEl.style.left = Math.round(left) + 'px';
+  tourSpotlightEl.style.top = Math.round(top) + 'px';
+  tourSpotlightEl.style.width = Math.round(width) + 'px';
+  tourSpotlightEl.style.height = Math.round(height) + 'px';
+  tourSpotlightEl.style.opacity = '1';
+  // Keep UI targets fully clear: update the backdrop "hole" to match the spotlight.
+  try{
+    var cx = left + (width / 2);
+    var cy = top + (height / 2);
+    var rr = (Math.max(width, height) / 2) + 18;
+    tourOverlayEl.style.setProperty('--spot-x', Math.round(cx) + 'px');
+    tourOverlayEl.style.setProperty('--spot-y', Math.round(cy) + 'px');
+    tourOverlayEl.style.setProperty('--spot-r', Math.round(rr) + 'px');
+  }catch(e){}
+  // Update backdrop hole so the target stays fully clear (no dim/blur on the target itself)
+  try{
+    var cx = left + (width / 2);
+    var cy = top + (height / 2);
+    var rr = (Math.max(width, height) / 2) + 18;
+    tourOverlayEl.style.setProperty('--spot-x', Math.round(cx) + 'px');
+    tourOverlayEl.style.setProperty('--spot-y', Math.round(cy) + 'px');
+    tourOverlayEl.style.setProperty('--spot-r', Math.round(rr) + 'px');
+  }catch(e){}
+  tourPositionCard({ left:left, top:top, right:left+width, bottom:top+height, width:width, height:height });
+}
+
+function tourRefreshStepLayout(){
+  if (!__tourState.open) return;
+  var step = tourGetCurrentStep();
+  if (!step) return;
+  var target = tourGetFirstVisibleElement(step.selectors);
+  if (!target && step.fallbackSelectors){
+    target = tourGetFirstVisibleElement(step.fallbackSelectors);
+  }
+  if (!target){
+    tourSpotlightEl.style.opacity = '0';
+    try{
+      tourCardEl.style.left = '12px';
+      tourCardEl.style.top = '12px';
+      tourCardEl.style.bottom = 'auto';
+    }catch(e){}
+    return;
+  }
+  tourApplySpotlight(target, step.spotPad);
+}
+
+function tourRunStep(index){
+  if (!tourOverlayEl) return;
+  if (!__tourState.steps || !__tourState.steps.length) return;
+  var max = __tourState.steps.length - 1;
+  __tourState.stepIndex = Math.max(0, Math.min(max, index));
+  var step = tourGetCurrentStep();
+  if (!step) return;
+
+  try{ if (typeof step.before === 'function') step.before(); }catch(e){}
+
+  if (tourTitleEl) tourTitleEl.innerHTML = step.title || '';
+  if (tourBodyEl) tourBodyEl.innerHTML = step.body || '';
+  if (tourStepEl) tourStepEl.textContent = 'Βήμα ' + (__tourState.stepIndex + 1) + ' από ' + __tourState.steps.length;
+  if (tourPrevBtnEl) tourPrevBtnEl.disabled = (__tourState.stepIndex === 0);
+  if (tourNextBtnEl) tourNextBtnEl.textContent = (__tourState.stepIndex >= max) ? 'Ολοκλήρωση ✓' : 'Επόμενο →';
+
+  var target = tourGetFirstVisibleElement(step.selectors);
+  if (!target && step.fallbackSelectors){
+    target = tourGetFirstVisibleElement(step.fallbackSelectors);
+  }
+  if (target){
+    tourScrollTargetIntoView(target);
+  }
+
+  clearTimeout(__tourState.scrollTimer);
+  __tourState.scrollTimer = setTimeout(function(){
+    tourRefreshStepLayout();
+  }, target ? 210 : 40);
+}
+
+function tourOpen(){
+  if (!tourOverlayEl) return;
+  try{ playTick(); }catch(e){}
+  tourCloseTransientUi();
+  __tourState.steps = tourBuildSteps();
+  __tourState.open = true;
+  __tourState.stepIndex = 0;
+  document.body.classList.add('gg-tour-active');
+  tourOverlayEl.classList.add('is-open');
+  tourOverlayEl.setAttribute('aria-hidden','false');
+  tourRunStep(0);
+}
+
+function tourClose(){
+  if (!tourOverlayEl) return;
+  __tourState.open = false;
+  clearTimeout(__tourState.scrollTimer);
+  tourOverlayEl.classList.remove('is-open');
+  tourOverlayEl.setAttribute('aria-hidden','true');
+  document.body.classList.remove('gg-tour-active');
+  if (tourSpotlightEl) tourSpotlightEl.style.opacity = '0';
+  try{ tourEnsureLeaderboardClosed(); }catch(e){}
+}
+
+function tourNext(){
+  if (!__tourState.open) return;
+  var step = tourGetCurrentStep();
+  if (step && typeof step.after === 'function'){
+    try{ step.after(); }catch(e){}
+  }
+  if (__tourState.stepIndex >= (__tourState.steps.length - 1)){
+    try{ playTick(); }catch(e){}
+    tourClose();
+    return;
+  }
+  try{ playTick(); }catch(e){}
+  tourRunStep(__tourState.stepIndex + 1);
+}
+
+function tourPrev(){
+  if (!__tourState.open || __tourState.stepIndex <= 0) return;
+  try{ playTick(); }catch(e){}
+  tourRunStep(__tourState.stepIndex - 1);
+}
+
+if (tourBtnEl){
+  tourBtnEl.addEventListener('click', function(){
+    tourOpen();
+  });
+}
+if (tourPrevBtnEl){
+  tourPrevBtnEl.addEventListener('click', tourPrev);
+}
+if (tourNextBtnEl){
+  tourNextBtnEl.addEventListener('click', tourNext);
+}
+if (tourCloseBtnEl){
+  tourCloseBtnEl.addEventListener('click', function(){
+    try{ playTick(); }catch(e){}
+    tourClose();
+  });
+}
+if (tourCloseBtn2El){
+  tourCloseBtn2El.addEventListener('click', function(){
+    try{ playTick(); }catch(e){}
+    tourClose();
+  });
+}
+if (tourOverlayEl){
+  tourOverlayEl.addEventListener('click', function(e){
+    if (!e) return;
+    if (e.target === tourOverlayEl || (e.target && e.target.classList && e.target.classList.contains('gg-tour-backdrop'))){
+      tourClose();
+    }
+  });
+}
+window.addEventListener('resize', function(){
+  if (!__tourState.open) return;
+  clearTimeout(__tourState.scrollTimer);
+  __tourState.scrollTimer = setTimeout(tourRefreshStepLayout, 40);
+});
+window.addEventListener('scroll', function(){
+  if (!__tourState.open) return;
+  clearTimeout(__tourState.scrollTimer);
+  __tourState.scrollTimer = setTimeout(tourRefreshStepLayout, 25);
+}, true);
+document.addEventListener('keydown', function(e){
+  if (!__tourState.open) return;
+  if (e.key === 'Escape'){
+    e.preventDefault();
+    tourClose();
+  } else if (e.key === 'ArrowRight' || e.key === 'Enter'){
+    e.preventDefault();
+    tourNext();
+  } else if (e.key === 'ArrowLeft'){
+    e.preventDefault();
+    tourPrev();
+  }
+});
 
 
   </script>
