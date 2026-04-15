@@ -1,6 +1,15 @@
 <!doctype html>
 <html lang="el">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-82ZVK4FDWT"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-82ZVK4FDWT');
+</script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="color-scheme" content="light dark" />
@@ -1356,10 +1365,6 @@ html{
   <link rel="preconnect" href="https://itunes.apple.com" crossorigin />
 
 </head>
-
-<!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-82ZVK4FDWT"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-82ZVK4FDWT'); </script>
-
-
 <body>
 <a class="skip" href="#main">Πήγαινε στο περιεχόμενο</a>
 
@@ -1712,21 +1717,7 @@ html{
           <h3>Πίνακας Κατάταξης</h3>
           <p>Δες το TOP 10 και τη θέση σου. Ένα επιπλέον κίνητρο για συνέπεια στη μελέτη.</p>
         </div>
-      
-        <div class="card feature reveal">
-                  <div class="icon" aria-hidden="true">👁️</div>
-                  <h3>Επίδειξη εφαρμογής</h3>
-                  <p>
-                    Άνοιξε ένα ζωντανό demo και <b>πάτησε το κουμπί «Ξενάγηση»</b> μέσα στην εφαρμογή.
-                  </p>
-                  <div class="featureActions">
-                    <button class="btn primary js-open-iframe" type="button"
-                            data-iframe-src="EmAppDemo.html"
-                            data-iframe-title="Επίδειξη εφαρμογής Ηλεκτρομαγνητισμός Γυμνασίου">
-                      Επίδειξη εφαρμογής
-                    </button>
-                  </div>
-                </div>
+
 </div>
       </div>
     </div>
@@ -1759,7 +1750,7 @@ html{
         <div class="card feature reveal">
           <div class="icon" aria-hidden="true">🧪</div>
           <h3>Έξυπνα Τεστ</h3>
-          <p>Έλεγξε αμέσως την επίδοση σου. Το αποτέλεσμα εμφανίζεται άμεσα! (Δες Επίδειξη Εφαρμογής)</p>
+          <p>Έλεγξε αμέσως την επίδοση σου. Το αποτέλεσμα εμφανίζεται άμεσα!</p>
         </div>
         <div class="card feature reveal">
           <div class="icon" aria-hidden="true">🧾</div>
@@ -2162,6 +2153,51 @@ html{
   window.addEventListener('orientationchange', syncTopbar);
   requestAnimationFrame(syncTopbar);
 
+  // -----------------------------
+  // Prevent unexpected "jump to top" (history/resize quirks)
+  // -----------------------------
+  try{ if('scrollRestoration' in history) history.scrollRestoration = 'manual'; }catch(_){}
+  let _lastUserTs = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+  let _lastStableY = window.scrollY || window.pageYOffset || 0;
+  let _programmaticUntil = 0;
+
+  function markUserInput(){
+    _lastUserTs = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+  }
+  function markProgrammatic(ms){
+    const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+    _programmaticUntil = now + (Number(ms) || 900);
+  }
+
+  ['pointerdown','touchstart','wheel','keydown'].forEach(ev=>{
+    window.addEventListener(ev, markUserInput, {capture:true, passive:true});
+  });
+
+  window.addEventListener('scroll', ()=>{
+    const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+    if(now < _programmaticUntil) return;
+
+    const y = window.scrollY || window.pageYOffset || 0;
+
+    // If we suddenly end up at the top WITHOUT recent user input,
+    // keep the previous stable value so we can restore it.
+    if(y <= 2 && _lastStableY > 200 && (now - _lastUserTs) > 250) return;
+
+    _lastStableY = y;
+  }, {passive:true});
+
+  // Periodic safety net: restore if an unexpected jump to top happens.
+  setInterval(()=>{
+    const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+    if(now < _programmaticUntil) return;
+
+    const y = window.scrollY || window.pageYOffset || 0;
+    if(y <= 2 && _lastStableY > 200 && (now - _lastUserTs) > 350){
+      markProgrammatic(700);
+      try{ window.scrollTo({top: _lastStableY, behavior: 'auto'}); }catch(_){ window.scrollTo(0, _lastStableY); }
+    }
+  }, 450);
+
 
   // -----------------------------
   // Mobile menu
@@ -2202,6 +2238,7 @@ html{
     const topH = (topbar && topbar.offsetHeight) ? topbar.offsetHeight : 64;
     const pad = getAnchorPad();
     const y = targetEl.getBoundingClientRect().top + window.pageYOffset - topH - pad;
+    markProgrammatic(smooth ? 1200 : 500);
     window.scrollTo({ top: Math.max(0, y), behavior: smooth ? 'smooth' : 'auto' });
   }
   // Intercept internal hash links and apply precise offset
@@ -2222,7 +2259,7 @@ html{
     syncTopbar();
     scrollToAnchor(el, true);
     // Update URL hash without the browser's default jump
-    history.pushState(null, '', '#' + encodeURIComponent(id));
+    try{ history.replaceState(null, '', '#' + encodeURIComponent(id)); }catch(_){ location.hash = encodeURIComponent(id); }
   }, true);
 
   // If the page loads with a hash, re-apply offset after the topbar height is known
@@ -2233,7 +2270,7 @@ html{
     if(!el) return;
     syncTopbar();
     // Next frame, after layout settles
-    requestAnimationFrame(()=> scrollToAnchor(el, false));
+    requestAnimationFrame(()=>{ markProgrammatic(500); scrollToAnchor(el, false); });
   });
 
 
@@ -3285,7 +3322,8 @@ payload.message = (payload.message || '').trim();
         document.body.classList.add('modal-open');
 
         // Safety: some browsers may try to adjust scroll when the overlay appears
-        requestAnimationFrame(()=>{ window.scrollTo(0, lastScrollY); });
+        markProgrammatic(500);
+        requestAnimationFrame(()=>{ try{ window.scrollTo({top:lastScrollY, behavior:'auto'}); }catch(_){ window.scrollTo(0, lastScrollY); } });
       }
 
       function closeIframeModal(){
@@ -3293,7 +3331,8 @@ payload.message = (payload.message || '').trim();
         frame.src = 'about:blank';
         document.documentElement.classList.remove('modal-open');
         document.body.classList.remove('modal-open');
-        requestAnimationFrame(()=>{ window.scrollTo(0, lastScrollY); });
+        markProgrammatic(500);
+        requestAnimationFrame(()=>{ try{ window.scrollTo({top:lastScrollY, behavior:'auto'}); }catch(_){ window.scrollTo(0, lastScrollY); } });
       }
 
       // Capture phase to prevent any other click handlers from causing hash jumps
@@ -3471,6 +3510,7 @@ payload.message = (payload.message || '').trim();
       setOpen(willOpen);
       if(willOpen){
         requestAnimationFrame(()=>{
+          markProgrammatic(1400);
           try{ panel.scrollIntoView({behavior:'smooth', block:'start'}); }catch(_){}
           const active = panel.querySelector('.tlYearBtn.is-active');
           if(active){
