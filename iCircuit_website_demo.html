@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="el">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>iCircuit — Demo εφαρμογής για website</title>
+  <style>
+    :root{--accent:#FF7E79;--ink:#625C5C;--line:#ffc0bc;--bg:#fff7f6}
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;font-family:Arial,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:linear-gradient(180deg,#fff,#fff7f6)}
+    body{overflow-x:hidden}
+    .demo-page{width:min(1180px,calc(100% - 28px));margin:0 auto;padding:28px 0 40px}
+    .hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(280px,.9fr);gap:22px;align-items:center;margin-bottom:22px}
+    .hero-card,.info-card,.frame-card{border:1px solid rgba(255,126,121,.25);border-radius:28px;background:rgba(255,255,255,.86);box-shadow:0 20px 60px rgba(15,23,42,.10);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+    .hero-card{padding:28px}
+    .eyebrow{display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(255,126,121,.28);border-radius:999px;background:#fff7f6;color:var(--accent);font-size:12px;font-weight:900;padding:.35rem .7rem;margin-bottom:12px}
+    h1{margin:0 0 10px;color:var(--accent);font-size:clamp(30px,4.2vw,54px);line-height:1.02;letter-spacing:-.04em}
+    .lead{font-size:clamp(15px,1.45vw,18px);line-height:1.55;margin:0 0 18px;color:#6f6262}
+    .cta-row{display:flex;gap:10px;flex-wrap:wrap}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:42px;border-radius:999px;border:1px solid rgba(255,126,121,.35);padding:.62rem 1rem;background:#fff;color:var(--ink);font-weight:900;text-decoration:none}.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}.btn:hover{filter:brightness(.99);transform:translateY(-1px)}
+    .info-card{padding:20px}.info-card h2{margin:0 0 12px;color:var(--accent);font-size:18px}.feature-list{display:grid;gap:12px;margin:0;padding:0;list-style:none}.feature-list li{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:start}.icon{width:34px;height:34px;border-radius:12px;background:#fff0ee;color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:900}.feature-list b{display:block;color:#625C5C;margin-bottom:2px}.feature-list span{font-size:13px;line-height:1.45;color:#7b6d6d}
+    .frame-card{overflow:hidden}.frame-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid rgba(255,126,121,.20);background:linear-gradient(180deg,#fff,#fff7f6)}.frame-head strong{color:var(--accent)}.chips{display:flex;gap:6px;flex-wrap:wrap}.chip{font-size:11px;font-weight:900;color:#8d5753;background:#fff;border:1px solid rgba(255,126,121,.22);border-radius:999px;padding:.22rem .52rem}.iframe-wrap{height:min(78vh,760px);min-height:560px;background:#fff}.iframe-wrap iframe{display:block;width:100%;height:100%;border:0;background:#fff}
+    .iframe-wrap.is-manual{display:flex;align-items:center;justify-content:center;padding:18px;background:linear-gradient(180deg,#fff,#fff7f6)}.demo-placeholder{width:min(640px,100%);padding:26px;border:1px dashed rgba(255,126,121,.38);border-radius:24px;background:rgba(255,255,255,.88);box-shadow:0 18px 50px rgba(15,23,42,.10);text-align:center}.demo-placeholder h2{margin:0 0 8px;color:var(--accent);font-size:22px}.demo-placeholder p{margin:0 0 16px;color:#6f6262;font-size:15px;line-height:1.55;font-weight:700}.trial-card{margin-top:18px;padding:22px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:center}.trial-card h2{margin:0 0 8px;color:var(--accent);font-size:22px}.trial-card p{margin:0;color:#6f6262;line-height:1.55;font-weight:700}.trial-card .btn{white-space:nowrap}
+    .embed-note{margin:14px 0 0;padding:14px 16px;border:1px dashed rgba(255,126,121,.35);border-radius:18px;background:rgba(255,255,255,.72);font-size:13px;line-height:1.5}.embed-note code{background:#fff;border:1px solid rgba(255,126,121,.18);border-radius:8px;padding:.12rem .32rem;color:#625C5C}
+    @media(max-width:860px){.hero{grid-template-columns:1fr}.demo-page{width:min(100% - 20px,1180px);padding-top:16px}.hero-card{padding:22px}.iframe-wrap{height:78vh;min-height:520px}.trial-card{grid-template-columns:1fr}.trial-card .btn{width:max-content;max-width:100%}}
+  </style>
+</head>
+<body>
+  <main class="demo-page">
+    <section class="hero" aria-label="Demo iCircuit">
+      <div class="hero-card">
+        <div class="eyebrow">⚡ iCircuit · Website Demo</div>
+        <h1>Διαδραστικό demo ηλεκτρικών κυκλωμάτων</h1>
+        <p class="lead">Το demo δεν φορτώνει τίποτα αυτόματα. Όταν πατήσεις «Φόρτωση demo», ανοίγει το έτοιμο κύκλωμα «Δύο αντιστάτες σε σειρά» και το φύλλο εργασίας «Σύνδεση δύο αντιστατών σε σειρά: ίδιο ρεύμα και διαίρεση τάσης». Όλα τα υπόλοιπα στοιχεία, φύλλα εργασίας και έτοιμα κυκλώματα παραμένουν ορατά αλλά κλειδωμένα.</p>
+        <div class="cta-row">
+          <a class="btn primary" href="#demo-frame">Μετάβαση στο demo</a>
+          <a class="btn" href="Circuit2DCore_i18n_WEBSITE_DEMO.html?lang=el&demo=1&preset=series2&worksheet=el_two_resistors_series_voltage_share_01&activity=act_simple_lamp" target="_blank" rel="noopener">Άνοιγμα πλήρους οθόνης</a>
+        </div>
+      </div>
+      <aside class="info-card">
+        <h2>Τι περιλαμβάνει</h2>
+        <ul class="feature-list">
+          <li><span class="icon">1</span><span><b>Έτοιμο κύκλωμα</b>Φορτώνεται μόνο όταν ο επισκέπτης πατήσει το κουμπί φόρτωσης.</span></li>
+          <li><span class="icon">2</span><span><b>Φύλλο εργασίας</b>Ανοίγει μετά τη χειροκίνητη φόρτωση το φύλλο για ίδιο ρεύμα στη σειρά και διαίρεση της τάσης.</span></li>
+          <li><span class="icon">3</span><span><b>Κλειδωμένο demo</b>Τα υπόλοιπα στοιχεία, φύλλα εργασίας και έτοιμα κυκλώματα φαίνονται αλλά δεν χρησιμοποιούνται.</span></li>
+          <li><span class="icon">4</span><span><b>Καθαρό website demo</b>Δεν υπάρχει φόρμα ή λειτουργία «Αποστολή απαντήσεων».</span></li>
+        </ul>
+      </aside>
+    </section>
+
+    <section class="frame-card" id="demo-frame">
+      <div class="frame-head">
+        <strong>Ζωντανό demo</strong>
+        <div class="chips"><span class="chip">Δύο αντιστάτες σε σειρά</span><span class="chip">Φύλλο εργασίας</span><span class="chip">Κλειδωμένο demo</span></div>
+      </div>
+      <div class="iframe-wrap is-manual" data-demo-src="Circuit2DCore_i18n_WEBSITE_DEMO.html?lang=el&demo=1&preset=series2&worksheet=el_two_resistors_series_voltage_share_01&activity=act_simple_lamp">
+        <div class="demo-placeholder">
+          <h2>Το demo δεν φορτώνεται αυτόματα</h2>
+          <p>Η εφαρμογή θα ξεκινήσει μόνο όταν πατήσεις το κουμπί. Έτσι η σελίδα παραμένει ελαφριά μέχρι να θελήσεις να δοκιμάσεις την iCircuit.</p>
+          <button class="btn primary" type="button" id="loadDemoBtn">Φόρτωση demo</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="info-card trial-card" aria-label="Περίοδος δοκιμών iCircuit">
+      <div>
+        <h2>Σύντομα ξεκινά περίοδος δοκιμών της iCircuit</h2>
+        <p>Η εφαρμογή ετοιμάζεται για δοκιμαστική περίοδο. Αν θέλεις να ενημερωθείς για το πότε θα ξεκινήσει, κάνε εγγραφή στο website μέσω της φόρμας επικοινωνίας/newsletter.</p>
+      </div>
+      <a class="btn primary" href="iPediaWebSite.html#contact">Εγγραφή μέσω φόρμας</a>
+    </section>
+
+  </main>
+  <script>
+    (function(){
+      const wrap = document.querySelector('.iframe-wrap[data-demo-src]');
+      const btn = document.getElementById('loadDemoBtn');
+      if(!wrap || !btn) return;
+      btn.addEventListener('click', function(){
+        if(wrap.dataset.loaded === '1') return;
+        const src = wrap.getAttribute('data-demo-src');
+        if(!src) return;
+        wrap.dataset.loaded = '1';
+        wrap.classList.remove('is-manual');
+        wrap.innerHTML = '';
+        const iframe = document.createElement('iframe');
+        iframe.title = 'iCircuit website demo';
+        iframe.src = src;
+        iframe.setAttribute('allow', 'clipboard-write; fullscreen');
+        wrap.appendChild(iframe);
+      });
+    })();
+  </script>
+</body>
+</html>

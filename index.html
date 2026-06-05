@@ -235,6 +235,236 @@ html{
         radial-gradient(900px 540px at 20% 85%, rgba(120,170,255,.14), transparent 62%),
         linear-gradient(180deg, rgba(0,0,0,0), rgba(255,255,255,.02));
     }
+
+
+    #icircuit-demo{ --section-bg:
+        radial-gradient(980px 520px at 18% 18%, rgba(255,126,121,.16), transparent 62%),
+        radial-gradient(900px 540px at 84% 78%, rgba(120,170,255,.13), transparent 64%),
+        radial-gradient(760px 460px at 50% 92%, rgba(122,255,208,.06), transparent 68%);
+    }
+
+    .icircuitDescCard{
+      margin-top: 16px;
+      padding: 18px;
+    }
+    .icircuitDescIntro{
+      margin: 0 0 14px;
+      color: rgba(255,255,255,.80);
+      font-size: var(--lead);
+      font-weight: 760;
+    }
+    .icircuitDescIntro p{
+      margin: 0 0 10px;
+    }
+    .icircuitDescIntro p:last-child{
+      margin-bottom: 0;
+    }
+    .icircuitDescGrid{
+      display:grid;
+      gap: 10px;
+    }
+    .icircuitDescItem{
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 18px;
+      background: rgba(0,0,0,.16);
+      overflow: hidden;
+    }
+    .icircuitDescItem summary{
+      list-style: none;
+      cursor: pointer;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 14px;
+      padding: 14px 14px;
+      font-weight: 950;
+      color: rgba(255,255,255,.94);
+      letter-spacing:.1px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .icircuitDescItem summary::-webkit-details-marker{
+      display:none;
+    }
+    .icircuitDescItem summary::after{
+      content:"+";
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      flex: 0 0 auto;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--accent);
+      font-weight: 950;
+      line-height: 1;
+      transition: transform .14s ease, background .14s ease, border-color .14s ease;
+    }
+    .icircuitDescItem[open] summary{
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+    }
+    .icircuitDescItem[open] summary::after{
+      content:"−";
+      transform: rotate(180deg);
+      background: rgba(255,126,121,.14);
+      border-color: rgba(255,126,121,.35);
+    }
+    .icircuitDescBody{
+      padding: 14px;
+      color: rgba(255,255,255,.78);
+      font-weight: 740;
+    }
+    .icircuitDescBody p{
+      margin: 0 0 10px;
+    }
+    .icircuitDescBody p:last-child{
+      margin-bottom: 0;
+    }
+    .icircuitDescBody ul{
+      margin: 10px 0 0;
+      padding-left: 20px;
+    }
+    .icircuitDescBody li{
+      margin: 6px 0;
+    }
+
+    .icircuitDemoCard{
+      margin-top: 16px;
+      padding: 0;
+      overflow: hidden;
+    }
+    .icircuitDemoIntro{
+      display:grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items:center;
+      padding: 18px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+    }
+    .icircuitDemoIntro h3{
+      margin: 0 0 6px;
+      font-size: 20px;
+      letter-spacing:.1px;
+    }
+    .icircuitDemoIntro p{
+      margin:0;
+      color: rgba(255,255,255,.78);
+      font-weight: 700;
+    }
+    .icircuitDemoActions{
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      gap:10px;
+    }
+    .icircuitDemoChips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      padding: 0 18px 16px;
+    }
+    .icircuitDemoChips .chip{
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      color: rgba(255,255,255,.82);
+      font-size:12px;
+      font-weight:900;
+      white-space:nowrap;
+    }
+    .icircuitDemoFrame{
+      height: min(78vh, 760px);
+      min-height: 560px;
+      background:#fff;
+      border-top: 1px solid rgba(255,255,255,.10);
+    }
+    .icircuitDemoFrame iframe{
+      display:block;
+      width:100%;
+      height:100%;
+      border:0;
+      background:#fff;
+    }
+    .icircuitDemoFrameLazy{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+    }
+    .icircuitDemoPlaceholder{
+      width:min(640px, 100%);
+      border: 1px dashed rgba(255,126,121,.35);
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,247,246,.88));
+      color: #625C5C;
+      padding: 24px;
+      text-align:center;
+      box-shadow: 0 18px 50px rgba(15,23,42,.10);
+    }
+    .icircuitDemoPlaceholder h4{
+      margin:0 0 8px;
+      color: var(--accent);
+      font-size: 20px;
+      letter-spacing:.1px;
+    }
+    .icircuitDemoPlaceholder p{
+      margin:0 0 16px;
+      color:#6f6262;
+      font-weight:760;
+      line-height:1.55;
+    }
+    .icircuitDemoPlaceholder .btn{
+      color: rgba(255,255,255,.94);
+    }
+    .icircuitTrialCard{
+      margin-top: 16px;
+      padding: 18px;
+      display:grid;
+      grid-template-columns:minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items:center;
+    }
+    .icircuitTrialCard h3{
+      margin:0 0 8px;
+      color: rgba(255,255,255,.95);
+      font-size: 20px;
+      letter-spacing:.1px;
+    }
+    .icircuitTrialCard p{
+      margin:0;
+      color: rgba(255,255,255,.78);
+      font-weight:740;
+      line-height:1.55;
+    }
+    .icircuitTrialCard .btn{
+      white-space:nowrap;
+    }
+    @media (max-width: 820px){
+      .icircuitTrialCard{
+        grid-template-columns:1fr;
+      }
+      .icircuitTrialCard .btn{
+        width:max-content;
+        max-width:100%;
+      }
+    }
+    @media (max-width: 820px){
+      .icircuitDemoIntro{
+        grid-template-columns:1fr;
+      }
+      .icircuitDemoActions{
+        justify-content:flex-start;
+      }
+      .icircuitDemoFrame{
+        height:78vh;
+        min-height:520px;
+      }
+    }
+
     #content{ --section-bg:
         radial-gradient(980px 520px at 20% 22%, rgba(122,255,208,.10), transparent 62%),
         radial-gradient(980px 520px at 85% 70%, rgba(255,126,121,.12), transparent 62%);
@@ -1599,6 +1829,10 @@ html{
               <span>Ολοκλήρωση περιεχομένου & σταθερότητα σε κινητό/τάμπλετ (Play Store). Στείλτε μας ένα μήνυμα μέσω της φόρμας επικονωνίας για να σας ενημερώσουμε για το πότε θα είναι διαθέσιμη για κατέβασμα.</span>
             </div>
             <div class="nowItem">
+              <b><span class="chip chip-has-ico"><img class="chip-ico" src="https://img.icons8.com/?size=100&id=Qn4GH3u6CYo5&format=png&color=000000" alt="Google Play" loading="lazy" decoding="async"></span> Android εφαρμογή: iCircuit</b>
+              <span>Διαδραστικό εργαστήριο ηλεκτρικών κυκλωμάτων για Android, με φύλλα εργασίας, αποστολές, έτοιμα κυκλώματα και εκπαιδευτικό demo μέσα στο website. Σύντομα θα ξεκινήσει περίοδος δοκιμών.</span>
+            </div>
+            <div class="nowItem">
               <b>🧊 Νέες 3D εφαρμογές</b>
               <span>Περισσότερα μοντέλα, προσομοιώσεις και διαδραστικά πειράματα.</span>
             </div>
@@ -1719,6 +1953,195 @@ html{
         </div>
 
 </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ICIRCUIT DEMO -->
+  <section class="section" id="icircuit-demo">
+    <div class="wrap">
+      <div class="reveal">
+        <h2>iCircuit — Διαδραστικό εργαστήριο ηλεκτρικών κυκλωμάτων στο Android</h2>
+        <div class="card icircuitDescCard">
+          <div class="icircuitDescIntro">
+            <p>
+              Η <b>iCircuit</b> είναι μια διαδραστική εκπαιδευτική Android εφαρμογή για τη μελέτη των ηλεκτρικών κυκλωμάτων, σχεδιασμένη ειδικά για μαθητές και εκπαιδευτικούς. Με απλό και οπτικό τρόπο, ο χρήστης μπορεί να κατασκευάζει κυκλώματα, να συνδέει ηλεκτρικά στοιχεία, να παρατηρεί τη ροή του ρεύματος και να διερευνά βασικές έννοιες του ηλεκτρισμού μέσα από άμεση αλληλεπίδραση.
+            </p>
+            <p>
+              Η εφαρμογή μετατρέπει τη θεωρία των ηλεκτρικών κυκλωμάτων σε ένα ζωντανό ψηφιακό εργαστήριο. Οι μαθητές δεν περιορίζονται στην παθητική παρακολούθηση ενός έτοιμου παραδείγματος, αλλά πειραματίζονται, κάνουν συνδέσεις, ελέγχουν αποτελέσματα και κατανοούν στην πράξη πώς λειτουργεί ένα κύκλωμα.
+            </p>
+            <p>
+              Η iCircuit είναι προσαρμοσμένη στα νέα ελληνικά προγράμματα σπουδών, αλλά και στα προγράμματα σπουδών αγγλόφωνων και ισπανόφωνων σχολείων, ώστε να μπορεί να αξιοποιηθεί σε διαφορετικά εκπαιδευτικά περιβάλλοντα με κοινό άξονα την πειραματική διερεύνηση, τη μοντελοποίηση και την κατανόηση των ηλεκτρικών κυκλωμάτων.
+            </p>
+          </div>
+
+          <div class="icircuitDescGrid" aria-label="Αναπτυσσόμενη περιγραφή iCircuit">
+            <details class="icircuitDescItem">
+              <summary>Τι μπορεί να κάνει ο μαθητής</summary>
+              <div class="icircuitDescBody">
+                <p>
+                  Στην iCircuit ο μαθητής μπορεί να τοποθετεί και να συνδέει βασικά ηλεκτρικά στοιχεία, όπως πηγές τάσης, μπαταρίες, αντιστάτες, λαμπτήρες, διακόπτες και όργανα μέτρησης. Μέσα από την αλληλεπίδραση με τα στοιχεία του κυκλώματος, παρατηρεί πότε ένα κύκλωμα είναι κλειστό ή ανοικτό, πότε διαρρέεται από ηλεκτρικό ρεύμα και πώς επηρεάζονται τα ηλεκτρικά μεγέθη όταν αλλάζει η συνδεσμολογία.
+                </p>
+                <p>
+                  Η εφαρμογή δίνει έμφαση στην κατανόηση και όχι στην απομνημόνευση. Ο μαθητής βλέπει άμεσα τις συνέπειες των επιλογών του: αν μια σύνδεση είναι λανθασμένη, το κύκλωμα δεν λειτουργεί σωστά· αν η σύνδεση είναι σωστή, μπορεί να προχωρήσει σε παρατηρήσεις, μετρήσεις και συμπεράσματα.
+                </p>
+              </div>
+            </details>
+
+            <details class="icircuitDescItem">
+              <summary>Φύλλα εργασίας και αποστολές</summary>
+              <div class="icircuitDescBody">
+                <p>
+                  Η iCircuit δεν είναι απλώς ένας ελεύθερος καμβάς κυκλωμάτων. Περιλαμβάνει οργανωμένα φύλλα εργασίας και αποστολές, ώστε η διερεύνηση να γίνεται με σαφή παιδαγωγική καθοδήγηση.
+                </p>
+                <p>
+                  Κάθε φύλλο εργασίας οδηγεί τον μαθητή βήμα προς βήμα σε μια συγκεκριμένη έννοια ή συνδεσμολογία. Για παράδειγμα, ο μαθητής μπορεί να μελετήσει τη σύνδεση δύο αντιστατών σε σειρά, να διαπιστώσει ότι το ρεύμα είναι ίδιο σε όλα τα σημεία του κυκλώματος και να παρατηρήσει πώς μοιράζεται η τάση στους αντιστάτες.
+                </p>
+                <p>
+                  Οι αποστολές λειτουργούν ως σύντομες εκπαιδευτικές προκλήσεις. Ο μαθητής καλείται να ολοκληρώσει έναν συγκεκριμένο στόχο, να κατασκευάσει το σωστό κύκλωμα ή να ερμηνεύσει τα αποτελέσματα των μετρήσεων.
+                </p>
+              </div>
+            </details>
+
+            <details class="icircuitDescItem">
+              <summary>Προσαρμογή σε προγράμματα σπουδών</summary>
+              <div class="icircuitDescBody">
+                <p>
+                  Η iCircuit έχει σχεδιαστεί ώστε να υποστηρίζει τη διδασκαλία των ηλεκτρικών κυκλωμάτων με βάση τα νέα ελληνικά προγράμματα σπουδών, δίνοντας έμφαση στη διερεύνηση, στη σύνδεση θεωρίας και πειράματος, στη χρήση μετρήσεων και στην εξαγωγή συμπερασμάτων από τον ίδιο τον μαθητή.
+                </p>
+                <p>
+                  Παράλληλα, η δομή της εφαρμογής, τα φύλλα εργασίας και το πολυγλωσσικό περιβάλλον της είναι προσαρμοσμένα και σε προγράμματα σπουδών αγγλόφωνων και ισπανόφωνων σχολείων. Έτσι, η ίδια εφαρμογή μπορεί να χρησιμοποιηθεί σε ελληνικά, αγγλικά και ισπανικά εκπαιδευτικά περιβάλλοντα, χωρίς να χάνεται η παιδαγωγική συνοχή.
+                </p>
+              </div>
+            </details>
+
+            <details class="icircuitDescItem">
+              <summary>Έτοιμα κυκλώματα για άμεση διερεύνηση</summary>
+              <div class="icircuitDescBody">
+                <p>
+                  Η εφαρμογή περιλαμβάνει έτοιμα κυκλώματα που βοηθούν τον μαθητή να ξεκινήσει γρήγορα τη διερεύνηση, χωρίς να χρειάζεται κάθε φορά να κατασκευάζει το κύκλωμα από την αρχή.
+                </p>
+                <p>
+                  Τα έτοιμα κυκλώματα μπορούν να χρησιμοποιηθούν από τον εκπαιδευτικό για επίδειξη στην τάξη ή από τον μαθητή για ατομική εξάσκηση. Έτσι, η εφαρμογή λειτουργεί τόσο ως εργαλείο διδασκαλίας όσο και ως περιβάλλον προσωπικής μελέτης.
+                </p>
+              </div>
+            </details>
+
+            <details class="icircuitDescItem">
+              <summary>Εκπαιδευτική αξία</summary>
+              <div class="icircuitDescBody">
+                <p>
+                  Η <b>iCircuit</b> δεν περιορίζεται στην απλή κατασκευή ενός κυκλώματος. Λειτουργεί ως ολοκληρωμένο ψηφιακό εργαστήριο, όπου ο μαθητής μπορεί να διερευνά ηλεκτρικά και ηλεκτρομαγνητικά φαινόμενα, να αλλάζει παραμέτρους, να παίρνει μετρήσεις και να συνδέει τη θεωρία με την παρατήρηση.
+                </p>
+                <p>Οι βασικές δυνατότητες και οι έννοιες που υποστηρίζει η εφαρμογή περιλαμβάνουν:</p>
+                <ul>
+                  <li><b>Κατασκευή κυκλωμάτων:</b> τοποθέτηση, μετακίνηση και σύνδεση ηλεκτρικών στοιχείων πάνω σε καμβά.</li>
+                  <li><b>Ανοικτό και κλειστό κύκλωμα:</b> έλεγχος της συνέχειας του κυκλώματος, λειτουργία διακόπτη και άμεση παρατήρηση του αποτελέσματος.</li>
+                  <li><b>Ηλεκτρικές πηγές:</b> χρήση μπαταρίας και ηλεκτρικής πηγής, μελέτη πολικότητας και τροφοδότησης κυκλώματος.</li>
+                  <li><b>Ένταση ηλεκτρικού ρεύματος:</b> παρατήρηση της ροής του ρεύματος και σύνδεση της έντασης με τη λειτουργία των στοιχείων.</li>
+                  <li><b>Ηλεκτρική τάση:</b> μελέτη διαφοράς δυναμικού σε πηγές, αντιστάτες και επιμέρους τμήματα κυκλώματος.</li>
+                  <li><b>Αντίσταση και νόμος του Ohm:</b> διερεύνηση της σχέσης τάσης, έντασης και αντίστασης σε απλά και σύνθετα κυκλώματα.</li>
+                  <li><b>Σύνδεση σε σειρά:</b> ίδιο ρεύμα στα στοιχεία, διαίρεση της τάσης και υπολογισμός ισοδύναμης αντίστασης.</li>
+                  <li><b>Παράλληλη σύνδεση:</b> ίδια τάση στους κλάδους, διαίρεση του ρεύματος και σύγκριση με τη σύνδεση σε σειρά.</li>
+                  <li><b>Όργανα μέτρησης:</b> χρήση αμπερομέτρου και βολτομέτρου με σωστή συνδεσμολογία και ερμηνεία ενδείξεων.</li>
+                  <li><b>Ρυθμιστική αντίσταση:</b> μετακίνηση του δρομέα Δ και παρατήρηση της μεταβολής του ρεύματος στο κύκλωμα.</li>
+                  <li><b>Λαμπτήρες και καταναλωτές:</b> σύνδεση λαμπτήρα, ανεμιστήρα, θερμικών συσκευών και άλλων καταναλωτών, ώστε ο μαθητής να συνδέει τα ηλεκτρικά μεγέθη με ορατά αποτελέσματα.</li>
+                  <li><b>Ηλεκτρική ισχύς και ενέργεια:</b> σύνδεση της λειτουργίας των συσκευών με την τάση, το ρεύμα, την αντίσταση και την κατανάλωση ενέργειας.</li>
+                  <li><b>Βραχυκύκλωμα και ασφάλεια:</b> αναγνώριση λανθασμένων συνδέσεων, επικίνδυνων διαδρομών ρεύματος και βασικών κανόνων ηλεκτρικής ασφάλειας.</li>
+                  <li><b>Πυκνωτής και δίοδος:</b> εισαγωγή σε βασικά ηλεκτρονικά στοιχεία και στη διαφορετική συμπεριφορά τους μέσα στο κύκλωμα.</li>
+                  <li><b>Συνεχές και εναλλασσόμενο ρεύμα:</b> διάκριση DC και AC, μελέτη εναλλασσόμενης τάσης και παρατήρηση της επίδρασής τους σε κυκλώματα.</li>
+                  <li><b>Πηνίο και ηλεκτρομαγνήτης:</b> σύνδεση ηλεκτρικού ρεύματος με μαγνητικά φαινόμενα και διερεύνηση της δράσης του ηλεκτρομαγνήτη.</li>
+                  <li><b>Πυξίδα και μαγνητικό πεδίο:</b> οπτική διερεύνηση της αλληλεπίδρασης ρεύματος, πηνίου, ηλεκτρομαγνήτη και μαγνητικής βελόνας.</li>
+                  <li><b>Μετασχηματιστής:</b> διερεύνηση της σχέσης πηνίων, εναλλασσόμενης τάσης και μεταβολής της τάσης σε απλοποιημένο εκπαιδευτικό μοντέλο.</li>
+                  <li><b>Δύναμη Laplace:</b> σύνδεση ρευματοφόρου αγωγού, μαγνητικού πεδίου και μηχανικής κίνησης.</li>
+                  <li><b>Δύναμη Lorentz:</b> εισαγωγή στη δύναμη που ασκείται σε κινούμενο φορτίο μέσα σε μαγνητικό πεδίο.</li>
+                  <li><b>Στατικός ηλεκτρισμός:</b> σημειακά φορτία, πρόσημο φορτίου, μονάδες φορτίου, ηλεκτρική δύναμη και οπτική αναπαράσταση ηλεκτρικών αλληλεπιδράσεων.</li>
+                  <li><b>Έτοιμα κυκλώματα:</b> άμεση φόρτωση ενδεικτικών συνδεσμολογιών για γρήγορη επίδειξη, σύγκριση και διερεύνηση.</li>
+                  <li><b>Φύλλα εργασίας:</b> καθοδηγούμενη διερεύνηση με βήματα, στόχους, παρατηρήσεις και συμπεράσματα.</li>
+                  <li><b>Αποστολές:</b> σύντομες εκπαιδευτικές προκλήσεις που ζητούν από τον μαθητή να κατασκευάσει, να ελέγξει ή να ερμηνεύσει ένα κύκλωμα.</li>
+                  <li><b>Πολυγλωσσικό περιβάλλον:</b> υποστήριξη ελληνικών, αγγλικών και ισπανικών, ώστε η εφαρμογή να μπορεί να αξιοποιηθεί σε διαφορετικά εκπαιδευτικά περιβάλλοντα.</li>
+                </ul>
+                <p>
+                  Η ύλη μπορεί να αξιοποιηθεί κλιμακωτά: στη <b>Γ΄ Γυμνασίου</b> για βασικά κυκλώματα, ρεύμα, τάση, αντίσταση, όργανα μέτρησης και εισαγωγή στα ηλεκτρομαγνητικά φαινόμενα· στη <b>Β΄ Λυκείου</b> για ποσοτική μελέτη κυκλωμάτων, συνδεσμολογίες, ισχύ, ενέργεια, ρυθμιστική αντίσταση και ηλεκτρονικά στοιχεία· και στη <b>Γ΄ Λυκείου</b> για ηλεκτρομαγνητισμό, πηνία, μετασχηματιστή, δύναμη Laplace, δύναμη Lorentz και συσχέτιση ηλεκτρικών και μαγνητικών φαινομένων.
+                </p>
+                <p>
+                  Η οπτικοποίηση, η άμεση ανατροφοδότηση, οι μετρήσεις και η δυνατότητα πειραματισμού κάνουν την iCircuit ιδιαίτερα χρήσιμη τόσο για διδασκαλία στην τάξη όσο και για προσωπική μελέτη στο σπίτι.
+                </p>
+              </div>
+            </details>
+
+            <details class="icircuitDescItem">
+              <summary>Για τον εκπαιδευτικό</summary>
+              <div class="icircuitDescBody">
+                <p>
+                  Ο εκπαιδευτικός μπορεί να αξιοποιήσει την iCircuit ως ψηφιακό εργαστήριο μέσα στην τάξη. Μπορεί να παρουσιάσει κυκλώματα στον διαδραστικό πίνακα, να καθοδηγήσει τους μαθητές μέσα από φύλλα εργασίας, να θέσει ερωτήματα διερεύνησης και να οργανώσει μικρές δραστηριότητες κατανόησης.
+                </p>
+                <p>
+                  Η εφαρμογή είναι κατάλληλη για εισαγωγή νέων εννοιών, για εμπέδωση, για επανάληψη, αλλά και για αξιολόγηση της κατανόησης των μαθητών μέσα από πρακτικές αποστολές.
+                </p>
+              </div>
+            </details>
+
+            <details class="icircuitDescItem">
+              <summary>Για τον μαθητή</summary>
+              <div class="icircuitDescBody">
+                <p>
+                  Ο μαθητής μπορεί να μάθει μέσα από δοκιμή, παρατήρηση και διόρθωση. Αντί να βλέπει μόνο ένα σχεδιάγραμμα στο βιβλίο, μπορεί να αλληλεπιδρά με το κύκλωμα, να αλλάζει στοιχεία, να ελέγχει συνδέσεις και να ανακαλύπτει ο ίδιος τους βασικούς κανόνες λειτουργίας.
+                </p>
+                <p>
+                  Η iCircuit ενισχύει την αυτενέργεια, την παρατηρητικότητα και τη φυσική σκέψη. Ο μαθητής δεν μαθαίνει απλώς τι συμβαίνει, αλλά κατανοεί γιατί συμβαίνει.
+                </p>
+              </div>
+            </details>
+
+            <details class="icircuitDescItem">
+              <summary>Ένα σύγχρονο εργαλείο για τη Φυσική</summary>
+              <div class="icircuitDescBody">
+                <p>
+                  Με την iCircuit, η μελέτη των ηλεκτρικών κυκλωμάτων γίνεται πιο καθαρή, πιο προσιτή και πιο ενδιαφέρουσα. Η εφαρμογή συνδυάζει την ακρίβεια της Φυσικής με τη δύναμη της διαδραστικής τεχνολογίας, προσφέροντας ένα σύγχρονο περιβάλλον μάθησης για το σχολείο και το σπίτι.
+                </p>
+                <p>
+                  Η iCircuit αποτελεί μέρος της φιλοσοφίας των iPedia Interactive Books: η γνώση δεν παρουσιάζεται απλώς ως κείμενο, αλλά ζωντανεύει μέσα από προσομοιώσεις, δραστηριότητες και ψηφιακά εργαλεία που βοηθούν τον μαθητή να κατανοήσει βαθύτερα τις έννοιες της Φυσικής.
+                </p>
+              </div>
+            </details>
+          </div>
+        </div>
+      </div>
+
+      <div class="card icircuitDemoCard reveal">
+        <div class="icircuitDemoIntro">
+          <div>
+            <h3>Ζωντανό demo της iCircuit</h3>
+          </div>
+          <div class="icircuitDemoActions">
+            <a class="btn" href="iCircuit_website_demo.html" target="_blank" rel="noopener">Άνοιγμα πλήρους οθόνης</a>
+            <button class="btn primary js-open-iframe" type="button"
+                    data-iframe-src="Circuit2DCore_i18n_WEBSITE_DEMO.html?lang=el&amp;demo=1&amp;preset=series2&amp;worksheet=el_two_resistors_series_voltage_share_01&amp;activity=act_simple_lamp"
+                    data-iframe-title="iCircuit — demo ηλεκτρικών κυκλωμάτων">
+              Άνοιγμα σε παράθυρο
+            </button>
+          </div>
+        </div>
+ 
+        <div class="icircuitDemoFrame icircuitDemoFrameLazy" data-demo-src="Circuit2DCore_i18n_WEBSITE_DEMO.html?lang=el&amp;demo=1&amp;preset=series2&amp;worksheet=el_two_resistors_series_voltage_share_01&amp;activity=act_simple_lamp">
+          <div class="icircuitDemoPlaceholder">
+            <h4>Το demo δεν φορτώνεται αυτόματα</h4>
+            <p>Για ταχύτερη φόρτωση της σελίδας, η προσομοίωση της iCircuit θα ξεκινήσει μόνο όταν το επιλέξεις.</p>
+            <button class="btn primary js-load-icircuit-demo" type="button">Φόρτωση demo</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card icircuitTrialCard reveal" id="icircuit-trials">
+        <div>
+          <h3>Σύντομα ξεκινά περίοδος δοκιμών της iCircuit</h3>
+          <p>
+Όσοι επισκέπτες ενδιαφέρονται να ενημερωθούν για το πότε θα ξεκινήσει η δοκιμαστική περίοδος της εφαρμογής, μπορούν να εγγραφούν μέσω της φόρμας του website και να λάβουν σχετική ενημέρωση μόλις ανοίξει η διαδικασία συμμετοχής. Οι συμμετέχοντες θα έχουν την ευκαιρία να αποκτήσουν, απολύτως δωρεάν, πρώιμη, πλήρη πρόσβαση.
+          </p>
+        </div>
+        <a class="btn primary" href="#contact">Εγγραφή μέσω φόρμας</a>
       </div>
     </div>
   </section>
@@ -3299,6 +3722,32 @@ payload.message = (payload.message || '').trim();
     });
   })();
 
+
+    // --- Manual loading for the embedded iCircuit demo ---
+    (function(){
+      function loadDemo(frameWrap){
+        if(!frameWrap || frameWrap.dataset.loaded === '1') return;
+        const src = frameWrap.getAttribute('data-demo-src');
+        if(!src) return;
+        frameWrap.dataset.loaded = '1';
+        frameWrap.classList.remove('icircuitDemoFrameLazy');
+        frameWrap.innerHTML = '';
+        const iframe = document.createElement('iframe');
+        iframe.title = 'iCircuit website demo';
+        iframe.src = src;
+        iframe.loading = 'lazy';
+        iframe.setAttribute('allow', 'clipboard-write; fullscreen');
+        frameWrap.appendChild(iframe);
+      }
+
+      document.addEventListener('click', (e)=>{
+        const btn = e.target.closest('.js-load-icircuit-demo');
+        if(!btn) return;
+        e.preventDefault();
+        const frameWrap = btn.closest('.icircuitDemoFrame');
+        loadDemo(frameWrap);
+      });
+    })();
 
     // --- Iframe modal (Δείγμα) ---
     (function(){
