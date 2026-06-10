@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="el">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Πανελλήνιες Φυσικής 2026 — Διαδραστική ανάλυση θεμάτων | iPedia</title>
+  <meta name="description" content="Διαδραστική ανάλυση των θεμάτων Φυσικής Πανελληνίων 2026: γρήγορη εικόνα, χάρτης ύλης και εκπαιδευτικός σχολιασμός ανά θέμα." />
+  <style>
+    :root{
+      --accent:#FF7E79;
+      --accent2:#ffb199;
+      --ink:#1f2430;
+      --muted:#667085;
+      --bg:#fff8f6;
+      --card:#ffffffcc;
+      --line:#f0d9d5;
+      --shadow:0 18px 50px rgba(55,35,30,.14);
+      --radius:24px;
+      --green:#16a34a;
+      --blue:#2563eb;
+      --orange:#ea580c;
+      --red:#dc2626;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at 10% 5%, rgba(255,126,121,.22), transparent 28%),
+        radial-gradient(circle at 90% 10%, rgba(255,177,153,.26), transparent 30%),
+        linear-gradient(180deg,#fff 0%,var(--bg) 48%,#fff 100%);
+      min-height:100vh;
+    }
+    .wrap{width:min(1180px,calc(100% - 32px));margin:auto;padding:28px 0 56px}
+    .hero{
+      position:relative;overflow:hidden;border:1px solid var(--line);border-radius:32px;padding:42px;
+      background:linear-gradient(135deg,rgba(255,255,255,.92),rgba(255,248,246,.78));box-shadow:var(--shadow)
+    }
+    .hero:after{content:"";position:absolute;right:-80px;top:-80px;width:260px;height:260px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));opacity:.16}
+    .eyebrow{display:inline-flex;gap:8px;align-items:center;padding:8px 12px;border-radius:999px;background:#fff;border:1px solid var(--line);font-weight:800;color:#9a3412;font-size:13px}
+    h1{font-size:clamp(34px,5vw,64px);line-height:1.02;margin:18px 0 14px;letter-spacing:-.045em}
+    .sub{font-size:clamp(17px,2.2vw,22px);line-height:1.55;color:var(--muted);max-width:920px;margin:0}
+    .hero-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:22px;margin-top:28px;align-items:stretch}
+    .score-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:0 10px 35px rgba(55,35,30,.08)}
+    .score-card h2,.section h2{margin:0 0 12px;font-size:26px;letter-spacing:-.02em}
+    .meter{height:16px;border-radius:999px;background:#f5e6e2;overflow:hidden;margin:16px 0 8px}
+    .bar{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--green),#facc15,var(--red));width:68%}
+    .pill-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+    .pill{border:1px solid var(--line);background:#fff;padding:9px 12px;border-radius:999px;font-weight:750;color:#3f3f46;font-size:14px}
+    .section{margin-top:28px;background:var(--card);border:1px solid var(--line);border-radius:32px;padding:28px;box-shadow:0 14px 42px rgba(55,35,30,.08);backdrop-filter:blur(14px)}
+    .lead{color:var(--muted);font-size:17px;line-height:1.6;margin:0 0 20px;max-width:none}
+    .quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+    .quick{background:#fff;border:1px solid var(--line);border-radius:22px;padding:18px;min-height:160px;position:relative;overflow:hidden}
+    .quick b{font-size:19px;display:block;margin-bottom:8px}.quick p{margin:0;color:var(--muted);line-height:1.45}.tag{display:inline-block;margin-top:14px;font-size:12px;font-weight:900;padding:7px 10px;border-radius:999px;background:#fff0ee;color:#b42318}
+    .map{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .concept{background:#fff;border:1px solid var(--line);border-radius:22px;padding:18px;transition:.22s transform,.22s box-shadow;cursor:default}
+    .concept:hover{transform:translateY(-3px);box-shadow:0 14px 32px rgba(55,35,30,.12)}
+    .concept .grade{font-size:12px;font-weight:900;color:#9a3412;text-transform:uppercase;letter-spacing:.05em}.concept h3{margin:8px 0 8px;font-size:20px}.concept p{margin:0;color:var(--muted);line-height:1.5}
+    .themes{display:grid;gap:14px}.theme{background:#fff;border:1px solid var(--line);border-radius:24px;overflow:hidden}.theme button{width:100%;border:0;background:transparent;padding:20px 22px;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:16px;cursor:pointer;color:var(--ink)}
+    .theme-title{display:flex;align-items:center;gap:14px}.badge{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;color:#fff;font-weight:950;box-shadow:0 9px 20px rgba(255,126,121,.25)}
+    .theme h3{margin:0;font-size:22px}.theme small{display:block;color:var(--muted);font-weight:700;margin-top:4px}.chev{font-size:24px;color:var(--accent);transition:.2s transform}.theme.open .chev{transform:rotate(45deg)}
+    .theme-body{display:none;padding:0 22px 22px}.theme.open .theme-body{display:block}.analysis-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.box{border:1px solid #f1dfdb;border-radius:18px;padding:14px;background:#fffafa}.box strong{display:block;margin-bottom:8px;color:#9a3412}.box p{margin:0;color:var(--muted);line-height:1.45}
+    .cta{display:flex;gap:18px;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#2a2324,#5b3431);color:#fff;border-radius:30px;padding:28px;margin-top:28px;box-shadow:var(--shadow)}.cta p{margin:0;color:#ffe7e2;line-height:1.55}.btn{display:inline-flex;align-items:center;justify-content:center;padding:13px 18px;border-radius:999px;background:#fff;color:#9a3412;text-decoration:none;font-weight:900;white-space:nowrap}.sources{font-size:13px;color:var(--muted);line-height:1.6}.sources a{color:#9a3412;font-weight:800;text-decoration:none}
+    @media(max-width:900px){.hero{padding:28px}.hero-grid,.quick-grid,.map,.analysis-grid{grid-template-columns:1fr}.cta{display:block}.btn{margin-top:16px}.wrap{width:min(100% - 20px,1180px)}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero" id="top">
+      <span class="eyebrow">iPedia Interactive Books • Επίκαιρη εκπαιδευτική ανάλυση</span>
+      <h1>Πανελλήνιες Φυσικής 2026</h1>
+      <p class="sub">Μια καθαρή, διαδραστική παρουσίαση των φετινών θεμάτων: τι εξέτασαν, ποια ύλη ενεργοποίησαν και πού φάνηκε η ουσιαστική κατανόηση της Φυσικής.</p>
+      <div class="hero-grid">
+        <article class="score-card">
+          <h2>Συνολική εικόνα</h2>
+          <p class="lead">Τα θέματα είχαν σαφή διατύπωση και κλιμακούμενη δυσκολία. Η βασική διαβάθμιση μεταφέρθηκε κυρίως στο Θέμα Δ, ενώ το Θέμα Γ έφερε στο προσκήνιο τη Σύγχρονη Φυσική.</p>
+          <div class="meter" aria-label="Ενδεικτική δυσκολία"><div class="bar"></div></div>
+          <div class="pill-row">
+            <span class="pill">Σαφείς διατυπώσεις</span><span class="pill">Κλιμακούμενη δυσκολία</span><span class="pill">Σύγχρονη Φυσική</span><span class="pill">Συνδυαστικό Θέμα Δ</span>
+          </div>
+        </article>
+        <article class="score-card">
+          <h2>Εκπαιδευτικά συμπεράσματα</h2>
+          <p class="lead">Οι Πανελλήνιες 2026 επιβεβαίωσαν ότι η επιτυχία στη Φυσική δεν βασίζεται μόνο στην απομνημόνευση τύπων. Οι μαθητές χρειάστηκε να ερμηνεύσουν φαινόμενα, να συνδέσουν διαφορετικά κεφάλαια της ύλης και να εφαρμόσουν θεμελιώδεις αρχές σε νέες καταστάσεις. Η κατανόηση των φυσικών εννοιών αποδείχθηκε σημαντικότερη από τη μηχανική εφαρμογή σχέσεων.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="overview">
+      <h2>1. Γρήγορη εικόνα θεμάτων</h2>
+      <p class="lead">Η παρακάτω σύνοψη δίνει άμεσα στον μαθητή, στον γονέα και στον εκπαιδευτικό το προφίλ κάθε θέματος.</p>
+      <div class="quick-grid">
+        <article class="quick"><b>Θέμα Α</b><p>Θεωρία, βασικές αναγνωρίσεις και ερωτήσεις χωρίς ιδιαίτερες παγίδες για καλά προετοιμασμένους μαθητές.</p><span class="tag">Χαμηλή δυσκολία</span></article>
+        <article class="quick"><b>Θέμα Β</b><p>Εννοιολογική εφαρμογή από διαφορετικά κεφάλαια: στροφορμή, στάσιμο κύμα, εναλλασσόμενο ρεύμα και κρούση.</p><span class="tag">Χαμηλή–μέτρια</span></article>
+        <article class="quick"><b>Θέμα Γ</b><p>Σύγχρονη Φυσική: φαινόμενο Compton και φωτοηλεκτρικό φαινόμενο, με ανάγκη προσοχής στις σχέσεις και στα μεγέθη.</p><span class="tag">Μέτρια</span></article>
+        <article class="quick"><b>Θέμα Δ</b><p>Συνδυαστικό θέμα με ηλεκτρομαγνητική επαγωγή, ταλάντωση, ενεργειακή προσέγγιση και θερμότητα Joule.</p><span class="tag">Διαβαθμισμένο</span></article>
+      </div>
+    </section>
+
+    <section class="section" id="map">
+      <h2>2. Χάρτης ύλης</h2>
+      <p class="lead">Οι έννοιες οργανώνονται ως θεματικός χάρτης, ώστε ο επισκέπτης να βλέπει αμέσως ποιες περιοχές της ύλης ενεργοποιήθηκαν.</p>
+      <div class="map">
+        <article class="concept"><span class="grade">Μηχανική στερεού</span><h3>Στροφορμή</h3><p>Έλεγχος εννοιολογικής κατανόησης και εφαρμογής διατήρησης/μεταβολής στροφορμής.</p></article>
+        <article class="concept"><span class="grade">Ταλαντώσεις & κύματα</span><h3>Στάσιμο κύμα</h3><p>Σχέση δεσμών, κοιλιών, μήκους κύματος και συχνότητας.</p></article>
+        <article class="concept"><span class="grade">Ηλεκτρισμός</span><h3>Εναλλασσόμενο ρεύμα</h3><p>Ενεργές τιμές, χρονικές μεταβολές και μαθηματική περιγραφή κυκλωμάτων.</p></article>
+        <article class="concept"><span class="grade">Κρούσεις</span><h3>Ορμή & ενέργεια</h3><p>Σύνδεση μοντέλων κρούσης με επιλογή κατάλληλων αρχών διατήρησης.</p></article>
+        <article class="concept"><span class="grade">Σύγχρονη Φυσική</span><h3>Compton + φωτοηλεκτρικό</h3><p>Φωτόνιο, ενέργεια, ορμή, μήκος κύματος και εξίσωση Einstein.</p></article>
+        <article class="concept"><span class="grade">Ηλεκτρομαγνητισμός</span><h3>Επαγωγή + Joule</h3><p>Επαγόμενη ΗΕΔ, ρεύμα, ταλάντωση και μετατροπές ενέργειας σε θερμότητα.</p></article>
+      </div>
+    </section>
+
+    <section class="section" id="analysis">
+      <h2>3. Ανάλυση ανά θέμα</h2>
+      <p class="lead">Κάθε κάρτα ανοίγει και παρουσιάζει τέσσερα επίπεδα ανάγνωσης: τι εξέταζε, τι απαιτούσε, πού δυσκόλευε και ποιο είναι το εκπαιδευτικό σχόλιο.</p>
+      <div class="themes">
+        <article class="theme open">
+          <button type="button" aria-expanded="true"><span class="theme-title"><span class="badge">Α</span><span><h3>Θέμα Α</h3><small>Θεωρία και βασικές αναγνωρίσεις</small></span></span><span class="chev">+</span></button>
+          <div class="theme-body"><div class="analysis-grid">
+            <div class="box"><strong>Τι εξέταζε</strong><p>Βασικές θεωρητικές γνώσεις και γρήγορη αναγνώριση φυσικών προτάσεων.</p></div>
+            <div class="box"><strong>Τι απαιτούσε</strong><p>Καθαρή γνώση ορισμών, σχέσεων και συμπερασμάτων από το σχολικό βιβλίο.</p></div>
+            <div class="box"><strong>Πού δυσκόλευε</strong><p>Κυρίως σε λεπτές διατυπώσεις, όχι σε σύνθετους υπολογισμούς.</p></div>
+            <div class="box"><strong>Σχόλιο iPedia</strong><p>Ιδανικό για γρήγορη διάγνωση θεωρητικών κενών πριν από σύνθετες ασκήσεις.</p></div>
+          </div></div>
+        </article>
+        <article class="theme">
+          <button type="button" aria-expanded="false"><span class="theme-title"><span class="badge">Β</span><span><h3>Θέμα Β</h3><small>Εννοιολογικές εφαρμογές από διαφορετικά κεφάλαια</small></span></span><span class="chev">+</span></button>
+          <div class="theme-body"><div class="analysis-grid">
+            <div class="box"><strong>Τι εξέταζε</strong><p>Στροφορμή, στάσιμο κύμα, εναλλασσόμενο ρεύμα και κρούση.</p></div>
+            <div class="box"><strong>Τι απαιτούσε</strong><p>Επιλογή της σωστής αρχής ή σχέσης χωρίς να χάνεται η φυσική εικόνα.</p></div>
+            <div class="box"><strong>Πού δυσκόλευε</strong><p>Στη γρήγορη διάκριση ανάμεσα σε παρόμοιες έννοιες και μοντέλα.</p></div>
+            <div class="box"><strong>Σχόλιο iPedia</strong><p>Δείχνει γιατί η διαδραστική αναπαράσταση βοηθά τον μαθητή να συνδέει κεφάλαια.</p></div>
+          </div></div>
+        </article>
+        <article class="theme">
+          <button type="button" aria-expanded="false"><span class="theme-title"><span class="badge">Γ</span><span><h3>Θέμα Γ</h3><small>Σύγχρονη Φυσική: Compton και φωτοηλεκτρικό</small></span></span><span class="chev">+</span></button>
+          <div class="theme-body"><div class="analysis-grid">
+            <div class="box"><strong>Τι εξέταζε</strong><p>Μεταβολή μήκους κύματος κατά Compton και φωτοηλεκτρική εξίσωση του Einstein.</p></div>
+            <div class="box"><strong>Τι απαιτούσε</strong><p>Σύνδεση ενέργειας φωτονίου, ορμής, έργου εξαγωγής και κινητικής ενέργειας ηλεκτρονίων.</p></div>
+            <div class="box"><strong>Πού δυσκόλευε</strong><p>Στη σωστή διαχείριση σταθερών, μονάδων και σχέσεων χωρίς μηχανική αποστήθιση.</p></div>
+            <div class="box"><strong>Σχόλιο iPedia</strong><p>Η Σύγχρονη Φυσική χρειάζεται οπτικοποίηση μικροσκοπικών φαινομένων για βαθύτερη κατανόηση.</p></div>
+          </div></div>
+        </article>
+        <article class="theme">
+          <button type="button" aria-expanded="false"><span class="theme-title"><span class="badge">Δ</span><span><h3>Θέμα Δ</h3><small>Συνδυαστικό και διαβαθμισμένο</small></span></span><span class="chev">+</span></button>
+          <div class="theme-body"><div class="analysis-grid">
+            <div class="box"><strong>Τι εξέταζε</strong><p>Ηλεκτρομαγνητική επαγωγή, ταλάντωση, ενεργειακή ανάλυση και θερμότητα Joule.</p></div>
+            <div class="box"><strong>Τι απαιτούσε</strong><p>Σύνθεση πολλών εννοιών σε ενιαίο φυσικό μοντέλο και προσεκτική αλληλουχία βημάτων.</p></div>
+            <div class="box"><strong>Πού δυσκόλευε</strong><p>Στη μετάβαση από το ηλεκτρομαγνητικό μέρος στο μηχανικό/ενεργειακό κομμάτι.</p></div>
+            <div class="box"><strong>Σχόλιο iPedia</strong><p>Εδώ φαίνεται η αξία των προσομοιώσεων: ο μαθητής βλέπει τις μετατροπές ενέργειας, όχι μόνο τύπους.</p></div>
+          </div></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="cta" id="ipedia">
+      <div><h2>Η Φυσική γίνεται πιο καθαρή όταν γίνεται διαδραστική.</h2><p>Η iPedia σχεδιάζει διαδραστικά βιβλία και εφαρμογές που μετατρέπουν την ύλη σε οπτική εμπειρία, με προσομοιώσεις, 3D μοντέλα και οργανωμένα φύλλα εργασίας.</p></div>
+      <a class="btn" href="#contact">Ζητήστε παρουσίαση</a>
+    </section>
+
+    <section class="section sources" id="sources">
+      <h2>Πηγές σχολιασμού</h2>
+      <p>Το περιεχόμενο βασίζεται σε δημόσιους σχολιασμούς και αναρτήσεις για τα θέματα Φυσικής ΓΕΛ 2026, όπως η Ένωση Ελλήνων Φυσικών, το esos/σχολιασμοί εκπαιδευτικών φορέων και δημοσιεύσεις εκπαιδευτικών ειδησεογραφικών μέσων.</p>
+      <p><a href="https://www.eef.gr/articles/fysiki-panellinies-2026-themata-apantiseis" target="_blank" rel="noopener">Ένωση Ελλήνων Φυσικών</a> · <a href="https://www.esos.gr/arthra/99494/ta-themata-stin-fysiki-ton-panelladikon-exetaseon-meta-ts-10-pm" target="_blank" rel="noopener">esos</a> · <a href="https://www.ertnews.gr/eidiseis/panelladikes-2026-ta-themata-se-istoria-fysiki-kai-oikonomia-sxoliasmos-kai-apantiseis-apo-tin-oefe/" target="_blank" rel="noopener">ΕΡΤ / ΟΕΦΕ</a></p>
+    </section>
+  </main>
+  <script>
+    document.querySelectorAll('.theme button').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const card=btn.closest('.theme');
+        const isOpen=card.classList.toggle('open');
+        btn.setAttribute('aria-expanded',String(isOpen));
+      });
+    });
+  </script>
+</body>
+</html>

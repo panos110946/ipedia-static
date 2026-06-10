@@ -13,8 +13,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="color-scheme" content="light dark" />
-  <title>iPedia Interactive Books — Διαδραστικά βιβλία και εφαρμογές</title>
-  <meta name="description" content="iPedia Interactive Books — σύγχρονος εκδοτικός οίκος διαδραστικών Multi‑touch eBooks για Apple Books και Google Play." />
+  <title>iPedia Interactive Books — Διαδραστικά βιβλία, εφαρμογές και ανάλυση Πανελληνίων Φυσικής</title>
+  <meta name="description" content="iPedia Interactive Books — διαδραστικά βιβλία και εκπαιδευτικές εφαρμογές Φυσικής για Apple Books, Android και Web. Δες και τη διαδραστική ανάλυση των θεμάτων Φυσικής στις Πανελλήνιες 2026." />
+  <meta name="keywords" content="iPedia, διαδραστικά βιβλία Φυσικής, Πανελλήνιες Φυσικής 2026, θέματα Φυσικής 2026, λύσεις Φυσικής 2026, στατιστικά Πανελληνίων Φυσικής, iCircuit, Φυσική Γυμνασίου, Φυσική Λυκείου" />
   <style>
     :root{
       --accent:#FF7E79;
@@ -236,6 +237,49 @@ html{
         linear-gradient(180deg, rgba(0,0,0,0), rgba(255,255,255,.02));
     }
 
+
+
+    #panellinies-fysiki{ --section-bg:
+        radial-gradient(980px 520px at 16% 16%, rgba(255,126,121,.16), transparent 62%),
+        radial-gradient(900px 540px at 84% 76%, rgba(120,170,255,.13), transparent 64%),
+        radial-gradient(760px 460px at 50% 92%, rgba(255,177,153,.08), transparent 68%);
+    }
+    .panelliniesCard{ margin-top:16px; padding:0; overflow:hidden; }
+    .panelliniesIntro{
+      display:grid; grid-template-columns:minmax(0,1fr) auto; gap:14px; align-items:center;
+      padding:18px; border-bottom:1px solid rgba(255,255,255,.10);
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+    }
+    .panelliniesIntro h3{ margin:0 0 6px; font-size:20px; letter-spacing:.1px; }
+    .panelliniesIntro p{ margin:0; color:rgba(255,255,255,.78); font-weight:740; line-height:1.55; }
+    .panelliniesActions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+    .panelliniesSeoGrid{ display:grid; grid-template-columns:1fr; gap:16px; margin-top:16px; }
+    .panelliniesSeoCard{ padding:20px; width:100%; grid-column:1 / -1; }
+    .panelliniesSeoCard h3{ margin:0 0 10px; font-size:19px; }
+    .panelliniesSeoCard p{ margin:0 0 10px; color:rgba(255,255,255,.78); font-weight:730; line-height:1.62; }
+    .panelliniesSeoCard p:last-child{ margin-bottom:0; }
+    .panelliniesKeywords{ display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+    .panelliniesKeywords a, .panelliniesKeywords span{
+      display:inline-flex; align-items:center; padding:8px 10px; border-radius:999px;
+      background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
+      color:rgba(255,255,255,.84); text-decoration:none; font-size:12px; font-weight:900;
+    }
+    .panelliniesFaq{ margin-top:16px; display:grid; gap:10px; }
+    .panelliniesFaq details{
+      border:1px solid rgba(255,255,255,.12); border-radius:18px; background:rgba(0,0,0,.16); overflow:hidden;
+    }
+    .panelliniesFaq summary{
+      list-style:none; cursor:pointer; padding:14px; font-weight:950; display:flex; justify-content:space-between; gap:14px;
+    }
+    .panelliniesFaq summary::-webkit-details-marker{ display:none; }
+    .panelliniesFaq summary::after{ content:"+"; color:var(--accent); font-weight:950; }
+    .panelliniesFaq details[open] summary{ background:rgba(255,255,255,.05); border-bottom:1px solid rgba(255,255,255,.10); }
+    .panelliniesFaq details[open] summary::after{ content:"−"; }
+    .panelliniesFaq div{ padding:14px; color:rgba(255,255,255,.78); font-weight:730; line-height:1.58; }
+    @media (max-width:820px){
+      .panelliniesIntro, .panelliniesSeoGrid{ grid-template-columns:1fr; }
+      .panelliniesActions{ justify-content:flex-start; }
+    }
 
     #icircuit-demo{ --section-bg:
         radial-gradient(980px 520px at 18% 18%, rgba(255,126,121,.16), transparent 62%),
@@ -1549,15 +1593,15 @@ html{
   <meta property="og:locale" content="el_GR" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="iPedia Interactive Books" />
-  <meta property="og:title" content="iPedia Interactive Books — Διαδραστικά βιβλία και εφαρμογές" />
-  <meta property="og:description" content="iPedia Interactive Books — σύγχρονος εκδοτικός οίκος διαδραστικών Multi‑touch eBooks για Apple Books και Google Play." />
+  <meta property="og:title" content="iPedia Interactive Books — Διαδραστικά βιβλία και Πανελλήνιες Φυσικής 2026" />
+  <meta property="og:description" content="Διαδραστικά βιβλία Φυσικής, εκπαιδευτικές εφαρμογές και ειδική διαδραστική ανάλυση των θεμάτων Φυσικής στις Πανελλήνιες 2026." />
   <meta property="og:url" content="https://www.ipedia.online/" />
   <meta property="og:image" content="https://www.ipedia.online/ipediaNw.png" />
   <meta property="og:image:alt" content="iPedia Interactive Books" />
 
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="iPedia Interactive Books — Διαδραστικά βιβλία και εφαρμογές" />
-  <meta name="twitter:description" content="iPedia Interactive Books — σύγχρονος εκδοτικός οίκος διαδραστικών Multi‑touch eBooks για Apple Books και Google Play." />
+  <meta name="twitter:title" content="iPedia Interactive Books — Πανελλήνιες Φυσικής 2026 & διαδραστικά βιβλία" />
+  <meta name="twitter:description" content="Εξερεύνησε διαδραστικά τα θέματα Φυσικής 2026, δες στατιστικά προηγούμενων ετών και γνώρισε τα βιβλία και τις εφαρμογές της iPedia." />
   <meta name="twitter:image" content="https://www.ipedia.online/ipediaNw.png" />
 
   <script type="application/ld+json">
@@ -1582,6 +1626,51 @@ html{
         "name": "iPedia Interactive Books",
         "url": "https://www.ipedia.online/",
         "inLanguage": "el-GR"
+      }
+    ]
+  }
+  </script>
+
+
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Article",
+        "headline": "Πανελλήνιες Φυσικής 2026 — Διαδραστική ανάλυση θεμάτων και στατιστικών",
+        "description": "Διαδραστική ανάλυση των θεμάτων Φυσικής στις Πανελλήνιες 2026 με χάρτη ύλης, σχολιασμό ανά θέμα, στατιστικά προηγούμενων ετών και σύγκριση βαθμολογίας.",
+        "inLanguage": "el-GR",
+        "author": { "@type": "Organization", "name": "iPedia Interactive Books" },
+        "publisher": { "@type": "Organization", "name": "iPedia Interactive Books", "logo": { "@type": "ImageObject", "url": "https://www.ipedia.online/ipediaNw.png" } },
+        "mainEntityOfPage": "https://www.ipedia.online/#panellinies-fysiki",
+        "about": ["Πανελλήνιες Φυσικής 2026", "Θέματα Φυσικής", "Στατιστικά βαθμολογιών", "Φυσική Γ Λυκείου"]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Τι περιλαμβάνει η διαδραστική ανάλυση των θεμάτων Φυσικής 2026;",
+            "acceptedAnswer": { "@type": "Answer", "text": "Περιλαμβάνει γρήγορη εικόνα των θεμάτων, χάρτη εξεταστέας ύλης, σχολιασμό ανά θέμα και εργαλείο σύγκρισης βαθμολογίας με προηγούμενες χρονιές." }
+          },
+          {
+            "@type": "Question",
+            "name": "Ποιες ενότητες της Φυσικής εμφανίζονται στην ανάλυση;",
+            "acceptedAnswer": { "@type": "Answer", "text": "Η ανάλυση αναφέρεται σε ενότητες όπως στροφορμή, στάσιμα κύματα, εναλλασσόμενο ρεύμα, κρούσεις, σύγχρονη Φυσική, φωτοηλεκτρικό φαινόμενο, φαινόμενο Compton, ηλεκτρομαγνητική επαγωγή και ταλαντώσεις." }
+          },
+          {
+            "@type": "Question",
+            "name": "Μπορώ να συγκρίνω τη βαθμολογία μου με προηγούμενα έτη;",
+            "acceptedAnswer": { "@type": "Answer", "text": "Ναι. Ο μαθητής μπορεί να εισάγει τον βαθμό του και να δει μια εκπαιδευτική εκτίμηση της επίδοσής του σε σχέση με τις κατανομές βαθμολογιών προηγούμενων ετών." }
+          },
+          {
+            "@type": "Question",
+            "name": "Σε ποιους απευθύνεται το εργαλείο;",
+            "acceptedAnswer": { "@type": "Answer", "text": "Απευθύνεται σε μαθητές, γονείς και εκπαιδευτικούς που θέλουν μια καθαρή εικόνα των θεμάτων Φυσικής στις Πανελλήνιες 2026 και της δυσκολίας τους." }
+          }
+        ]
       }
     ]
   }
@@ -1616,6 +1705,7 @@ html{
       <nav aria-label="Κύρια πλοήγηση">
         <a href="#top">Για εμάς</a>
         <a href="#play-structure">Play Store</a>
+        <a href="#panellinies-fysiki">Πανελλήνιες 2026</a>
         <a href="#content">Περιεχόμενο</a>
         <a href="#applebooks">Apple Books</a>
         <a href="#youtube">YouTube</a>
@@ -1629,6 +1719,7 @@ html{
   <div class="drawer" id="drawer" aria-label="Μενού κινητού">
     <a href="#top">Για εμάς</a>
     <a href="#play-structure">Δομή Play Store</a>
+    <a href="#panellinies-fysiki">Πανελλήνιες 2026</a>
     <a href="#content">Περιεχόμενο</a>
     <a href="#sketchfab">3D Αποθετήριο</a>
     <a href="#applebooks">Apple Books</a>
@@ -1843,6 +1934,80 @@ html{
           </div>
           </div>
         </div>
+      </div>
+    </div>
+  </section>
+
+
+
+  <!-- PANELLINIES FYSIKI 2026 -->
+  <section class="section" id="panellinies-fysiki">
+    <div class="wrap">
+      <div class="reveal">
+        <h2>Πανελλήνιες 2026 — Φυσική</h2>
+        <p class="lead">
+          Πόσο απαιτητικά ήταν τα φετινά θέματα; Ποιες ενότητες εξετάστηκαν; Και πώς συγκρίνεται η δική σου επίδοση με τα αποτελέσματα των τελευταίων ετών;
+        </p>
+      </div>
+
+      <div class="card panelliniesCard reveal">
+        <div class="panelliniesIntro">
+          <div>
+            <h3>Διαδραστική ανάλυση θεμάτων</h3>
+            <p>
+              Δες τη συνολική εικόνα των θεμάτων, τον χάρτη της ύλης, την ανάλυση ανά θέμα και τη σύγκριση της βαθμολογίας σου με προηγούμενες χρονιές.
+            </p>
+          </div>
+          <div class="panelliniesActions">
+            <button class="btn primary js-open-iframe" type="button"
+                    data-iframe-src="panellinies_fysiki_2026_ipedia.html"
+                    data-iframe-title="Πανελλήνιες Φυσικής 2026 — Διαδραστική ανάλυση">
+              🚀 Εξερεύνησε τα θέματα
+            </button>
+            <a class="btn js-request-presentation" href="#contact" data-message="Θα ήθελα να ζητήσω παρουσίαση για την εφαρμογή Πανελλήνιες Φυσικής 2026.">Ζητήστε παρουσίαση</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="panelliniesSeoGrid">
+        <article class="card panelliniesSeoCard reveal">
+          <h3>Σύντομη ανάλυση θεμάτων Φυσικής Πανελληνίων 2026</h3>
+          <p>
+            Η σύντομη ανάλυση για τα <b>θέματα Φυσικής Πανελληνίων 2026</b> συγκεντρώνει σε ένα καθαρό περιβάλλον τη γρήγορη εικόνα των θεμάτων, τον χάρτη της εξεταστέας ύλης και τον εκπαιδευτικό σχολιασμό ανά θέμα. Ο μαθητής μπορεί να δει ποιες ενότητες εξετάστηκαν, πού χρειαζόταν άμεση εφαρμογή τύπων και πού απαιτούνταν βαθύτερη φυσική κατανόηση των φαινομένων.
+          </p>
+
+          <p>
+            Το εργαλείο σύγκρισης βαθμολογίας βοηθά τον μαθητή να εισάγει τον βαθμό του και να δει σε ποια περιοχή επίδοσης βρίσκεται σε σχέση με τις κατανομές προηγούμενων ετών. Η σύγκριση δεν αντικαθιστά τα επίσημα στατιστικά, αλλά προσφέρει μια άμεση, εκπαιδευτική εικόνα της επίδοσης και της δυσκολίας του μαθήματος μέσα στον χρόνο.
+          </p>
+          <div class="panelliniesKeywords" aria-label="Σχετικές αναζητήσεις">
+            <span>θέματα Φυσικής 2026</span>
+            <span>λύσεις Φυσικής 2026</span>
+            <span>Πανελλήνιες Φυσική</span>
+            <span>στατιστικά βαθμολογιών</span>
+            <span>Φυσική Γ΄ Λυκείου</span>
+          </div>
+        </article>
+
+
+      </div>
+
+      <div class="panelliniesFaq reveal" aria-label="Συχνές ερωτήσεις για Πανελλήνιες Φυσικής 2026">
+        <details>
+          <summary>Τι περιλαμβάνει η διαδραστική ανάλυση των θεμάτων Φυσικής 2026;</summary>
+          <div>Περιλαμβάνει γρήγορη εικόνα των θεμάτων, χάρτη εξεταστέας ύλης, σχολιασμό ανά θέμα και εργαλείο σύγκρισης βαθμολογίας με προηγούμενες χρονιές.</div>
+        </details>
+        <details>
+          <summary>Ποιες ενότητες της Φυσικής εμφανίζονται στην ανάλυση;</summary>
+          <div>Η ανάλυση αναφέρεται σε ενότητες όπως στροφορμή, στάσιμα κύματα, εναλλασσόμενο ρεύμα, κρούσεις, σύγχρονη Φυσική, φωτοηλεκτρικό φαινόμενο, φαινόμενο Compton, ηλεκτρομαγνητική επαγωγή και ταλαντώσεις.</div>
+        </details>
+        <details>
+          <summary>Μπορώ να συγκρίνω τη βαθμολογία μου με προηγούμενα έτη;</summary>
+          <div>Ναι. Ο μαθητής μπορεί να εισάγει τον βαθμό του και να δει μια εκπαιδευτική εκτίμηση της επίδοσής του σε σχέση με τις κατανομές βαθμολογιών προηγούμενων ετών.</div>
+        </details>
+        <details>
+          <summary>Σε ποιους απευθύνεται το εργαλείο;</summary>
+          <div>Απευθύνεται σε μαθητές, γονείς και εκπαιδευτικούς που θέλουν μια καθαρή εικόνα των θεμάτων Φυσικής στις Πανελλήνιες 2026 και της δυσκολίας τους.</div>
+        </details>
       </div>
     </div>
   </section>
@@ -3722,6 +3887,41 @@ payload.message = (payload.message || '').trim();
     });
   })();
 
+
+
+
+    // --- Request presentation from Πανελλήνιες Φυσικής 2026 card/app ---
+    (function(){
+      function requestPresentation(message){
+        try{ if(typeof window.closeIediaIframeModal === 'function') window.closeIediaIframeModal(); }catch(_){}
+        const contact = document.getElementById('contact');
+        const msg = document.getElementById('message');
+        if(msg && message && !msg.value.trim()) msg.value = message;
+        if(contact){
+          closeDrawer();
+          syncTopbar();
+          scrollToAnchor(contact, true);
+          try{ history.replaceState(null, '', '#contact'); }catch(_){}
+        }
+        setTimeout(()=>{
+          const name = document.getElementById('name');
+          if(name) name.focus({preventScroll:true});
+        }, 650);
+      }
+
+      document.addEventListener('click', (e)=>{
+        const reqBtn = e.target.closest('.js-request-presentation');
+        if(!reqBtn) return;
+        e.preventDefault();
+        requestPresentation(reqBtn.getAttribute('data-message') || 'Θα ήθελα να ζητήσω παρουσίαση.');
+      });
+
+      window.addEventListener('message', (event)=>{
+        const data = event && event.data;
+        if(!data || data.type !== 'ipedia-request-presentation') return;
+        requestPresentation('Θα ήθελα να ζητήσω παρουσίαση για την εφαρμογή Πανελλήνιες Φυσικής 2026.');
+      });
+    })();
 
     // --- Manual loading for the embedded iCircuit demo ---
     (function(){
