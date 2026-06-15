@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>iPedia Interactive Physics Ebooks | Kickstarter Campaign</title>
+  <meta name="description" content="iPedia has already created interactive physics ebooks in Greek, available on Apple Books. Now we are preparing English editions for students, teachers, and curious learners around the world." />
+  <link rel="canonical" href="https://ipedia.online/kickstarter/" />
+  <meta property="og:title" content="iPedia Interactive Physics Ebooks — From Greece to the World" />
+  <meta property="og:description" content="Greek interactive physics ebooks already exist on Apple Books. Help us bring them to the English-speaking world through Kickstarter." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://ipedia.online/kickstarter/" />
+  <meta property="og:image" content="https://ipedia.online/ipediaNw.png" />
+  <meta name="theme-color" content="#0b1224" />
+
+  <!--
+    INSTALLATION
+    1. Upload the full /kickstarter/ folder to your site.
+    2. Keep index.html and the /assets/ folder together.
+    3. Final URL: https://ipedia.online/kickstarter/
+    4. Ebook covers/previews are loaded live from Apple's public iTunes lookup API with a graceful fallback.
+    5. Connect the signup form to Mailchimp / Brevo / ConvertKit / your backend before launch.
+  -->
+
+  <style>
+    :root{
+      --bg:#07111f;
+      --bg2:#0b1628;
+      --panel:rgba(255,255,255,.075);
+      --panel2:rgba(255,255,255,.105);
+      --text:#f6f8fb;
+      --muted:#b8c3d6;
+      --soft:#dbe5f5;
+      --brand:#ff9500;
+      --brand2:#38bdf8;
+      --ok:#4ade80;
+      --line:rgba(255,255,255,.16);
+      --shadow:0 22px 70px rgba(0,0,0,.35);
+      --radius:24px;
+      --max:1180px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 20% -10%, rgba(56,189,248,.26), transparent 38%),
+        radial-gradient(circle at 80% 10%, rgba(255,149,0,.18), transparent 34%),
+        linear-gradient(180deg, #07111f 0%, #0b1628 52%, #07111f 100%);
+      line-height:1.6;
+    }
+
+    a{color:inherit;text-decoration:none}
+    img{max-width:100%;display:block}
+    .wrap{width:min(var(--max), calc(100% - 36px)); margin-inline:auto}
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:30;
+      backdrop-filter:blur(18px);
+      background:rgba(7,17,31,.76);
+      border-bottom:1px solid var(--line);
+    }
+    .nav{
+      height:72px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-weight:850;
+      letter-spacing:.2px;
+    }
+    .brand img{width:42px;height:42px;border-radius:12px}
+    .navlinks{display:flex;gap:18px;align-items:center;color:var(--muted);font-size:.95rem}
+    .navlinks a:hover{color:var(--text)}
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      min-height:46px;
+      padding:12px 18px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      color:var(--text);
+      background:rgba(255,255,255,.06);
+      font-weight:750;
+      transition:transform .18s ease, background .18s ease, border .18s ease;
+    }
+    .btn:hover{transform:translateY(-2px);background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.28)}
+    .btn.primary{background:linear-gradient(135deg, var(--brand), #ffd166); color:#1b1200; border-color:transparent; box-shadow:0 16px 40px rgba(255,149,0,.24)}
+    .btn.blue{background:linear-gradient(135deg, #38bdf8, #8b5cf6); color:white; border-color:transparent}
+    .btn.small{min-height:38px;padding:8px 13px;font-size:.9rem}
+
+    .hero{padding:86px 0 64px; position:relative; overflow:hidden}
+    .heroGrid{display:grid;grid-template-columns:1.05fr .95fr;gap:46px;align-items:center}
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:9px;
+      padding:8px 12px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      color:var(--soft);
+      background:rgba(255,255,255,.07);
+      font-weight:750;
+      font-size:.92rem;
+    }
+    .dot{width:9px;height:9px;border-radius:99px;background:var(--ok);box-shadow:0 0 0 5px rgba(74,222,128,.15)}
+    h1{
+      margin:22px 0 18px;
+      font-size:clamp(2.6rem, 6vw, 5.65rem);
+      line-height:.95;
+      letter-spacing:-.065em;
+    }
+    .lead{font-size:clamp(1.08rem,2vw,1.35rem);color:var(--soft);max-width:760px;margin:0 0 28px}
+    .heroActions{display:flex;gap:14px;flex-wrap:wrap;margin:30px 0 24px}
+    .proofrow{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:.96rem}
+    .proofrow span{border:1px solid var(--line);background:rgba(255,255,255,.05);padding:8px 11px;border-radius:999px}
+
+    .device{
+      border:1px solid rgba(255,255,255,.18);
+      background:linear-gradient(180deg, rgba(255,255,255,.13), rgba(255,255,255,.06));
+      border-radius:36px;
+      padding:18px;
+      box-shadow:var(--shadow);
+      position:relative;
+      transform:rotate(1.5deg);
+    }
+    .screen{
+      border-radius:24px;
+      overflow:hidden;
+      min-height:520px;
+      background:
+        linear-gradient(180deg, rgba(7,17,31,.2), rgba(7,17,31,.75)),
+        url('assets/emapp_shot_3d.png') center/cover no-repeat,
+        #101827;
+      border:1px solid rgba(255,255,255,.18);
+      display:flex;
+      align-items:flex-end;
+      padding:22px;
+    }
+    .screenCard{
+      width:100%;
+      padding:18px;
+      border-radius:20px;
+      background:rgba(7,17,31,.72);
+      backdrop-filter:blur(16px);
+      border:1px solid rgba(255,255,255,.18);
+    }
+    .screenCard b{font-size:1.15rem}
+    .screenCard p{margin:6px 0 0;color:var(--muted)}
+
+    section{padding:72px 0;border-top:1px solid rgba(255,255,255,.08)}
+    .sectionHead{max-width:780px;margin:0 0 34px}
+    .kicker{color:var(--brand);font-weight:850;letter-spacing:.12em;text-transform:uppercase;font-size:.78rem}
+    h2{font-size:clamp(2rem,4vw,3.35rem);line-height:1.03;letter-spacing:-.045em;margin:10px 0 14px}
+    .sectionHead p, .text p{color:var(--soft);font-size:1.08rem;margin:0 0 14px}
+
+    .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+    .card{
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.095), rgba(255,255,255,.045));
+      border-radius:var(--radius);
+      padding:24px;
+      box-shadow:0 18px 50px rgba(0,0,0,.17);
+    }
+    .card h3{margin:0 0 9px;font-size:1.22rem;line-height:1.2}
+    .card p{margin:0;color:var(--muted)}
+    .icon{font-size:2rem;margin-bottom:10px}
+
+    .proofBand{
+      padding:26px;
+      border-radius:30px;
+      border:1px solid rgba(255,255,255,.17);
+      background:linear-gradient(135deg, rgba(255,149,0,.16), rgba(56,189,248,.12));
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:16px;
+    }
+    .stat strong{display:block;font-size:clamp(1.6rem,3vw,2.3rem);line-height:1;color:#fff}
+    .stat span{color:var(--muted);font-weight:650}
+
+    .booksToolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px}
+    .filterBtn{cursor:pointer}
+    .filterBtn.active{background:rgba(255,149,0,.22);border-color:rgba(255,149,0,.6)}
+    .booksGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .bookCard{display:flex;flex-direction:column;gap:14px}
+    .bookCover{
+      aspect-ratio:4/3;
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,.12);
+      background:
+        radial-gradient(circle at 20% 10%, rgba(255,149,0,.35), transparent 35%),
+        radial-gradient(circle at 80% 0%, rgba(56,189,248,.28), transparent 34%),
+        linear-gradient(135deg, rgba(255,255,255,.11), rgba(255,255,255,.04));
+      display:grid;
+      place-items:center;
+      padding:18px;
+      text-align:center;
+      color:#fff;
+      font-weight:850;
+      letter-spacing:-.02em;
+      overflow:hidden;
+      position:relative;
+    }
+    .bookCover img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      border-radius:16px;
+      box-shadow:0 12px 35px rgba(0,0,0,.32);
+      background:#111827;
+    }
+    .bookCover.hasImage{padding:10px;background:rgba(255,255,255,.055)}
+    .bookCover .fallbackTitle{padding:10px}
+    .bookMeta{display:flex;gap:8px;flex-wrap:wrap;margin:3px 0 3px}
+    .tag{font-size:.78rem;color:var(--soft);border:1px solid var(--line);border-radius:999px;padding:4px 8px;background:rgba(255,255,255,.05)}
+    .bookCard .links{margin-top:auto;display:flex;gap:8px;flex-wrap:wrap}
+
+    .featureMedia{
+      border-radius:28px;
+      overflow:hidden;
+      border:1px solid var(--line);
+      min-height:360px;
+      background:url('assets/glossari.png') center/cover no-repeat, rgba(255,255,255,.05);
+    }
+    .mediaXp{background-image:url('assets/xp.png')}
+    .mediaLeaderboard{background-image:url('assets/leaderboard.png')}
+    .mediaNotes{background-image:url('assets/notes.png')}
+
+    .timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+    .step{position:relative;padding-top:34px}
+    .step::before{content:"";position:absolute;top:12px;left:24px;right:-24px;height:2px;background:rgba(255,255,255,.16)}
+    .step:last-child::before{display:none}
+    .num{position:absolute;top:0;left:0;width:26px;height:26px;border-radius:99px;display:grid;place-items:center;background:var(--brand);color:#211400;font-weight:900}
+
+    .formBox{display:grid;grid-template-columns:1fr 1fr auto;gap:12px;margin-top:22px}
+    input, select, textarea{
+      width:100%;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.075);
+      color:#fff;
+      border-radius:16px;
+      padding:14px 15px;
+      font:inherit;
+      outline:none;
+    }
+    input::placeholder, textarea::placeholder{color:#8fa0ba}
+    textarea{min-height:120px;resize:vertical}
+    .fine{font-size:.88rem;color:var(--muted);margin-top:10px}
+
+    .finalCta{
+      text-align:center;
+      padding:58px 26px;
+      border:1px solid var(--line);
+      border-radius:34px;
+      background:radial-gradient(circle at 50% 0%, rgba(255,149,0,.2), rgba(255,255,255,.06) 42%, rgba(255,255,255,.03));
+    }
+    .finalCta h2{margin-top:0}
+    .finalCta p{max-width:760px;margin:0 auto 24px;color:var(--soft);font-size:1.12rem}
+
+    footer{padding:34px 0 50px;color:var(--muted);border-top:1px solid rgba(255,255,255,.08)}
+    .footerGrid{display:flex;justify-content:space-between;gap:22px;flex-wrap:wrap}
+    .footerLinks{display:flex;gap:14px;flex-wrap:wrap}
+
+    @media (max-width: 960px){
+      .heroGrid,.grid2{grid-template-columns:1fr}
+      .grid3,.booksGrid,.timeline{grid-template-columns:1fr 1fr}
+      .proofBand{grid-template-columns:1fr 1fr}
+      .navlinks{display:none}
+      .screen{min-height:390px}
+      .formBox{grid-template-columns:1fr}
+    }
+    @media (max-width: 620px){
+      .grid3,.booksGrid,.timeline,.proofBand{grid-template-columns:1fr}
+      .hero{padding-top:56px}
+      .screen{min-height:310px}
+      .device{transform:none}
+      .step::before{display:none}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap nav">
+      <a class="brand" href="#top" aria-label="iPedia Kickstarter page">
+        <img src="assets/ipediaNw.png" alt="iPedia logo" />
+        <span>iPedia</span>
+      </a>
+      <nav class="navlinks" aria-label="Main navigation">
+        <a href="#books">Apple Books</a>
+        <a href="#features">Features</a>
+        <a href="#kickstarter">Why Kickstarter</a>
+        <a href="#roadmap">Roadmap</a>
+        <a href="#notify">Notify me</a>
+      </nav>
+      <a class="btn primary small" href="#notify">Notify Me</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="wrap heroGrid">
+        <div>
+          <span class="eyebrow"><span class="dot"></span> Kickstarter pre-launch page</span>
+          <h1>Interactive Physics Ebooks — From Greece to the World</h1>
+          <p class="lead">
+            iPedia has already created interactive physics ebooks in Greek, available on Apple Books. Now we are preparing the English editions for students, teachers, and curious learners around the world.
+          </p>
+          <div class="heroActions">
+            <a class="btn primary" href="#notify">Notify Me When the Kickstarter Launches</a>
+            <a class="btn" href="#books">View the Greek Editions on Apple Books</a>
+          </div>
+          <div class="proofrow" aria-label="Project proof points">
+            <span>Greek editions already published</span>
+            <span>Apple Books catalog</span>
+            <span>Interactive simulations</span>
+            <span>7,500+ YouTube subscribers</span>
+          </div>
+        </div>
+
+        <div class="device" aria-label="iPedia visual preview">
+          <div class="screen">
+            <div class="screenCard">
+              <b>Physics should not feel dead on the page.</b>
+              <p>Interactive explanations, tests, 3D models, simulations, XP progress, and visual learning tools.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="proof">
+      <div class="wrap">
+        <div class="proofBand">
+          <div class="stat"><strong>2011–2026</strong><span>Project evolution</span></div>
+          <div class="stat"><strong>14</strong><span>Apple Books titles listed</span></div>
+          <div class="stat"><strong>300+</strong><span>3D models in the repository</span></div>
+          <div class="stat"><strong>250+</strong><span>Educational YouTube videos</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="problem">
+      <div class="wrap grid2">
+        <div class="sectionHead">
+          <div class="kicker">The idea</div>
+          <h2>Physics becomes difficult when it is reduced to formulas.</h2>
+        </div>
+        <div class="text">
+          <p>
+            Physics is one of the most powerful ways to understand the natural world. But for many students, it becomes a dry collection of definitions, equations, and exercises.
+          </p>
+          <p>
+            iPedia was created to make physics more visual, more interactive, and more human. A formula should not appear as a dead symbol. It should be connected to motion, force, energy, fields, waves, circuits, experiments, and real physical meaning.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="about">
+      <div class="wrap">
+        <div class="sectionHead">
+          <div class="kicker">What is iPedia?</div>
+          <h2>A digital learning ecosystem for physics.</h2>
+          <p>
+            iPedia is a collection of interactive ebooks and educational applications designed to turn passive reading into active learning.
+          </p>
+        </div>
+        <div class="grid3">
+          <article class="card"><div class="icon">📚</div><h3>Interactive ebooks</h3><p>Multi-touch ebooks with explanations, visual material, exercises, tests, and digital activities.</p></article>
+          <article class="card"><div class="icon">🧊</div><h3>3D models</h3><p>Over 300 3D models help students rotate, zoom, inspect, and understand physical structures.</p></article>
+          <article class="card"><div class="icon">🧪</div><h3>Smart tests</h3><p>Immediate feedback helps readers check understanding and build confidence step by step.</p></article>
+          <article class="card"><div class="icon">🏆</div><h3>XP and progress</h3><p>Gamified progress, milestones, and ranking elements create motivation without unnecessary pressure.</p></article>
+          <article class="card"><div class="icon">🔬</div><h3>Experiments and simulations</h3><p>Physics is the science of observation. Interactive simulations let students explore phenomena directly.</p></article>
+          <article class="card"><div class="icon">🎙️</div><h3>Narrations and summaries</h3><p>Audio descriptions, notes, summaries, and guided explanations support different learning styles.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="books">
+      <div class="wrap">
+        <div class="sectionHead">
+          <div class="kicker">Already available in Greek</div>
+          <h2>Published on Apple Books.</h2>
+          <p>
+            The Greek editions already exist. This Kickstarter campaign is about translating, adapting, and preparing the English editions for a global audience.
+          </p>
+        </div>
+
+        <div class="booksToolbar" aria-label="Book filters">
+          <button class="btn small filterBtn active" data-filter="all" type="button">All</button>
+          <button class="btn small filterBtn" data-filter="gymnasium" type="button">Middle School</button>
+          <button class="btn small filterBtn" data-filter="lyceum" type="button">High School</button>
+          <button class="btn small filterBtn" data-filter="other" type="button">Other</button>
+        </div>
+
+        <div class="booksGrid" id="booksGrid" aria-live="polite"></div>
+
+        <p class="fine">
+          The ebook cards load Apple Books preview covers live from Apple's public catalog. If Apple blocks or delays the preview request, the cards still show the title, level, original Greek title, sample link, and Apple Books link.
+        </p>
+      </div>
+    </section>
+
+    <section id="features">
+      <div class="wrap">
+        <div class="sectionHead">
+          <div class="kicker">Why interactive?</div>
+          <h2>More than a PDF. More than a static textbook.</h2>
+          <p>
+            iPedia connects theory, examples, questions, simulations, and visual feedback inside one learning flow.
+          </p>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="featureMedia" role="img" aria-label="iPedia glossary preview"></div>
+            <h3>Glossary and concepts</h3>
+            <p>Students can quickly find key terms, definitions, and concepts while studying or revising.</p>
+          </div>
+          <div class="card">
+            <div class="featureMedia mediaXp" role="img" aria-label="XP progress preview"></div>
+            <h3>Visible progress</h3>
+            <p>XP, levels, milestones, and statistics make progress visible and create a sense of movement.</p>
+          </div>
+          <div class="card">
+            <div class="featureMedia mediaLeaderboard" role="img" aria-label="Leaderboard preview"></div>
+            <h3>Motivation through goals</h3>
+            <p>Leaderboards and milestones can support consistent study when used carefully and pedagogically.</p>
+          </div>
+          <div class="card">
+            <div class="featureMedia mediaNotes" role="img" aria-label="Notes preview"></div>
+            <h3>Study in small pieces</h3>
+            <p>Notes, challenges, quizzes, and guided activities keep attention active and reduce passive reading.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="kickstarter">
+      <div class="wrap grid2">
+        <div class="sectionHead">
+          <div class="kicker">Why Kickstarter?</div>
+          <h2>We are not starting from zero. We are scaling what already exists.</h2>
+        </div>
+        <div class="text">
+          <p>
+            Translating a scientific educational ebook is not a simple word-for-word translation. Physics requires precision. Educational writing requires clarity. Interactive books require careful adaptation, testing, and redesign.
+          </p>
+          <p>
+            Kickstarter will help fund the next stage: bringing iPedia from Greek readers to English-speaking students, teachers, schools, and self-learners.
+          </p>
+        </div>
+      </div>
+      <div class="wrap grid3" style="margin-top:28px">
+        <article class="card"><h3>Scientific translation</h3><p>Accurate English translation of Greek physics content, explanations, questions, and terminology.</p></article>
+        <article class="card"><h3>Editing and adaptation</h3><p>Polishing the English editions so they feel natural and useful for international readers.</p></article>
+        <article class="card"><h3>Design and testing</h3><p>Testing interactive elements, updating visuals, and preparing the editions for digital distribution.</p></article>
+      </div>
+    </section>
+
+    <section id="story">
+      <div class="wrap grid2">
+        <div class="card">
+          <h2>Why I built iPedia</h2>
+          <p>
+            I am a physicist and physics teacher from Greece. After years of teaching students, I realized that many of them were not really afraid of physics itself. They were afraid of the way physics was presented to them.
+          </p>
+          <p>
+            Too often, physics appears as a wall of formulas. But behind every formula there is an idea, a phenomenon, and a way of seeing the world. iPedia was created to help students cross that wall.
+          </p>
+        </div>
+        <div class="card">
+          <h2>The vision</h2>
+          <p>
+            We believe physics education should be rigorous, but also alive. It should be accessible, beautiful, visual, and intellectually exciting.
+          </p>
+          <p>
+            The Greek editions are the first step. The English editions are the next one. With your support, this work can reach a much larger audience.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="roadmap">
+      <div class="wrap">
+        <div class="sectionHead">
+          <div class="kicker">Roadmap</div>
+          <h2>From pre-launch to English editions.</h2>
+        </div>
+        <div class="timeline">
+          <article class="card step"><span class="num">1</span><h3>Pre-launch</h3><p>Prepare the English landing page, campaign story, preview material, and email list.</p></article>
+          <article class="card step"><span class="num">2</span><h3>Kickstarter launch</h3><p>Launch the campaign and gather support from readers, teachers, students, and science communities.</p></article>
+          <article class="card step"><span class="num">3</span><h3>Translation</h3><p>Translate selected ebooks from Greek into English with scientific accuracy and educational clarity.</p></article>
+          <article class="card step"><span class="num">4</span><h3>Publication</h3><p>Edit, test, package, publish, and deliver the English editions to backers.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="rewards">
+      <div class="wrap">
+        <div class="sectionHead">
+          <div class="kicker">Reward ideas</div>
+          <h2>Possible Kickstarter rewards.</h2>
+          <p>These rewards can be finalized before the campaign launches.</p>
+        </div>
+        <div class="grid3">
+          <article class="card"><h3>Early Supporter</h3><p>A thank-you update and your name on the supporter page.</p></article>
+          <article class="card"><h3>First English Ebook</h3><p>Digital access to the first English iPedia ebook when it is ready.</p></article>
+          <article class="card"><h3>English Ebook Bundle</h3><p>A bundle of translated English iPedia titles for deeper physics study.</p></article>
+          <article class="card"><h3>Teacher Pack</h3><p>Material designed for teachers who want to use iPedia in class or as homework support.</p></article>
+          <article class="card"><h3>School License</h3><p>A larger option for schools, tutoring centers, or educational organizations.</p></article>
+          <article class="card"><h3>Behind the Scenes</h3><p>Development updates showing how interactive physics content is translated and rebuilt.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="notify">
+      <div class="wrap">
+        <div class="finalCta">
+          <div class="kicker">Join the pre-launch list</div>
+          <h2>Be the first to know when the Kickstarter launches.</h2>
+          <p>
+            The Greek editions are already here. Now we want to bring iPedia to students, teachers, and curious learners everywhere.
+          </p>
+          <form class="formBox" action="#" method="post">
+            <input type="text" name="name" placeholder="Your name" autocomplete="name" />
+            <input type="email" name="email" placeholder="Your email" autocomplete="email" required />
+            <button class="btn primary" type="submit">Notify Me</button>
+          </form>
+          <p class="fine">Connect this form to your email list provider before launch. No spam — only important iPedia Kickstarter updates.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap footerGrid">
+      <div>
+        <strong>iPedia Interactive Books</strong><br />
+        Created in Greece. Designed for curious minds everywhere.
+      </div>
+      <div class="footerLinks">
+        <a href="https://ipedia.online/">Home</a>
+        <a href="https://www.youtube.com/@iPediainteractivebooks" target="_blank" rel="noopener">YouTube</a>
+        <a href="https://sketchfab.com/iPedia/models" target="_blank" rel="noopener">3D Repository</a>
+        <a href="mailto:info@ipedia.online">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const books = [
+      {id:6465691356, cat:'gymnasium', title:'Physics — Middle School Year 1', original:'Φυσική Α΄ Γυμνασίου', level:'Middle School', url:'https://books.apple.com/gr/book/%CF%86%CF%85%CF%83%CE%B9%CE%BA%CE%AE-a-%CE%B3%CF%85%CE%BC%CE%BD%CE%B1%CF%83%CE%AF%CE%BF%CF%85/id6465691356', sample:'https://apple.co/3PcyFt5', desc:'An interactive introduction to basic physical ideas for early secondary education.'},
+      {id:672672178, cat:'gymnasium', title:'Physics — Middle School Year 2', original:'Φυσική Β΄ Γυμνασίου', level:'Middle School', url:'https://books.apple.com/gr/book/%CF%86%CF%85%CF%83%CE%B9%CE%BA%CE%AE-%CE%B2-%CE%B3%CF%85%CE%BC%CE%BD%CE%B1%CF%83%CE%AF%CE%BF%CF%85/id672672178', sample:'https://apple.co/3vccl7h', desc:'Interactive physics material for middle school students, with explanations, activities, and visual support.'},
+      {id:1584700901, cat:'gymnasium', title:'Physics — Middle School Year 3', original:'Φυσική Γ΄ Γυμνασίου', level:'Middle School', url:'https://books.apple.com/gr/book/%CF%86%CF%85%CF%83%CE%B9%CE%BA%CE%AE-%CE%B3-%CE%B3%CF%85%CE%BC%CE%BD%CE%B1%CF%83%CE%AF%CE%BF%CF%85/id1584700901', sample:'https://apple.co/2WWPyk0', desc:'A complete interactive physics ebook for the final year of Greek middle school.'},
+      {id:1039955474, cat:'lyceum', title:'Physics Formula Book — High School Year 1', original:'Τυπολόγιο στην Φυσική Α΄ Λυκείου', level:'High School', url:'https://books.apple.com/gr/book/%CF%84%CF%85%CF%80%CE%BF%CE%BB%CF%8C%CE%B3%CE%B9%CE%BF-%CF%83%CF%84%CE%B7%CE%BD-%CF%86%CF%85%CF%83%CE%B9%CE%BA%CE%AE-a-%CE%BB%CF%85%CE%BA%CE%B5%CE%AF%CE%BF%CF%85/id1039955474', sample:'https://apple.co/3vjXfwj', desc:'A structured formula reference for high-school physics study.'},
+      {id:957948940, cat:'lyceum', title:'Physics Question Bank', original:'Η Τράπεζα Θεμάτων', level:'High School', url:'https://books.apple.com/gr/book/%CE%B7-%CF%84%CF%81%CE%AC%CF%80%CE%B5%CE%B6%CE%B1-%CE%B8%CE%B5%CE%BC%CE%AC%CF%84%CF%89%CE%BD/id957948940?l=el', sample:'https://apple.co/32DVePF', desc:'Practice-oriented material based on high-school physics question-bank style exercises.'},
+      {id:1289444127, cat:'lyceum', title:'Kinematics — High School Year 1', original:'Κινηματική Α΄ Λυκείου', level:'High School', url:'https://books.apple.com/gr/book/%CE%BA%CE%B9%CE%BD%CE%B7%CE%BC%CE%B1%CF%84%CE%B9%CE%BA%CE%AE-%CE%B1-%CE%BB%CF%85%CE%BA%CE%B5%CE%AF%CE%BF%CF%85/id1289444127', sample:'https://apple.co/32JOYFK', desc:'Motion, position, velocity, acceleration, and step-by-step reasoning in classical kinematics.'},
+      {id:1289175171, cat:'lyceum', title:'Dynamics — High School Year 1', original:'Δυναμική Α΄ Λυκείου', level:'High School', url:'https://books.apple.com/gr/book/%CE%B4%CF%85%CE%BD%CE%B1%CE%BC%CE%B9%CE%BA%CE%AE-a-%CE%BB%CF%85%CE%BA%CE%B5%CE%AF%CE%BF%CF%85/id1289175171', sample:'https://apple.co/32HYj0Q', desc:'Forces, Newtonian thinking, and the physical meaning behind equations of motion.'},
+      {id:1553254271, cat:'lyceum', title:'Electromagnetism — High School Physics', original:'Ηλεκτρομαγνητισμός', level:'High School', url:'https://books.apple.com/gr/book/%CE%B7%CE%BB%CE%B5%CE%BA%CF%84%CF%81%CE%BF%CE%BC%CE%B1%CE%B3%CE%BD%CE%B7%CF%84%CE%B9%CF%83%CE%BC%CF%8C%CF%82/id1553254271', sample:'https://apple.co/3awKpTy', desc:'Electric and magnetic phenomena through visual explanations, exercises, and interactive tools.'},
+      {id:1500126000, cat:'lyceum', title:'Projectile Motion', original:'Οριζόντια Βολή', level:'High School', url:'https://books.apple.com/gr/book/%CE%BF%CF%81%CE%B9%CE%B6%CE%BF-%CE%BD%CF%84%CE%B9%CE%B1-%CE%B2%CE%BF%CE%BB%CE%B7/id1500126000', sample:'https://apple.co/3ncjn9g', desc:'A focused interactive ebook on horizontal projectile motion and two-dimensional thinking.'},
+      {id:1048712551, cat:'lyceum', title:'The Gas Laws', original:'Οι Νόμοι των Αερίων', level:'High School', url:'https://books.apple.com/gr/book/%CE%BF%CE%B9-%CE%BD%CF%8C%CE%BC%CE%BF%CE%B9-%CF%84%CF%89%CE%BD-%CE%B1%CE%B5%CF%81%CE%AF%CF%89%CE%BD/id1048712551', sample:'https://apple.co/3tJYF2V', desc:'Temperature, pressure, volume, and the laws that connect macroscopic gas behavior.'},
+      {id:1062955686, cat:'lyceum', title:'Introduction to Thermodynamics', original:'Εισαγωγή στην Θερμοδυναμική', level:'High School', url:'https://books.apple.com/gr/book/%CE%B5%CE%B9%CF%83%CE%B1%CE%B3%CF%89%CE%B3%CE%AE-%CF%83%CF%84%CE%B7%CE%BD-%CE%B8%CE%B5%CF%81%CE%BC%CE%BF%CE%B4%CF%85%CE%BD%CE%B1%CE%BC%CE%B9%CE%BA%CE%AE/id1062955686', sample:'https://apple.co/3nbKdhV', desc:'An accessible introduction to heat, energy, work, and thermodynamic reasoning.'},
+      {id:6446159540, cat:'lyceum', title:'Energy — High School Year 1', original:'Ενέργεια Α΄ Λυκείου', level:'High School', url:'https://books.apple.com/gr/book/%CE%B5%CE%BD%CE%AD%CF%81%CE%B3%CE%B5%CE%B9%CE%B1-a-%CE%BB%CF%85%CE%BA%CE%B5%CE%AF%CE%BF%CF%85/id6446159540', sample:'https://apple.co/439iYcl', desc:'Energy concepts, conservation ideas, and physical interpretation for high-school students.'},
+      {id:888118174, cat:'other', title:'The Parthenon', original:'Ο Παρθενώνας', level:'Culture / 3D', url:'https://books.apple.com/gr/book/%CE%BF-%CF%80%CE%B1%CF%81%CE%B8%CE%B5%CE%BD%CF%8E%CE%BD%CE%B1%CF%82/id888118174', sample:'https://apple.co/3enqyrf', desc:'An interactive cultural ebook connected to 3D digital representation and visual exploration.'},
+      {id:1042471852, cat:'other', title:'The Parthenon in 3D', original:'The Parthenon in 3D', level:'Culture / 3D', url:'https://books.apple.com/gr/book/the-parthenon-in-3d/id1042471852', sample:'https://apple.co/4fkokXv', desc:'An English interactive 3D ebook experience about the Parthenon.'}
+    ];
+
+    const grid = document.querySelector('#booksGrid');
+    const filterBtns = document.querySelectorAll('.filterBtn');
+    const appleCache = new Map();
+
+    function escapeHtml(value){
+      return String(value ?? '').replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
+    }
+
+    function appleLookup(id){
+      if (appleCache.has(id)) return Promise.resolve(appleCache.get(id));
+      return new Promise(resolve => {
+        const cb = `__ipediaAppleBook_${id}_${Math.random().toString(36).slice(2)}`;
+        const script = document.createElement('script');
+        let finished = false;
+
+        function done(result){
+          if (finished) return;
+          finished = true;
+          try { delete window[cb]; } catch (_) { window[cb] = undefined; }
+          script.remove();
+          appleCache.set(id, result);
+          resolve(result);
+        }
+
+        window[cb] = data => done(((data && data.results) || [])[0] || null);
+        script.onerror = () => done(null);
+        script.src = `https://itunes.apple.com/lookup?id=${encodeURIComponent(id)}&country=gr&entity=ebook&callback=${encodeURIComponent(cb)}`;
+        document.head.appendChild(script);
+        setTimeout(() => done(null), 9000);
+      });
+    }
+
+    function highResArtwork(url){
+      if (!url) return '';
+      return String(url)
+        .replace(/100x100bb\.(jpg|png|webp)/i, '600x600bb.$1')
+        .replace(/60x60bb\.(jpg|png|webp)/i, '600x600bb.$1');
+    }
+
+    function plainTextFromHtml(html){
+      if (!html) return '';
+      const div = document.createElement('div');
+      div.innerHTML = html;
+      return (div.textContent || div.innerText || '').replace(/\s+/g,' ').trim();
+    }
+
+    function shortText(text, max=185){
+      const clean = String(text || '').replace(/\s+/g,' ').trim();
+      return clean.length > max ? clean.slice(0, max - 1) + '…' : clean;
+    }
+
+    function cardTemplate(book, apple=null){
+      const appleTitle = apple?.trackName || book.title;
+      const author = apple?.artistName || 'iPedia';
+      const artwork = highResArtwork(apple?.artworkUrl100 || apple?.artworkUrl60 || '');
+      const desc = shortText(plainTextFromHtml(apple?.description) || book.desc, 210);
+      const price = apple?.formattedPrice || '';
+      const viewUrl = apple?.trackViewUrl || book.url;
+
+      return `
+        <div class="bookCover ${artwork ? 'hasImage' : ''}">
+          ${artwork ? `<img src="${escapeHtml(artwork)}" alt="Apple Books cover preview for ${escapeHtml(appleTitle)}" loading="lazy" decoding="async">` : `<span class="fallbackTitle">${escapeHtml(book.title)}</span>`}
+        </div>
+        <div>
+          <h3>${escapeHtml(appleTitle)}</h3>
+          <div class="bookMeta">
+            <span class="tag">${escapeHtml(book.level)}</span>
+            <span class="tag">Greek edition</span>
+            <span class="tag">Apple Books</span>
+            ${price ? `<span class="tag">${escapeHtml(price)}</span>` : ''}
+          </div>
+          <p><strong>Original:</strong> ${escapeHtml(book.original)}</p>
+          <p>${escapeHtml(desc)}</p>
+          <p class="fine">${escapeHtml(author)}</p>
+        </div>
+        <div class="links">
+          <a class="btn primary small" href="${escapeHtml(book.sample)}" target="_blank" rel="noopener">Apple Books Sample</a>
+          <a class="btn small" href="${escapeHtml(viewUrl)}" target="_blank" rel="noopener">View Title</a>
+        </div>
+      `;
+    }
+
+    function renderBooks(filter='all'){
+      grid.innerHTML = '';
+      const visibleBooks = books.filter(b => filter === 'all' || b.cat === filter);
+
+      visibleBooks.forEach(book => {
+        const card = document.createElement('article');
+        card.className = 'card bookCard';
+        card.dataset.cat = book.cat;
+        card.innerHTML = cardTemplate(book);
+        grid.appendChild(card);
+
+        appleLookup(book.id).then(apple => {
+          if (!apple) return;
+          card.innerHTML = cardTemplate(book, apple);
+        });
+      });
+    }
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderBooks(btn.dataset.filter);
+      });
+    });
+
+    renderBooks();
+  </script>
+</body>
+</html>
