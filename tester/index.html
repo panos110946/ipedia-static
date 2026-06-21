@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="el">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#ff7e79" />
+  <title>iPedia HTML Tester</title>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">iP</div>
+        <div>
+          <h1>iPedia HTML Tester</h1>
+          <p>Άνοιγμα .html ή .zip εφαρμογής στο iPhone</p>
+        </div>
+      </div>
+      <div class="status" id="status">Έτοιμο</div>
+    </header>
+
+    <main class="main">
+      <section class="panel uploadPanel" id="uploadPanel">
+        <h2>Δοκιμή εφαρμογής</h2>
+        <p class="lead">Διάλεξε ένα απλό αρχείο <b>.html</b> ή ένα <b>.zip</b> που περιέχει ολόκληρο φάκελο εφαρμογής με index.html, εικόνες, ήχους, css και js.</p>
+
+        <label class="dropzone" for="fileInput" id="dropzone">
+          <input id="fileInput" type="file" accept=".html,.htm,.zip,text/html,application/zip,application/x-zip-compressed" />
+          <span class="bigIcon">＋</span>
+          <strong>Επιλογή HTML ή ZIP</strong>
+          <small>Στο iPhone: Files → Browse → επιλογή αρχείου</small>
+        </label>
+
+        <div class="actions">
+          <button id="openSampleBtn" type="button">Άνοιγμα demo</button>
+          <button id="clearBtn" type="button" class="ghost">Καθαρισμός</button>
+        </div>
+
+        <div class="hintBox">
+          <h3>Σωστό ZIP</h3>
+          <pre>my_app/
+├── index.html
+├── images/
+├── sounds/
+├── css/
+└── js/</pre>
+        </div>
+      </section>
+
+      <section class="viewerPanel" id="viewerPanel" hidden>
+        <div class="viewerToolbar">
+          <div class="fileInfo">
+            <strong id="appTitle">Εφαρμογή</strong>
+            <span id="appPath"></span>
+          </div>
+          <div class="viewerActions">
+            <button id="reloadBtn" type="button">Ανανέωση</button>
+            <button id="openNewTabBtn" type="button">Νέο παράθυρο</button>
+            <button id="fullscreenBtn" type="button">Πλήρης οθόνη</button>
+            <button id="backBtn" type="button" class="ghost">Νέο αρχείο</button>
+          </div>
+        </div>
+        <div class="frameWrap" id="frameWrap">
+          <iframe id="previewFrame" title="HTML app preview" allow="autoplay; fullscreen; xr-spatial-tracking; clipboard-read; clipboard-write" sandbox="allow-scripts allow-same-origin allow-forms allow-downloads allow-modals allow-popups allow-pointer-lock"></iframe>
+        </div>
+      </section>
+
+      <section class="panel logPanel" id="logPanel">
+        <div class="logHead">
+          <h2>Μηνύματα</h2>
+          <button id="copyLogBtn" type="button" class="ghost small">Αντιγραφή</button>
+        </div>
+        <pre id="log">Δεν έχει φορτωθεί αρχείο.</pre>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
