@@ -1,90 +1,69 @@
 # iPedia HTML Tester
 
-A pure static browser app for previewing either:
+A minimal static viewer for one local `.html` or `.htm` file at a time.
 
-- one standalone `.html` or `.htm` file; or
-- a `.zip` containing a small HTML project with relative CSS, JavaScript, images, audio, fonts, and other assets.
-
-The app is designed to be published at `/tester/`, for example:
+Open:
 
 `https://ipedia.online/tester/`
 
-No backend, Node.js server, framework, or build step is required.
+Choose an HTML file and it is displayed in an iframe. Choosing another file immediately replaces the current preview. The previous Blob URL is revoked and the previous file is not retained.
 
-## ZIP rules
+## What it does
 
-The ZIP importer:
+- accepts only `.html` and `.htm`;
+- reads the selected file into browser memory;
+- creates one temporary Blob URL for the current preview;
+- revokes the previous Blob URL when another file is chosen or the preview is cleared;
+- provides reload, clear, and open-in-new-tab controls;
+- unregisters old Service Workers under `/tester/` on startup;
+- deletes legacy tester preview caches on startup.
 
-- ignores `.DS_Store` and `__MACOSX` entries;
-- strips one common top-level folder when every useful file is inside it;
-- chooses root `index.html` or `index.htm` first, then a nested index file, then the first `.html`/`.htm` file;
-- preserves the project's remaining directory structure so relative asset paths work;
-- rejects unsafe `..` archive paths and reports missing assets in the log panel.
+It does not use a Service Worker, ZIP files, `files.json`, a file library, local storage, IndexedDB, a backend, or a build step.
 
-Use relative paths such as `css/style.css` or `../images/photo.png`. Root-relative paths such as `/images/photo.png` point to the website root, not to the uploaded ZIP project.
+## Important limitation
+
+The viewer receives only the single file selected through the browser picker. Separate local files beside it—such as `style.css`, scripts, images, fonts, or audio—are not available to the preview.
+
+For a self-contained preview, embed CSS, JavaScript, and other required content inside the HTML file or use external `https://` URLs.
 
 ## Local testing
 
-Service Workers do not work when `index.html` is opened directly with `file://`. Serve the repository root on localhost instead:
+Serve the repository root:
 
 ```bash
 cd "/path/to/repository-root"
 python3 -m http.server 8000
 ```
 
-Then open:
+Open:
 
 `http://localhost:8000/tester/`
 
-Test all of these:
+Test the replacement workflow:
 
-1. Click **Open demo**. It loads separate CSS and JavaScript through relative paths.
-2. Upload a standalone `.html` or `.htm` file.
-3. Upload a ZIP containing `index.html`, CSS, JavaScript, and an image or sound.
-4. Try reload, back, clear, fullscreen, and open in new tab.
-5. Check the message panel for missing files or runtime errors.
+1. Select `first.html`.
+2. Select `second.html`; it must replace `first.html`.
+3. Select `third.htm`; it must replace `second.html`.
+4. Test reload, clear, and open in new tab.
 
-If an older Service Worker is still installed after deployment, reload the tester page once. In browser developer tools, you can also unregister the old worker and clear site storage before retesting.
+## Deployment
 
-The Service Worker never caches or intercepts the tester shell (`index.html`, `app.js`, `style.css`, or `sw.js`). It only serves generated URLs below `/tester/__ipedia_preview__/`. Use **Reset tester cache** to unregister tester-scoped workers, remove preview caches, and return to the normal `/tester/` URL.
-
-## GitHub deployment at `/tester/`
-
-Keep these files together in the repository's `tester/` directory:
+Keep these files in the repository's `tester/` directory:
 
 ```text
 tester/
 ├── index.html
 ├── style.css
 ├── app.js
-├── sw.js
 └── README.md
 ```
 
-Commit and push from the repository root:
+`sw.js` must not be present.
 
-```bash
-git add tester .gitignore
-git commit -m "Fix static HTML tester under /tester/"
-git push origin YOUR_BRANCH
-```
+For a Render Static Site:
 
-Your hosting configuration must publish the repository so that `tester/index.html` is available as `/tester/`. The Service Worker registers with `/tester/` scope, and all generated iframe preview URLs stay under that scope.
+- repository root as Render Root Directory: Publish Directory `tester`;
+- `tester` as Render Root Directory: Publish Directory `.`;
+- Build Command: empty or `echo "no build"`.
 
-## Render Static Site settings
-
-Create or edit a **Static Site**, not a Web Service.
-
-If Render's **Root Directory** is the repository root:
-
-- Build Command: leave empty, or use `echo "no build"`
-- Publish Directory: `tester`
-
-If Render's **Root Directory** is already the `tester` folder:
-
-- Build Command: leave empty, or use `echo "no build"`
-- Publish Directory: `.`
-
-Do not use both `tester` as the Root Directory and `tester` as the Publish Directory; that would make Render look for `tester/tester`.
-
-After deployment, open the final HTTPS URL and test the demo before testing uploads. HTTPS is required for Service Workers outside localhost.
+No backend or framework is required.
