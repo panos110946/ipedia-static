@@ -1,5 +1,5 @@
-const TESTER_VERSION = '2026-06-23-simple-2';
-const APP_BASE_URL = new URL('./', window.location.href);
+const TESTER_VERSION = '2026-06-23-simple-3';
+const APP_BASE_URL = new URL('/tester/', window.location.origin);
 const LEGACY_PREVIEW_CACHE_PREFIXES = ['ipedia-preview-', 'tester-preview-'];
 const ASSET_WARNING = 'Single local HTML preview only loads the selected HTML file. Separate local assets will not be available unless they are embedded in the HTML.';
 

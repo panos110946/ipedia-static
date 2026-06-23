@@ -2,7 +2,9 @@
 
 A minimal static viewer for one local `.html` or `.htm` file at a time.
 
-Current app version: `2026-06-23-simple-2`.
+Current app version: `2026-06-23-simple-3`.
+
+The HTML uses `/tester/` as its explicit base and loads CSS/JavaScript from absolute `/tester/...` URLs. This keeps the app working whether the host exposes the page as `/tester` or `/tester/`.
 
 Open:
 
