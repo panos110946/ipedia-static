@@ -1,4 +1,4 @@
-const TESTER_VERSION = '2026-06-23-simple-1';
+const TESTER_VERSION = '2026-06-23-simple-2';
 const APP_BASE_URL = new URL('./', window.location.href);
 const LEGACY_PREVIEW_CACHE_PREFIXES = ['ipedia-preview-', 'tester-preview-'];
 const ASSET_WARNING = 'Single local HTML preview only loads the selected HTML file. Separate local assets will not be available unless they are embedded in the HTML.';
@@ -17,6 +17,7 @@ const logEl = $('log');
 let currentBlobURL = '';
 let currentFileName = '';
 let loadSequence = 0;
+let activeReader = null;
 
 function setStatus(message) {
   statusEl.textContent = message;
@@ -50,7 +51,31 @@ function revokeCurrentPreview() {
   currentFileName = '';
 }
 
+function readFileAsText(file) {
+  const reader = new FileReader();
+  activeReader = reader;
+
+  const reading = new Promise((resolve, reject) => {
+    reader.onload = () => resolve(String(reader.result || ''));
+    reader.onerror = () => reject(reader.error || new Error('Ο browser δεν μπόρεσε να διαβάσει το αρχείο.'));
+    reader.onabort = () => reject(new Error('Η ανάγνωση του προηγούμενου αρχείου ακυρώθηκε.'));
+    reader.readAsText(file, 'UTF-8');
+  });
+
+  return reading.then(
+    (value) => {
+      if (activeReader === reader) activeReader = null;
+      return value;
+    },
+    (error) => {
+      if (activeReader === reader) activeReader = null;
+      throw error;
+    }
+  );
+}
+
 function clearPreview({ resetMessages = true } = {}) {
+  if (activeReader && activeReader.readyState === 1) activeReader.abort();
   loadSequence += 1;
   revokeCurrentPreview();
   fileInput.value = '';
@@ -61,10 +86,11 @@ function clearPreview({ resetMessages = true } = {}) {
 }
 
 async function loadHTMLFile(file) {
+  if (activeReader && activeReader.readyState === 1) activeReader.abort();
   const sequence = ++loadSequence;
   revokeCurrentPreview();
   updateControls(false);
-  fileName.textContent = file?.name || 'Δεν έχει επιλεγεί αρχείο';
+  fileName.textContent = file && file.name ? file.name : 'Δεν έχει επιλεγεί αρχείο';
   resetLog('Φόρτωση HTML αρχείου...');
   setStatus('Φόρτωση...');
 
@@ -73,7 +99,7 @@ async function loadHTMLFile(file) {
       throw new Error('Επίλεξε αρχείο με κατάληξη .html ή .htm.');
     }
 
-    const html = await file.text();
+    const html = await readFileAsText(file);
     if (sequence !== loadSequence) return;
 
     const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
@@ -127,7 +153,8 @@ async function cleanLegacyTesterState() {
 }
 
 fileInput.addEventListener('change', (event) => {
-  loadHTMLFile(event.target.files?.[0]);
+  const files = event.target.files;
+  loadHTMLFile(files && files.length ? files[0] : null);
 });
 
 reloadBtn.addEventListener('click', () => {

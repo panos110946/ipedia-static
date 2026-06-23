@@ -2,6 +2,8 @@
 
 A minimal static viewer for one local `.html` or `.htm` file at a time.
 
+Current app version: `2026-06-23-simple-2`.
+
 Open:
 
 `https://ipedia.online/tester/`
