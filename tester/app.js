@@ -13,8 +13,9 @@ const appPath = $('appPath');
 
 const APP_BASE_URL = new URL('./', window.location.href);
 const PREVIEW_DIRECTORY = '__ipedia_preview__';
-const CACHE_PREFIX = 'ipedia-preview-';
-const SW_VERSION = '4';
+const TESTER_VERSION = '2026-06-23-2';
+const ALL_PREVIEW_CACHE_PREFIX = 'ipedia-preview-';
+const CACHE_PREFIX = `${ALL_PREVIEW_CACHE_PREFIX}${TESTER_VERSION}-`;
 
 let currentPreviewURL = '';
 let currentSession = '';
@@ -191,7 +192,7 @@ function controllerVersion(controller, timeoutMs = 500) {
 async function waitForServiceWorkerController(scriptURL, timeoutMs = 10000) {
   const isCurrentController = async () => {
     const controller = navigator.serviceWorker.controller;
-    return controller?.scriptURL === scriptURL && await controllerVersion(controller) === SW_VERSION;
+    return controller?.scriptURL === scriptURL && await controllerVersion(controller) === TESTER_VERSION;
   };
 
   if (await isCurrentController()) return;
@@ -235,7 +236,7 @@ async function ensureSW() {
 
   if (!swReady) {
     swReady = (async () => {
-      const scriptURL = new URL('sw.js', APP_BASE_URL).href;
+      const scriptURL = new URL(`sw.js?v=${encodeURIComponent(TESTER_VERSION)}`, APP_BASE_URL).href;
       const registration = await navigator.serviceWorker.register(scriptURL, {
         scope: APP_BASE_URL.pathname,
         updateViaCache: 'none'
@@ -437,6 +438,35 @@ async function resetPreview({ clearLog = true } = {}) {
   showUpload();
 }
 
+async function resetTesterCache() {
+  const button = $('resetCacheBtn');
+  button.disabled = true;
+  setStatus('Reset...');
+  resetLog('Καθαρισμός Service Worker και preview caches...');
+  previewFrame.src = 'about:blank';
+
+  try {
+    if ('serviceWorker' in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      const testerRegistrations = registrations.filter((registration) => registration.scope.startsWith(APP_BASE_URL.href));
+      await Promise.all(testerRegistrations.map((registration) => registration.unregister()));
+    }
+
+    if ('caches' in window) {
+      const cacheNames = await caches.keys();
+      await Promise.all(cacheNames
+        .filter((cacheName) => cacheName.startsWith(ALL_PREVIEW_CACHE_PREFIX))
+        .map((cacheName) => caches.delete(cacheName)));
+    }
+
+    window.location.replace(APP_BASE_URL.href);
+  } catch (error) {
+    button.disabled = false;
+    setStatus('Σφάλμα');
+    resetLog(`Σφάλμα reset cache: ${error.message || error}`);
+  }
+}
+
 fileInput.addEventListener('change', (event) => handleFile(event.target.files[0]));
 
 dropzone.addEventListener('dragover', (event) => {
@@ -460,6 +490,7 @@ dropzone.addEventListener('drop', (event) => {
 });
 
 $('clearBtn').addEventListener('click', () => resetPreview());
+$('resetCacheBtn').addEventListener('click', resetTesterCache);
 $('backBtn').addEventListener('click', () => resetPreview({ clearLog: false }));
 
 $('reloadBtn').addEventListener('click', () => {
@@ -563,4 +594,10 @@ window.addEventListener('message', (event) => {
   if (data?.__ipediaTesterSW && data.session === currentSession) {
     log(`ERROR: Δεν βρέθηκε asset: ${data.path}`);
   }
+});
+
+// Register and check for worker updates as soon as the normal /tester/ page loads.
+ensureSW().catch((error) => {
+  setStatus('Σφάλμα SW');
+  resetLog(`Σφάλμα Service Worker: ${error.message || error}`);
 });

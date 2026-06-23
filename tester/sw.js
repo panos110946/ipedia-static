@@ -1,18 +1,27 @@
-const CACHE_PREFIX = 'ipedia-preview-';
+const TESTER_SW_VERSION = '2026-06-23-2';
+const ALL_PREVIEW_CACHE_PREFIX = 'ipedia-preview-';
+const CACHE_PREFIX = `${ALL_PREVIEW_CACHE_PREFIX}${TESTER_SW_VERSION}-`;
 const PREVIEW_DIRECTORY = '__ipedia_preview__';
-const SW_VERSION = '4';
+const TESTER_SCOPE_PATH = new URL(self.registration.scope).pathname;
+const PREVIEW_PATH_PREFIX = `${TESTER_SCOPE_PATH}${PREVIEW_DIRECTORY}/`;
 
 self.addEventListener('install', (event) => {
   event.waitUntil(self.skipWaiting());
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim());
+  event.waitUntil((async () => {
+    const cacheNames = await caches.keys();
+    await Promise.all(cacheNames
+      .filter((cacheName) => cacheName.startsWith(ALL_PREVIEW_CACHE_PREFIX) && !cacheName.startsWith(CACHE_PREFIX))
+      .map((cacheName) => caches.delete(cacheName)));
+    await self.clients.claim();
+  })());
 });
 
 self.addEventListener('message', (event) => {
   if (event.data?.type === 'IPEDIA_TESTER_VERSION') {
-    event.ports[0]?.postMessage({ version: SW_VERSION });
+    event.ports[0]?.postMessage({ version: TESTER_SW_VERSION });
   }
 });
 
@@ -28,16 +37,13 @@ async function notifyMissingAsset(session, path) {
 }
 
 self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET') return;
-
   const requestURL = new URL(event.request.url);
-  const scopePath = new URL(self.registration.scope).pathname;
-  const previewPrefix = `${scopePath}${PREVIEW_DIRECTORY}/`;
 
-  if (!requestURL.pathname.startsWith(previewPrefix)) return;
+  // Never intercept the tester shell or normal site files. Only virtual preview URLs belong here.
+  if (event.request.method !== 'GET' || !requestURL.pathname.startsWith(PREVIEW_PATH_PREFIX)) return;
 
   event.respondWith((async () => {
-    const previewPath = requestURL.pathname.slice(previewPrefix.length);
+    const previewPath = requestURL.pathname.slice(PREVIEW_PATH_PREFIX.length);
     const slashIndex = previewPath.indexOf('/');
 
     if (slashIndex < 1) {
@@ -53,7 +59,7 @@ self.addEventListener('fetch', (event) => {
 
     const cache = await caches.open(`${CACHE_PREFIX}${session}`);
     const cacheURL = new URL(requestURL.href);
-    cacheURL.pathname = `${previewPrefix}${session}/${filePath}`;
+    cacheURL.pathname = `${PREVIEW_PATH_PREFIX}${session}/${filePath}`;
     cacheURL.search = '';
     cacheURL.hash = '';
 

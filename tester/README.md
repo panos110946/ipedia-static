@@ -46,6 +46,8 @@ Test all of these:
 
 If an older Service Worker is still installed after deployment, reload the tester page once. In browser developer tools, you can also unregister the old worker and clear site storage before retesting.
 
+The Service Worker never caches or intercepts the tester shell (`index.html`, `app.js`, `style.css`, or `sw.js`). It only serves generated URLs below `/tester/__ipedia_preview__/`. Use **Reset tester cache** to unregister tester-scoped workers, remove preview caches, and return to the normal `/tester/` URL.
+
 ## GitHub deployment at `/tester/`
 
 Keep these files together in the repository's `tester/` directory:
