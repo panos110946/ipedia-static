@@ -1581,13 +1581,12 @@ html{
 
   <!-- =============================
        SEO + Social previews (Google / OpenGraph / Twitter)
-       NOTE: Replace https://www.ipedia.online/ with your real domain (HTTPS).
        ============================= -->
   <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
   <meta name="googlebot" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
   <meta name="theme-color" content="#0b0b0f" />
-  <link rel="icon" href="ipediaNw.png" />
-  <link rel="apple-touch-icon" href="ipediaNw.png" />
+  <link rel="icon" type="image/png" href="https://www.ipedia.online/ipediaNw.png" />
+  <link rel="apple-touch-icon" href="https://www.ipedia.online/ipediaNw.png" />
   <link rel="canonical" href="https://www.ipedia.online/" />
 
   <meta property="og:locale" content="el_GR" />
@@ -1597,12 +1596,15 @@ html{
   <meta property="og:description" content="Διαδραστικά βιβλία Φυσικής, εκπαιδευτικές εφαρμογές και ειδική διαδραστική ανάλυση των θεμάτων Φυσικής στις Πανελλήνιες 2026." />
   <meta property="og:url" content="https://www.ipedia.online/" />
   <meta property="og:image" content="https://www.ipedia.online/ipediaNw.png" />
+  <meta property="og:image:width" content="512" />
+  <meta property="og:image:height" content="512" />
   <meta property="og:image:alt" content="iPedia Interactive Books" />
 
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="iPedia Interactive Books — Πανελλήνιες Φυσικής 2026 & διαδραστικά βιβλία" />
   <meta name="twitter:description" content="Εξερεύνησε διαδραστικά τα θέματα Φυσικής 2026, δες στατιστικά προηγούμενων ετών και γνώρισε τα βιβλία και τις εφαρμογές της iPedia." />
   <meta name="twitter:image" content="https://www.ipedia.online/ipediaNw.png" />
+  <meta name="twitter:image:alt" content="iPedia Interactive Books" />
 
   <script type="application/ld+json">
   {
@@ -1610,6 +1612,7 @@ html{
     "@graph": [
       {
         "@type": "Organization",
+        "@id": "https://www.ipedia.online/#organization",
         "name": "iPedia Interactive Books",
         "url": "https://www.ipedia.online/",
         "logo": "https://www.ipedia.online/ipediaNw.png",
@@ -1623,9 +1626,31 @@ html{
       },
       {
         "@type": "WebSite",
+        "@id": "https://www.ipedia.online/#website",
         "name": "iPedia Interactive Books",
         "url": "https://www.ipedia.online/",
-        "inLanguage": "el-GR"
+        "inLanguage": "el-GR",
+        "publisher": { "@id": "https://www.ipedia.online/#organization" }
+      },
+      {
+        "@type": "Product",
+        "@id": "https://www.ipedia.online/#interactive-books",
+        "name": "iPedia Interactive Books",
+        "description": "Διαδραστικά βιβλία Φυσικής με προσομοιώσεις, 3D μοντέλα, τεστ, γλωσσάρι, σημειώσεις και εκπαιδευτικές δραστηριότητες για Apple Books, Android και Web.",
+        "image": "https://www.ipedia.online/ipediaNw.png",
+        "brand": { "@id": "https://www.ipedia.online/#organization" },
+        "category": "EducationalApplication",
+        "url": "https://www.ipedia.online/#applebooks"
+      },
+      {
+        "@type": "Product",
+        "@id": "https://www.ipedia.online/#icircuit",
+        "name": "iCircuit",
+        "description": "Διαδραστικό εργαστήριο ηλεκτρικών κυκλωμάτων για Android και Web demo με έτοιμα κυκλώματα και φύλλα εργασίας.",
+        "image": "https://www.ipedia.online/ipediaNw.png",
+        "brand": { "@id": "https://www.ipedia.online/#organization" },
+        "category": "EducationalApplication",
+        "url": "https://www.ipedia.online/iCircuit_website_demo.html"
       }
     ]
   }
