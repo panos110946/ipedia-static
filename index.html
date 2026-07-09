@@ -684,6 +684,7 @@ html{
       background: linear-gradient(135deg, rgba(255,126,121,.36), rgba(120,170,255,.18));
       border-color: rgba(255,126,121,.35);
       box-shadow: 0 18px 50px rgba(255,126,121,.14);
+      color: rgba(255,255,255,.94);
     }
     .btn.primary:hover{border-color: rgba(255,126,121,.55)}
     .btn.ghost{background: transparent}
@@ -1108,6 +1109,7 @@ html{
     .book .price{margin-top: 4px; font-size: 25px; font-weight: 900; letter-spacing:.02em; color: #D6D6D6}
     .book p{margin: 8px 0 12px; color: rgba(255,255,255,.76); font-size: 13px; line-height:1.45}
     .book .links{display:flex; gap:8px; flex-wrap:wrap}
+    .book .btn{color: rgba(255,255,255,.94)}
 
 
         /* Book card expand (Apple Books description) */
@@ -3453,6 +3455,7 @@ const SAMPLE_LINKS = {
     const img = (item.artworkUrl100 || item.artworkUrl60 || '').replace('100x100bb', '300x300bb');
     const price = item.formattedPrice || "";
     const sampleHref = (SAMPLE_LINKS && SAMPLE_LINKS[meta.id]) || meta.url || item.trackViewUrl || '#';
+    const bookWebsiteHref = meta.id === 6465691356 ? 'https://www.ipedia.online/physics_AG/' : '';
     const el = document.createElement('div');
     el.className = 'card book';
     el.dataset.cat = meta.cat;
@@ -3465,6 +3468,7 @@ const SAMPLE_LINKS = {
         ${price ? `<div class="price">${escapeHtml(price)}</div>` : '' }
         <div class="links">
           <a class="btn primary" href="${sampleHref}" target="_blank" rel="noopener">Δωρεάν δείγμα</a>
+          ${bookWebsiteHref ? `<a class="btn" href="${bookWebsiteHref}" target="_blank" rel="noopener">Ιστοσελίδα Βιβλίου</a>` : ''}
           ${rawDesc ? `<button class="btn js-book-preview" type="button" aria-expanded="false">Περισσότερα</button>` : ''}
         </div>
       </div>
