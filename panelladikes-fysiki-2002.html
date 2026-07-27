@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+
+<html lang="el">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Θέματα και αναλυτικές λύσεις Πανελλαδικών Εξετάσεων Φυσικής 2002." name="description"/>
+<meta content="Πανελλαδικές 2002, Φυσική, ταλαντώσεις, κύματα, στερεό σώμα, λύσεις" name="keywords"/>
+<title>Πανελλαδικές Εξετάσεις Φυσικής 2002 | Θέματα και Λύσεις</title>
+<script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']],
+        processEscapes: true
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+<script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+    :root {
+      --bg: #eef4f8;
+      --paper: #ffffff;
+      --ink: #172033;
+      --muted: #667085;
+      --navy: #123b5d;
+      --blue: #1769aa;
+      --blue-soft: #e8f2fb;
+      --cyan: #0e8fa8;
+      --green: #18794e;
+      --green-soft: #ecfdf3;
+      --amber: #b45309;
+      --amber-soft: #fff7ed;
+      --line: #d8e2ea;
+      --shadow: 0 18px 55px rgba(18, 59, 93, 0.13);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans", Arial, sans-serif;
+      line-height: 1.75;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(49, 137, 190, 0.18), transparent 34%),
+        radial-gradient(circle at 95% 18%, rgba(14, 143, 168, 0.10), transparent 30%),
+        var(--bg);
+    }
+
+    button, summary { font: inherit; }
+
+    .progress {
+      position: fixed;
+      inset: 0 auto auto 0;
+      z-index: 1000;
+      width: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--cyan), #38bdf8, #2563eb);
+      box-shadow: 0 0 12px rgba(14, 143, 168, 0.6);
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      color: white;
+      background: linear-gradient(135deg, #0f2e49 0%, #13527d 56%, #0e8fa8 120%);
+    }
+
+    .hero::before,
+    .hero::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(2px);
+      pointer-events: none;
+    }
+
+    .hero::before {
+      width: 340px;
+      height: 340px;
+      right: -120px;
+      top: -170px;
+      background: rgba(255,255,255,0.08);
+    }
+
+    .hero::after {
+      width: 220px;
+      height: 220px;
+      left: -110px;
+      bottom: -120px;
+      background: rgba(56,189,248,0.12);
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      width: min(1120px, calc(100% - 34px));
+      margin: auto;
+      padding: 54px 0 44px;
+    }
+
+    .eyebrow {
+      margin: 0 0 9px;
+      font-size: 0.9rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.78;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 850px;
+      font-size: clamp(2rem, 5vw, 3.65rem);
+      line-height: 1.08;
+      letter-spacing: -0.035em;
+    }
+
+    .lead {
+      max-width: 780px;
+      margin: 18px 0 0;
+      font-size: clamp(1rem, 2vw, 1.16rem);
+      color: rgba(255,255,255,0.86);
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 24px;
+    }
+
+    .pill {
+      padding: 6px 12px;
+      border: 1px solid rgba(255,255,255,0.24);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.11);
+      backdrop-filter: blur(8px);
+      font-size: 0.91rem;
+    }
+
+    .toolbar-wrap {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      border-bottom: 1px solid rgba(216,226,234,0.95);
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(14px);
+    }
+
+    .toolbar {
+      width: min(1120px, calc(100% - 34px));
+      margin: auto;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+    }
+
+    .topic-nav {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .topic-nav::-webkit-scrollbar { display: none; }
+
+    .topic-nav a,
+    .global-toggle {
+      white-space: nowrap;
+      text-decoration: none;
+      border: 1px solid var(--line);
+      color: var(--navy);
+      background: white;
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+    }
+
+    .topic-nav a:hover,
+    .global-toggle:hover {
+      transform: translateY(-1px);
+      border-color: #98b9d1;
+      box-shadow: 0 7px 18px rgba(18,59,93,0.10);
+      background: #f8fbfd;
+    }
+
+    .global-toggle {
+      color: white;
+      background: var(--navy);
+      border-color: var(--navy);
+    }
+
+    main {
+      width: min(1120px, calc(100% - 34px));
+      margin: 28px auto 70px;
+    }
+
+    .intro-card {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 22px;
+      align-items: center;
+      margin-bottom: 24px;
+      padding: 22px 24px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.86);
+      box-shadow: 0 10px 30px rgba(18,59,93,0.08);
+    }
+
+    .intro-card p { margin: 0; }
+    .intro-card strong { color: var(--navy); }
+
+    .exam-card {
+      margin-top: 26px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+      box-shadow: var(--shadow);
+      overflow: clip;
+      scroll-margin-top: 82px;
+      animation: rise 520ms ease both;
+    }
+
+    .exam-card:nth-of-type(2) { animation-delay: 70ms; }
+    .exam-card:nth-of-type(3) { animation-delay: 140ms; }
+    .exam-card:nth-of-type(4) { animation-delay: 210ms; }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .exam-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+      padding: 25px 27px 21px;
+      color: white;
+      background: linear-gradient(135deg, #143d5f, #1769aa);
+    }
+
+    .exam-head h2 {
+      margin: 0;
+      font-size: clamp(1.55rem, 3vw, 2rem);
+      line-height: 1.2;
+    }
+
+    .exam-head p {
+      margin: 7px 0 0;
+      color: rgba(255,255,255,0.8);
+      font-size: 0.95rem;
+    }
+
+    .score {
+      flex: 0 0 auto;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.22);
+      font-weight: 800;
+      font-size: 0.9rem;
+    }
+
+    .statement {
+      padding: 26px 28px 8px;
+    }
+
+    .statement h3,
+    .solution-content h3 {
+      margin: 22px 0 10px;
+      color: var(--navy);
+      font-size: 1.16rem;
+    }
+
+    .statement h3:first-child,
+    .solution-content h3:first-child { margin-top: 0; }
+
+    p { margin: 0 0 12px; }
+
+    .question,
+    .solution-step {
+      margin: 16px 0;
+      padding: 17px 18px;
+      border: 1px solid #e2e8f0;
+      border-radius: 15px;
+      background: #fbfdff;
+    }
+
+    .question-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 7px;
+      font-weight: 800;
+      color: var(--navy);
+    }
+
+    .points {
+      flex: 0 0 auto;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin: 12px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .options li {
+      padding: 8px 11px;
+      border-radius: 11px;
+      background: white;
+      border: 1px solid #e5eaf0;
+    }
+
+    .diagram {
+      width: min(100%, 650px);
+      margin: 21px auto;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      background: linear-gradient(180deg, #fff, #f8fbfd);
+      overflow-x: auto;
+      text-align: center;
+    }
+
+    .diagram svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      min-width: 360px;
+    }
+
+    .diagram figcaption {
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .solution-shell {
+      margin: 22px 28px 28px;
+      border: 1px solid #b9dccb;
+      border-radius: 17px;
+      overflow: hidden;
+      background: var(--green-soft);
+    }
+
+    .solution-toggle {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 15px 17px;
+      border: 0;
+      color: #105c3b;
+      background: transparent;
+      font-weight: 850;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .solution-toggle:hover { background: rgba(24,121,78,0.06); }
+
+    .solution-toggle .icon {
+      width: 31px;
+      height: 31px;
+      display: inline-grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: white;
+      border: 1px solid #b9dccb;
+      transition: transform 250ms ease, background 250ms ease;
+    }
+
+    .solution-shell.open .solution-toggle .icon {
+      transform: rotate(180deg);
+      background: #dff6e9;
+    }
+
+    .solution-panel {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 520ms cubic-bezier(.2,.75,.2,1), opacity 230ms ease;
+    }
+
+    .solution-shell.open .solution-panel { opacity: 1; }
+
+    .solution-content {
+      margin: 0 13px 13px;
+      padding: 21px 20px 23px;
+      border-radius: 13px;
+      background: white;
+      border: 1px solid #cce7d8;
+    }
+
+    .answer-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      color: #105c3b;
+      background: #ddf7e8;
+      border: 1px solid #bce4ce;
+      font-weight: 850;
+      font-size: 0.93rem;
+    }
+
+    .math {
+      overflow-x: auto;
+      margin: 14px 0;
+      padding: 12px 14px;
+      border: 1px solid #e0e7ef;
+      border-radius: 13px;
+      background: #f8fafc;
+    }
+
+    .note {
+      margin: 17px 0;
+      padding: 13px 15px;
+      border-left: 5px solid var(--amber);
+      border-radius: 12px;
+      background: var(--amber-soft);
+      color: #713f12;
+    }
+
+    .result {
+      margin: 15px 0;
+      padding: 14px 15px;
+      border-left: 5px solid var(--green);
+      border-radius: 12px;
+      background: #effcf5;
+      font-weight: 700;
+    }
+
+    .back-top {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      width: 43px;
+      height: 43px;
+      display: grid;
+      place-items: center;
+      border: 0;
+      border-radius: 50%;
+      color: white;
+      background: var(--navy);
+      box-shadow: 0 10px 25px rgba(18,59,93,0.28);
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: 180ms ease;
+    }
+
+    .back-top.visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 760px) {
+      .hero-inner { padding: 42px 0 35px; }
+      .toolbar { align-items: stretch; flex-direction: column; }
+      .global-toggle { align-self: flex-end; }
+      .intro-card { grid-template-columns: 1fr; }
+      .exam-head { padding: 21px 20px; }
+      .statement { padding: 22px 19px 5px; }
+      .solution-shell { margin: 20px 19px 22px; }
+      .options { grid-template-columns: 1fr; }
+      .question-title { display: block; }
+      .points { display: block; margin-top: 3px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    @media print {
+      body { background: white; }
+      .progress, .toolbar-wrap, .back-top, .global-toggle { display: none !important; }
+      .hero { color: black; background: white; border-bottom: 2px solid #333; }
+      .hero-inner { padding: 20px 0; }
+      .lead, .eyebrow { color: #333; }
+      .pill { color: #222; border-color: #aaa; background: white; }
+      main { width: 100%; margin: 0; }
+      .exam-card { box-shadow: none; break-inside: avoid; }
+      .exam-head { color: black; background: #f2f2f2; }
+      .exam-head p { color: #333; }
+      .solution-panel { max-height: none !important; opacity: 1 !important; }
+      .solution-toggle { display: none; }
+    }
+  
+
+    /* Λύση ακριβώς κάτω από κάθε υποερώτημα */
+    .statement { padding-bottom: 26px; }
+
+    .inline-solution {
+      margin: 15px 0 0;
+      border-radius: 14px;
+      box-shadow: none;
+    }
+
+    .inline-solution .solution-toggle {
+      padding: 12px 14px;
+      font-size: 0.96rem;
+    }
+
+    .inline-solution .solution-content {
+      margin: 0 9px 9px;
+      padding: 17px 16px 19px;
+    }
+
+    .subquestion-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .subquestion {
+      padding: 14px 15px;
+      border: 1px solid #dfe7ee;
+      border-radius: 13px;
+      background: #ffffff;
+    }
+
+    .subquestion > p:last-of-type { margin-bottom: 0; }
+
+    .question:has(.solution-shell.open),
+    .subquestion:has(.solution-shell.open) {
+      border-color: #acd7c1;
+      box-shadow: 0 8px 22px rgba(24,121,78,0.07);
+    }
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<header class="hero" id="top">
+<div class="hero-inner">
+<p class="eyebrow">Απολυτήριες Εξετάσεις Γ΄ Τάξης Ενιαίου Λυκείου</p>
+<h1>Πανελλαδικές Εξετάσεις Φυσικής 2002</h1>
+<p class="lead">Πέμπτη 6 Ιουνίου 2002 · Θέματα Θετικής και Τεχνολογικής Κατεύθυνσης με αναλυτικές λύσεις.</p>
+<div class="hero-meta">
+<span class="pill">4 Θέματα</span>
+<span class="pill">100 Μονάδες</span>
+<span class="pill">Ταλαντώσεις</span>
+<span class="pill">Κύματα</span>
+<span class="pill">Στερεό σώμα</span>
+</div>
+</div>
+</header>
+<div class="toolbar-wrap">
+<div class="toolbar">
+<nav aria-label="Πλοήγηση στα θέματα" class="topic-nav">
+<a href="#thema-1">Θέμα 1</a>
+<a href="#thema-2">Θέμα 2</a>
+<a href="#thema-3">Θέμα 3</a>
+<a href="#thema-4">Θέμα 4</a>
+</nav>
+<button class="global-toggle" id="globalToggle" type="button">Εμφάνιση όλων των λύσεων</button>
+</div>
+</div>
+<main>
+<div class="intro-card">
+<p><strong>Τρόπος χρήσης: </strong>διάβασε κάθε υποερώτημα και άνοιξε τη λύση ακριβώς από κάτω μόνο όταν θέλεις να ελέγξεις την απάντησή σου.</p>
+<span class="answer-badge">Διαδραστικές λύσεις</span>
+</div>
+<article class="exam-card" id="thema-1">
+<header class="exam-head">
+<div>
+<h2>Θέμα 1ο</h2>
+<p>Ερωτήσεις θεωρίας και πολλαπλής επιλογής</p>
+</div>
+<span class="score">25 μονάδες</span>
+</header>
+<section class="statement">
+<p>Στις ερωτήσεις 1–4 να επιλέξετε τη σωστή απάντηση.</p>
+<div class="question">
+<div class="question-title"><span>1. Εξαναγκασμένη ταλάντωση</span><span class="points">5 μονάδες</span></div>
+<p>Η ιδιοσυχνότητα ενός συστήματος που εκτελεί εξαναγκασμένη ταλάντωση χωρίς τριβή είναι 20 Hz. Το πλάτος της ταλάντωσης γίνεται μέγιστο όταν η συχνότητα του διεγέρτη είναι:</p>
+<ul class="options">
+<li>α. 10 Hz</li><li>β. 20 Hz</li><li>γ. 30 Hz</li><li>δ. 40 Hz</li>
+</ul>
+<section class="solution-shell inline-solution"><button aria-expanded="false" class="solution-toggle" type="button"><span>Εμφάνιση λύσης ερώτησης 1</span><span class="icon">⌄</span></button><div class="solution-panel"><div class="solution-content"><p><span class="answer-badge">1. β</span> Στον συντονισμό η συχνότητα του διεγέρτη ισούται με την ιδιοσυχνότητα του συστήματος.</p><div class="math">\[f_{\delta}=f_0=20\,\text{Hz}\]</div></div></div></section></div>
+<div class="question">
+<div class="question-title"><span>2. Ηλεκτρική ταλάντωση LC</span><span class="points">5 μονάδες</span></div>
+<p>Ηλεκτρικό κύκλωμα LC, αμελητέας ωμικής αντίστασης, εκτελεί ηλεκτρική ταλάντωση με περίοδο \(T\). Αν τετραπλασιάσουμε τη χωρητικότητα του πυκνωτή, χωρίς να μεταβάλουμε τον συντελεστή αυτεπαγωγής του πηνίου, τότε η περίοδος θα είναι:</p>
+<ul class="options">
+<li>α. \(T/2\)</li><li>β. \(T\)</li><li>γ. \(2T\)</li><li>δ. \(4T\)</li>
+</ul>
+<section class="solution-shell inline-solution"><button aria-expanded="false" class="solution-toggle" type="button"><span>Εμφάνιση λύσης ερώτησης 2</span><span class="icon">⌄</span></button><div class="solution-panel"><div class="solution-content"><p><span class="answer-badge">2. γ</span> Η περίοδος κυκλώματος LC είναι:</p><div class="math">
+              \[T=2\pi\sqrt{LC}\]
+              \[C'=4C \Rightarrow T'=2\pi\sqrt{L\cdot4C}=2T\]
+            </div></div></div></section></div>
+<div class="question">
+<div class="question-title"><span>3. Στάσιμο κύμα</span><span class="points">5 μονάδες</span></div>
+<p>Το μήκος κύματος δύο κυμάτων που συμβάλλουν και δημιουργούν στάσιμο κύμα είναι \(\lambda\). Η απόσταση μεταξύ δύο διαδοχικών δεσμών είναι:</p>
+<ul class="options">
+<li>α. \(\lambda\)</li><li>β. \(\lambda/2\)</li><li>γ. \(2\lambda\)</li><li>δ. \(\lambda/4\)</li>
+</ul>
+<section class="solution-shell inline-solution"><button aria-expanded="false" class="solution-toggle" type="button"><span>Εμφάνιση λύσης ερώτησης 3</span><span class="icon">⌄</span></button><div class="solution-panel"><div class="solution-content"><p><span class="answer-badge">3. β</span> Η απόσταση δύο διαδοχικών δεσμών στάσιμου κύματος είναι:</p><div class="math">\[d=\frac{\lambda}{2}\]</div></div></div></section></div>
+<div class="question">
+<div class="question-title"><span>4. Δύναμη επαναφοράς</span><span class="points">5 μονάδες</span></div>
+<p>Υλικό σημείο εκτελεί απλή αρμονική ταλάντωση υπό την επίδραση συνισταμένης δύναμης \(F\). Αν \(x\) είναι η απομάκρυνση από τη θέση ισορροπίας και \(D\) θετική σταθερά, τότε:</p>
+<ul class="options">
+<li>α. \(F=D\)</li><li>β. \(F=Dx\)</li><li>γ. \(F=-Dx\)</li><li>δ. \(F=0\)</li>
+</ul>
+<section class="solution-shell inline-solution"><button aria-expanded="false" class="solution-toggle" type="button"><span>Εμφάνιση λύσης ερώτησης 4</span><span class="icon">⌄</span></button><div class="solution-panel"><div class="solution-content"><p><span class="answer-badge">4. γ</span> Στην απλή αρμονική ταλάντωση η συνισταμένη δύναμη είναι αντίθετη της απομάκρυνσης:</p><div class="math">\[F=-Dx\]</div></div></div></section></div>
+<div class="question"><div class="question-title"><span>5. Συμπλήρωση κενών</span><span class="points">5 μονάδες</span></div><p>Να συμπληρώσετε σωστά τις προτάσεις:</p><div class="subquestion-list"><div class="subquestion"><p><strong>α.</strong> Κατά τη διάδοση ενός κύματος μεταφέρεται ενέργεια και ορμή, αλλά δεν μεταφέρεται …</p><section class="solution-shell inline-solution"><button aria-expanded="false" class="solution-toggle" type="button"><span>Εμφάνιση λύσης του 5α</span><span class="icon">⌄</span></button><div class="solution-panel"><div class="solution-content"><p><strong>α.</strong> ύλη</p></div></div></section></div><div class="subquestion"><p><strong>β.</strong> Διαμήκη ονομάζονται τα κύματα στα οποία τα σημεία του μέσου ταλαντώνονται … στη διεύθυνση διάδοσης.</p><section class="solution-shell inline-solution"><button aria-expanded="false" class="solution-toggle" type="button"><span>Εμφάνιση λύσης του 5β</span><span class="icon">⌄</span></button><div class="solution-panel"><div class="solution-content"><p><strong>β.</strong> παράλληλα</p></div></div></section></div><div class="subquestion"><p><strong>γ.</strong> Η αιτία δημιουργίας ηλεκτρομαγνητικού κύματος είναι η … κίνηση ηλεκτρικών φορτίων.</p><section class="solution-shell inline-solution"><button aria-expanded="false" class="solution-toggle" type="button"><span>Εμφάνιση λύσης του 5γ</span><span class="icon">⌄</span></button><div class="solution-panel"><div class="solution-content"><p><strong>γ.</strong> επιταχυνόμενη</p></div></div></section></div><div class="subquestion"><p><strong>δ.</strong> Το αλγεβρικό άθροισμα των … που δρουν σε στερεό που περιστρέφεται γύρω από σταθερό άξονα ισούται με τον ρυθμό μεταβολής της στροφορμής του.</p><section class="solution-shell inline-solution"><button aria-expanded="false" class="solution-toggle" type="button"><span>Εμφάνιση λύσης του 5δ</span><span class="icon">⌄</span></button><div class="solution-panel"><div class="solution-content"><p><strong>δ.</strong> ροπών</p></div></div></section></div><div class="subquestion"><p><strong>ε.</strong> Μη αδρανειακό είναι ένα σύστημα αναφοράς που … σε σχέση με αδρανειακό σύστημα.</p><section class="solution-shell inline-solution"><button aria-expanded="false" class="solution-toggle" type="button"><span>Εμφάνιση λύσης του 5ε</span><span class="icon">⌄</span></button><div class="solution-panel"><div class="solution-content"><p><strong>ε.</strong> επιταχύνεται</p></div></div></section></div></div></div>
+</section>
+
+</article>
+<article class="exam-card" id="thema-2">
+<header class="exam-head">
+<div>
+<h2>Θέμα 2ο</h2>
+<p>Διάθλαση, διατήρηση στροφορμής και ελαστική κρούση</p>
+</div>
+<span class="score">25 μονάδες</span>
+</header>
+<section class="statement">
+<div class="question">
+<div class="question-title"><span>1. Διάθλαση φωτός</span><span class="points">9 μονάδες</span></div>
+<p>Ακτίνα μονοχρωματικού φωτός διαδίδεται στο οπτικό μέσο Α με δείκτη διάθλασης \(n_A\) και προσπίπτει με γωνία μικρότερη της κρίσιμης στη διαχωριστική επιφάνεια με το μέσο Β, όπου \(n_B&lt;n_A\).</p>
+<figure class="diagram">
+<svg aria-label="Προσπίπτουσα ακτίνα από το μέσο Α προς το μέσο Β" role="img" viewbox="0 0 640 330">
+<defs>
+<marker id="arrow-ray" markerheight="10" markerwidth="10" orient="auto" refx="8" refy="3">
+<path d="M0,0 L0,6 L9,3 z" fill="#172033"></path>
+</marker>
+</defs>
+<rect fill="#eef7ff" height="165" width="640" x="0" y="0"></rect>
+<rect fill="#f6fbf7" height="165" width="640" x="0" y="165"></rect>
+<line stroke="#172033" stroke-width="3" x1="45" x2="595" y1="165" y2="165"></line>
+<line stroke="#667085" stroke-dasharray="8 7" stroke-width="2" x1="320" x2="320" y1="32" y2="298"></line>
+<line marker-end="url(#arrow-ray)" stroke="#172033" stroke-width="4" x1="202" x2="320" y1="56" y2="165"></line>
+<line stroke="#9aa4b2" stroke-dasharray="8 7" stroke-width="3" x1="320" x2="352" y1="165" y2="241"></line>
+<text fill="#123b5d" font-size="24" font-weight="700" x="72" y="130">Μέσο Α, nₐ</text>
+<text fill="#18794e" font-size="24" font-weight="700" x="72" y="213">Μέσο Β, nᵦ</text>
+<text fill="#667085" font-size="19" x="328" y="58">κάθετη</text>
+</svg>
+<figcaption>Να σχεδιάσετε τη διαθλώμενη ακτίνα.</figcaption>
+</figure>
+<p><strong>Α.</strong> Να σχεδιάσετε τη διαθλώμενη ακτίνα. <span class="points">2 μονάδες</span></p>
+<p><strong>Β.</strong> Ποια γωνία είναι μεγαλύτερη, η γωνία πρόσπτωσης ή η γωνία διάθλασης; Να αιτιολογήσετε. <span class="points">7 μονάδες</span></p>
+<section class="solution-shell inline-solution"><button aria-expanded="false" class="solution-toggle" type="button"><span>Εμφάνιση λύσης ερώτησης 1</span><span class="icon">⌄</span></button><div class="solution-panel"><div class="solution-content"><figure class="diagram">
+<svg aria-label="Διαθλώμενη ακτίνα απομακρύνεται από την κάθετη" role="img" viewbox="0 0 640 330">
+<defs>
+<marker id="arrow-ray2" markerheight="10" markerwidth="10" orient="auto" refx="8" refy="3">
+<path d="M0,0 L0,6 L9,3 z" fill="#172033"></path>
+</marker>
+</defs>
+<rect fill="#eef7ff" height="165" width="640" x="0" y="0"></rect>
+<rect fill="#f6fbf7" height="165" width="640" x="0" y="165"></rect>
+<line stroke="#172033" stroke-width="3" x1="45" x2="595" y1="165" y2="165"></line>
+<line stroke="#667085" stroke-dasharray="8 7" stroke-width="2" x1="320" x2="320" y1="32" y2="298"></line>
+<line marker-end="url(#arrow-ray2)" stroke="#172033" stroke-width="4" x1="202" x2="320" y1="56" y2="165"></line>
+<line marker-end="url(#arrow-ray2)" stroke="#1769aa" stroke-width="4" x1="320" x2="493" y1="165" y2="260"></line>
+<path d="M320 115 A50 50 0 0 0 283 130" fill="none" stroke="#b45309" stroke-width="3"></path>
+<path d="M320 215 A50 50 0 0 1 364 189" fill="none" stroke="#18794e" stroke-width="3"></path>
+<text fill="#b45309" font-size="20" x="279" y="107">θₐ</text>
+<text fill="#18794e" font-size="20" x="366" y="219">θᵦ</text>
+<text fill="#123b5d" font-size="24" font-weight="700" x="72" y="130">Μέσο Α</text>
+<text fill="#18794e" font-size="24" font-weight="700" x="72" y="213">Μέσο Β</text>
+</svg>
+<figcaption>Η ακτίνα απομακρύνεται από την κάθετη, επειδή περνά σε οπτικά αραιότερο μέσο.</figcaption>
+</figure><p><span class="answer-badge">Σωστή επιλογή: β</span></p><p>Από τον νόμο του Snell:</p><div class="math">
+              \[n_A\operatorname{ημ}\theta_A=n_B\operatorname{ημ}\theta_B\]
+              \[\frac{\operatorname{ημ}\theta_A}{\operatorname{ημ}\theta_B}=\frac{n_B}{n_A}\]
+            </div><p>Επειδή \(n_B&lt;n_A\), προκύπτει:</p><div class="math">\[\operatorname{ημ}\theta_B&gt;\operatorname{ημ}\theta_A\Rightarrow\theta_B&gt;\theta_A\]</div></div></div></section></div>
+<div class="question">
+<div class="question-title"><span>2. Περιστρεφόμενος δίσκος</span><span class="points">8 μονάδες</span></div>
+<p>Δίσκος παιδικής χαράς περιστρέφεται γύρω από κατακόρυφο άξονα που διέρχεται από το κέντρο του. Ένα παιδί μετακινείται από σημείο Α της περιφέρειας σε σημείο Β πλησιέστερα στο κέντρο. Ο δίσκος θα περιστρέφεται:</p>
+<ul class="options"><li>α. πιο αργά</li><li>β. πιο γρήγορα</li></ul>
+<figure class="diagram">
+<svg aria-label="Κάτοψη περιστρεφόμενου δίσκου με σημεία Α, Β και Ο" role="img" viewbox="0 0 640 340">
+<circle cx="330" cy="170" fill="#edf3f7" r="128" stroke="#123b5d" stroke-width="4"></circle>
+<circle cx="330" cy="170" fill="#123b5d" r="6"></circle>
+<circle cx="230" cy="170" fill="#1769aa" r="6"></circle>
+<circle cx="202" cy="170" fill="#1769aa" r="6"></circle>
+<circle cx="160" cy="170" fill="#0e8fa8" r="7"></circle>
+<line marker-end="url(#arrow-ray)" stroke="#0e8fa8" stroke-width="4" x1="160" x2="230" y1="170" y2="170"></line>
+<text font-size="23" font-weight="700" x="139" y="199">A</text>
+<text font-size="23" font-weight="700" x="219" y="199">B</text>
+<text font-size="23" font-weight="700" x="340" y="199">O</text>
+</svg>
+</figure>
+<p>Να αιτιολογήσετε την απάντησή σας.</p>
+<section class="solution-shell inline-solution"><button aria-expanded="false" class="solution-toggle" type="button"><span>Εμφάνιση λύσης ερώτησης 2</span><span class="icon">⌄</span></button><div class="solution-panel"><div class="solution-content"><p><span class="answer-badge">Σωστή επιλογή: β</span> Ο δίσκος περιστρέφεται πιο γρήγορα.</p><p>Ως προς τον κατακόρυφο άξονα δεν ασκείται εξωτερική ροπή, άρα διατηρείται η στροφορμή του συστήματος δίσκος–παιδί:</p><div class="math">
+              \[L_1=L_2\]
+              \[I_1\omega_1=I_2\omega_2\]
+            </div><p>Όταν το παιδί πλησιάζει στον άξονα, η ροπή αδράνειας του συστήματος μειώνεται, δηλαδή \(I_2&lt;I_1\). Επομένως:</p><div class="math">\[\omega_2=\frac{I_1}{I_2}\omega_1&gt;\omega_1\]</div></div></div></section></div>
+<div class="question">
+<div class="question-title"><span>3. Κεντρική ελαστική κρούση</span><span class="points">8 μονάδες</span></div>
+<p>Σφαίρα μάζας \(m\), κινούμενη με ταχύτητα μέτρου \(υ_1\), συγκρούεται κεντρικά και ελαστικά με ακίνητη σφαίρα ίσης μάζας. Να βρείτε τις ταχύτητες των δύο σφαιρών μετά την κρούση με εφαρμογή των αρχών που διέπουν την ελαστική κρούση.</p>
+<section class="solution-shell inline-solution"><button aria-expanded="false" class="solution-toggle" type="button"><span>Εμφάνιση λύσης ερώτησης 3</span><span class="icon">⌄</span></button><div class="solution-panel"><div class="solution-content"><p>Θεωρούμε θετική τη φορά κίνησης της πρώτης σφαίρας. Από τη διατήρηση της ορμής:</p><div class="math">
+              \[mυ_1=mυ'_1+mυ'_2\]
+              \[υ_1=υ'_1+υ'_2 \tag{1}\]
+            </div><p>Από τη διατήρηση της κινητικής ενέργειας:</p><div class="math">
+              \[\frac12mυ_1^2=\frac12m{υ'_1}^2+\frac12m{υ'_2}^2\]
+              \[υ_1^2={υ'_1}^2+{υ'_2}^2 \tag{2}\]
+            </div><p>Υψώνουμε την (1) στο τετράγωνο και τη συγκρίνουμε με την (2):</p><div class="math">
+              \[υ_1^2={υ'_1}^2+{υ'_2}^2+2υ'_1υ'_2\]
+              \[2υ'_1υ'_2=0\]
+            </div><p>Η φυσικά αποδεκτή λύση για πραγματική κρούση είναι:</p><div class="result">
+              \[υ'_1=0,\qquad υ'_2=υ_1\]
+              Οι δύο ίσες σφαίρες ανταλλάσσουν ταχύτητες.
+            </div><div class="note"><strong>Παρατήρηση:</strong> Στο παρεχόμενο PDF των απαντήσεων υπάρχει τυπογραφικό λάθος στον γενικό τύπο της ταχύτητας της δεύτερης σφαίρας. Εδώ έχει χρησιμοποιηθεί η σωστή φυσική σχέση.</div></div></div></section></div>
+</section>
+
+</article>
+<article class="exam-card" id="thema-3">
+<header class="exam-head">
+<div>
+<h2>Θέμα 3ο</h2>
+<p>Διάδοση αρμονικού κύματος σε χορδή</p>
+</div>
+<span class="score">25 μονάδες</span>
+</header>
+<section class="statement">
+<p>Το σημείο \(O\) ομογενούς ελαστικής χορδής, τη χρονική στιγμή \(t=0\), αρχίζει να εκτελεί απλή αρμονική ταλάντωση κάθετα στη διεύθυνση της χορδής, με εξίσωση:</p>
+<div class="math">\[y=0{,}05\operatorname{ημ}(8\pi t)\quad (SI)\]</div>
+<p>Το κύμα που παράγεται διαδίδεται προς τη θετική φορά του άξονα \(x'x\), κατά μήκος της χορδής, με ταχύτητα μέτρου \(20\,\text{m/s}\).</p>
+<div class="question"><div class="question-title"><span>α. Να βρεθεί η περίοδος ταλάντωσης ενός σημείου του μέσου.</span><span class="points">6 μονάδες</span></div><section class="solution-shell inline-solution"><button aria-expanded="false" class="solution-toggle" type="button"><span>Εμφάνιση λύσης του α</span><span class="icon">⌄</span></button><div class="solution-panel"><div class="solution-content"><p>Από την εξίσωση της πηγής προκύπτει:</p><div class="math">\[\omega=8\pi\,\text{rad/s}\]</div><p>Επειδή:</p><div class="math">
+              \[\omega=\frac{2\pi}{T}\]
+              \[T=\frac{2\pi}{8\pi}=0{,}25\,\text{s}\]
+            </div></div></div></section></div>
+<div class="question"><div class="question-title"><span>β. Να βρεθεί το μήκος κύματος.</span><span class="points">6 μονάδες</span></div><section class="solution-shell inline-solution"><button aria-expanded="false" class="solution-toggle" type="button"><span>Εμφάνιση λύσης του β</span><span class="icon">⌄</span></button><div class="solution-panel"><div class="solution-content"><p>Η συχνότητα είναι:</p><div class="math">\[f=\frac1T=4\,\text{Hz}\]</div><p>Από τη θεμελιώδη εξίσωση της κυματικής:</p><div class="math">
+              \[υ=\lambda f\]
+              \[\lambda=\frac{υ}{f}=\frac{20}{4}=5\,\text{m}\]
+            </div></div></div></section></div>
+<div class="question"><div class="question-title"><span>γ. Να γραφεί η εξίσωση του κύματος.</span><span class="points">6 μονάδες</span></div><section class="solution-shell inline-solution"><button aria-expanded="false" class="solution-toggle" type="button"><span>Εμφάνιση λύσης του γ</span><span class="icon">⌄</span></button><div class="solution-panel"><div class="solution-content"><p>Για κύμα που διαδίδεται προς τη θετική φορά του άξονα \(x\):</p><div class="math">
+              \[y=A\operatorname{ημ}2\pi\left(\frac{t}{T}-\frac{x}{\lambda}\right)\]
+            </div><p>Με \(A=0{,}05\,\text{m}\), \(T=0{,}25\,\text{s}\) και \(\lambda=5\,\text{m}\):</p><div class="result">
+              \[y=0{,}05\operatorname{ημ}\left(8\pi t-0{,}4\pi x\right)\quad (SI)\]
+            </div><p>Η εξίσωση ισχύει για τα σημεία στα οποία έχει φτάσει το κύμα, δηλαδή για \(0\le x\le 20t\).</p></div></div></section></div>
+<div class="question"><div class="question-title"><span>δ. Να βρεθεί το μέτρο της μέγιστης ταχύτητας ταλάντωσης ενός σημείου της χορδής.</span><span class="points">7 μονάδες</span></div><section class="solution-shell inline-solution"><button aria-expanded="false" class="solution-toggle" type="button"><span>Εμφάνιση λύσης του δ</span><span class="icon">⌄</span></button><div class="solution-panel"><div class="solution-content"><div class="math">
+              \[υ_{\max}=\omega A\]
+              \[υ_{\max}=8\pi\cdot0{,}05=0{,}4\pi\,\text{m/s}\]
+            </div><div class="result">\[υ_{\max}=0{,}4\pi\,\text{m/s}\approx1{,}26\,\text{m/s}\]</div></div></div></section></div>
+</section>
+
+</article>
+<article class="exam-card" id="thema-4">
+<header class="exam-head">
+<div>
+<h2>Θέμα 4ο</h2>
+<p>Σύνθετο στερεό από δύο ομογενείς ράβδους</p>
+</div>
+<span class="score">25 μονάδες</span>
+</header>
+<section class="statement">
+<p>Δύο ίδιες, λεπτές, ισοπαχείς και ομογενείς ράβδοι \(OA\) και \(OB\), μάζας \(M=4\,\text{kg}\) και μήκους \(L=1{,}5\,\text{m}\) η καθεμία, συγκολλούνται στο άκρο \(O\), ώστε να σχηματίζουν ορθή γωνία.</p>
+<p>Το σύστημα μπορεί να περιστρέφεται γύρω από οριζόντιο άξονα κάθετο στο επίπεδο \(AOB\), που διέρχεται από το \(O\). Αρχικά συγκρατείται με τη ράβδο \(OA\) οριζόντια και τη ράβδο \(OB\) κατακόρυφη προς τα κάτω.</p>
+<figure class="diagram">
+<svg aria-label="Δύο κάθετες ράβδοι OA και OB με άξονα στο O" role="img" viewbox="0 0 680 380">
+<defs>
+<marker id="arrow-g" markerheight="10" markerwidth="10" orient="auto" refx="8" refy="3"><path d="M0,0 L0,6 L9,3 z" fill="#b45309"></path></marker>
+</defs>
+<line stroke="#123b5d" stroke-linecap="round" stroke-width="13" x1="90" x2="390" y1="105" y2="105"></line>
+<line stroke="#1769aa" stroke-linecap="round" stroke-width="13" x1="390" x2="390" y1="105" y2="335"></line>
+<circle cx="390" cy="105" fill="#fff" r="13" stroke="#172033" stroke-width="4"></circle>
+<line stroke="#667085" stroke-dasharray="8 7" stroke-width="2" x1="90" x2="580" y1="105" y2="105"></line>
+<line stroke="#667085" stroke-dasharray="8 7" stroke-width="2" x1="390" x2="390" y1="105" y2="360"></line>
+<text font-size="25" font-weight="700" x="64" y="98">A</text>
+<text font-size="25" font-weight="700" x="404" y="99">O</text>
+<text font-size="25" font-weight="700" x="405" y="340">B</text>
+<text fill="#667085" font-size="20" x="405" y="366">x</text>
+</svg>
+<figcaption>Αρχική θέση του συστήματος.</figcaption>
+</figure>
+<p>Η ροπή αδράνειας κάθε ράβδου ως προς το κέντρο μάζας της είναι:</p>
+<div class="math">\[I_{cm}=\frac{1}{12}ML^2\]</div>
+<div class="question"><div class="question-title"><span>Α. Να υπολογίσετε τη ροπή αδράνειας κάθε ράβδου ως προς τον άξονα που διέρχεται από το O.</span><span class="points">6 μονάδες</span></div><section class="solution-shell inline-solution"><button aria-expanded="false" class="solution-toggle" type="button"><span>Εμφάνιση λύσης του Α</span><span class="icon">⌄</span></button><div class="solution-panel"><div class="solution-content"><p>Με το θεώρημα παραλλήλων αξόνων:</p><div class="math">
+              \[I_O=I_{cm}+M\left(\frac{L}{2}\right)^2\]
+              \[I_O=\frac{1}{12}ML^2+\frac14ML^2=\frac13ML^2\]
+            </div><p>Αριθμητικά:</p><div class="result">
+              \[I_O=\frac13\cdot4\cdot(1{,}5)^2=3\,\text{kg·m}^2\]
+            </div></div></div></section></div>
+<div class="question"><div class="question-title"><span>Β. Να υπολογίσετε το μέτρο της γωνιακής επιτάχυνσης του συστήματος τη στιγμή της εκκίνησης.</span><span class="points">6 μονάδες</span></div><section class="solution-shell inline-solution"><button aria-expanded="false" class="solution-toggle" type="button"><span>Εμφάνιση λύσης του Β</span><span class="icon">⌄</span></button><div class="solution-panel"><div class="solution-content"><figure class="diagram">
+<svg aria-label="Σχήμα λύσης του ερωτήματος Β: οι ράβδοι OA και OB στην αρχική θέση με τα βάρη τους" role="img" viewBox="0 0 680 360">
+<defs>
+  <marker id="arrow-b-sol" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+    <path d="M0,0 L0,6 L9,3 z" fill="#111"></path>
+  </marker>
+</defs>
+<!-- διακεκομμένοι άξονες αναφοράς -->
+<line x1="110" y1="72" x2="570" y2="72" stroke="#333" stroke-width="2.5" stroke-dasharray="10 10"></line>
+<line x1="360" y1="72" x2="360" y2="310" stroke="#333" stroke-width="2.5" stroke-dasharray="10 10"></line>
+<!-- ράβδοι -->
+<line x1="215" y1="72" x2="360" y2="72" stroke="#111" stroke-width="4"></line>
+<line x1="360" y1="72" x2="360" y2="220" stroke="#111" stroke-width="4"></line>
+<!-- σημεία -->
+<circle cx="287.5" cy="72" r="4.5" fill="#111"></circle>
+<circle cx="360" cy="146" r="4.5" fill="#111"></circle>
+<circle cx="360" cy="72" r="4.5" fill="#111"></circle>
+<!-- βάρη -->
+<line x1="287.5" y1="72" x2="287.5" y2="146" stroke="#111" stroke-width="3" marker-end="url(#arrow-b-sol)"></line>
+<line x1="360" y1="146" x2="360" y2="220" stroke="#111" stroke-width="3" marker-end="url(#arrow-b-sol)"></line>
+<!-- ετικέτες -->
+<text x="196" y="58" font-size="27" fill="#111">A</text>
+<text x="348" y="58" font-size="27" fill="#111">O</text>
+<text x="331" y="238" font-size="27" fill="#111">B</text>
+<text x="270" y="175" font-size="25" fill="#111">Mg</text>
+<text x="374" y="195" font-size="25" fill="#111">Mg</text>
+<text x="300" y="345" font-size="23" fill="#d33" font-weight="700" text-decoration="underline">Σχήμα 1</text>
+</svg>
+</figure><p>Στην αρχική θέση, το βάρος της κατακόρυφης ράβδου \(OB\) έχει φορέα που περνά από το \(O\), άρα δεν δημιουργεί ροπή. Ροπή δημιουργεί μόνο το βάρος της οριζόντιας ράβδου \(OA\):</p><div class="math">\[\tau_O=Mg\frac{L}{2}\]</div><p>Η συνολική ροπή αδράνειας του συστήματος είναι:</p><div class="math">\[I_{\text{συστ}}=2I_O=\frac23ML^2\]</div><p>Από τον θεμελιώδη νόμο της στροφικής κίνησης:</p><div class="math">
+              \[\tau_O=I_{\text{συστ}}\alpha\]
+              \[Mg\frac{L}{2}=\frac23ML^2\alpha\]
+              \[\alpha=\frac{3g}{4L}\]
+            </div><div class="result">\[\alpha=\frac{3\cdot10}{4\cdot1{,}5}=5\,\text{rad/s}^2\]</div></div></div></section></div>
+<div class="question"><div class="question-title"><span>Γ. Τη χρονική στιγμή κατά την οποία οι ράβδοι σχηματίζουν ίσες γωνίες με την κατακόρυφο Οx, να υπολογίσετε το μέτρο της γωνιακής ταχύτητας του συστήματος των δύο ράβδων.</span><span class="points">7 μονάδες</span></div><section class="solution-shell inline-solution"><button aria-expanded="false" class="solution-toggle" type="button"><span>Εμφάνιση λύσης του Γ</span><span class="icon">⌄</span></button><div class="solution-panel"><div class="solution-content"><p>Στην τελική θέση οι δύο ράβδοι σχηματίζουν γωνία \(45^\circ\) με την κατακόρυφο.</p><figure class="diagram">
+<svg aria-label="Σχήμα λύσης του ερωτήματος Γ: οι δύο ράβδοι σε συμμετρική θέση με γωνία 45 μοιρών" role="img" viewBox="0 0 680 440">
+<defs>
+  <marker id="arrow-g-sol" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+    <path d="M0,0 L0,6 L9,3 z" fill="#111"></path>
+  </marker>
+  <marker id="arrow-h-up" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+    <path d="M0,6 L9,3 L0,0 z" fill="#111"></path>
+  </marker>
+</defs>
+<!-- επίπεδο μηδενικής δυναμικής ενέργειας -->
+<line x1="75" y1="58" x2="600" y2="58" stroke="#333" stroke-width="2.5" stroke-dasharray="10 10"></line>
+<text x="65" y="46" font-size="24" fill="#111">U = 0</text>
+<!-- οριζόντιο επίπεδο κέντρων μάζας -->
+<line x1="85" y1="142" x2="600" y2="142" stroke="#333" stroke-width="2.5" stroke-dasharray="10 10"></line>
+<!-- κατακόρυφος από το O -->
+<line x1="350" y1="58" x2="350" y2="385" stroke="#333" stroke-width="2.5" stroke-dasharray="10 10"></line>
+<!-- οι ράβδοι -->
+<line x1="350" y1="58" x2="190" y2="218" stroke="#111" stroke-width="4"></line>
+<line x1="350" y1="58" x2="510" y2="218" stroke="#111" stroke-width="4"></line>
+<!-- κέντρα μάζας -->
+<circle cx="270" cy="138" r="5" fill="#111"></circle>
+<circle cx="430" cy="138" r="5" fill="#111"></circle>
+<!-- βάρη -->
+<line x1="270" y1="138" x2="270" y2="230" stroke="#111" stroke-width="3" marker-end="url(#arrow-g-sol)"></line>
+<line x1="430" y1="138" x2="430" y2="230" stroke="#111" stroke-width="3" marker-end="url(#arrow-g-sol)"></line>
+<!-- γωνία 45° αριστερά της κατακορύφου -->
+<path d="M350 112 A54 54 0 0 0 312 96" fill="none" stroke="#111" stroke-width="2.5"></path>
+<text x="303" y="131" font-size="24" fill="#111">45°</text>
+<!-- ύψος h -->
+<line x1="205" y1="60" x2="205" y2="138" stroke="#111" stroke-width="2.5"></line>
+<path d="M205 60 l-7 14 h14 z" fill="#111"></path>
+<path d="M205 138 l-7 -14 h14 z" fill="#111"></path>
+<text x="174" y="108" font-size="24" fill="#111">h</text>
+<!-- ετικέτες -->
+<text x="337" y="50" font-size="27" fill="#111">O</text>
+<text x="164" y="242" font-size="27" fill="#111">A</text>
+<text x="518" y="242" font-size="27" fill="#111">B</text>
+<text x="248" y="264" font-size="25" fill="#111">Mg</text>
+<text x="409" y="264" font-size="25" fill="#111">Mg</text>
+<text x="300" y="425" font-size="23" fill="#d33" font-weight="700" text-decoration="underline">Σχήμα 2</text>
+</svg>
+</figure><p>Η μηχανική ενέργεια διατηρείται. Θεωρούμε μηδενική τη βαρυτική δυναμική ενέργεια στο οριζόντιο επίπεδο που περνά από το \(O\).</p><p>Αρχικά:</p><div class="math">\[U_i=-Mg\frac{L}{2},\qquad K_i=0\]</div><p>Στη συμμετρική θέση, το κέντρο μάζας κάθε ράβδου βρίσκεται σε κατακόρυφη απόσταση \(\frac{L}{2}\operatorname{συν}45^\circ\) κάτω από το \(O\):</p><div class="math">
+              \[U_f=-2Mg\frac{L}{2}\operatorname{συν}45^\circ=-MgL\operatorname{συν}45^\circ\]
+              \[K_f=\frac12I_{\text{συστ}}\omega^2=\frac13ML^2\omega^2\]
+            </div><p>Άρα:</p><div class="math">
+              \[-Mg\frac{L}{2}=-MgL\operatorname{συν}45^\circ+\frac13ML^2\omega^2\]
+              \[\omega^2=\frac{3g}{L}\left(\operatorname{συν}45^\circ-\frac12\right)\]
+            </div><p>Με \(\operatorname{συν}45^\circ=\frac{\sqrt2}{2}\):</p><div class="math">\[\omega=\sqrt{\frac{3g(\sqrt2-1)}{2L}}\]</div><div class="result">\[\omega\approx2\,\text{rad/s}\]</div></div></div></section></div>
+<div class="question"><div class="question-title"><span>Δ. Την ίδια χρονική στιγμή, να υπολογίσετε το μέτρο της στροφορμής της κάθε ράβδου ως προς τον άξονα περιστροφής που διέρχεται από το σημείο Ο.</span><span class="points">6 μονάδες</span></div><section class="solution-shell inline-solution"><button aria-expanded="false" class="solution-toggle" type="button"><span>Εμφάνιση λύσης του Δ</span><span class="icon">⌄</span></button><div class="solution-panel"><div class="solution-content"><p>Για κάθε ράβδο:</p><div class="math">
+              \[L_{\text{ράβδου}}=I_O\omega\]
+              \[L_{\text{ράβδου}}=\frac13ML^2\omega\]
+            </div><div class="result">
+              \[L_{\text{ράβδου}}=\frac13\cdot4\cdot(1{,}5)^2\cdot2=6\,\text{kg·m}^2/\text{s}\]
+            </div></div></div></section></div>
+<p>Δίνονται: \(g=10\,\text{m/s}^2\), \(\operatorname{ημ}45^\circ=\operatorname{συν}45^\circ=0{,}7\).</p>
+</section>
+
+</article>
+</main>
+<button aria-label="Επιστροφή στην κορυφή" class="back-top" id="backTop" type="button">↑</button>
+<script>
+    const shells = [...document.querySelectorAll('.solution-shell')];
+    const globalToggle = document.getElementById('globalToggle');
+    const progress = document.getElementById('progress');
+    const backTop = document.getElementById('backTop');
+
+    function setPanel(shell, open) {
+      const button = shell.querySelector('.solution-toggle');
+      const panel = shell.querySelector('.solution-panel');
+      const label = button.querySelector('span:first-child');
+      const topic = label.textContent.replace('Εμφάνιση ', '').replace('Απόκρυψη ', '');
+
+      shell.classList.toggle('open', open);
+      button.setAttribute('aria-expanded', String(open));
+      label.textContent = `${open ? 'Απόκρυψη' : 'Εμφάνιση'} ${topic}`;
+
+      if (open) {
+        panel.style.maxHeight = panel.scrollHeight + 'px';
+        setTimeout(() => {
+          if (shell.classList.contains('open')) panel.style.maxHeight = panel.scrollHeight + 'px';
+        }, 400);
+      } else {
+        panel.style.maxHeight = panel.scrollHeight + 'px';
+        requestAnimationFrame(() => { panel.style.maxHeight = '0px'; });
+      }
+    }
+
+    shells.forEach(shell => {
+      const button = shell.querySelector('.solution-toggle');
+      button.addEventListener('click', () => setPanel(shell, !shell.classList.contains('open')));
+    });
+
+    globalToggle.addEventListener('click', () => {
+      const shouldOpen = shells.some(shell => !shell.classList.contains('open'));
+      shells.forEach(shell => setPanel(shell, shouldOpen));
+      globalToggle.textContent = shouldOpen ? 'Απόκρυψη όλων των λύσεων' : 'Εμφάνιση όλων των λύσεων';
+    });
+
+    window.addEventListener('resize', () => {
+      shells.forEach(shell => {
+        if (shell.classList.contains('open')) {
+          const panel = shell.querySelector('.solution-panel');
+          panel.style.maxHeight = panel.scrollHeight + 'px';
+        }
+      });
+    });
+
+    function updateScrollUI() {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const ratio = max > 0 ? window.scrollY / max : 0;
+      progress.style.width = `${Math.min(100, ratio * 100)}%`;
+      backTop.classList.toggle('visible', window.scrollY > 650);
+    }
+
+    window.addEventListener('scroll', updateScrollUI, { passive: true });
+    window.addEventListener('load', updateScrollUI);
+    backTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  </script>
+</body>
+</html>
