@@ -3322,6 +3322,12 @@ const SAMPLE_LINKS = {
 };
 
 
+  // Book landing pages: shown immediately after the Free sample button.
+  const BOOK_WEBSITES = {
+    6465691356: "https://www.ipedia.online/physics_AG/", // Φυσική Α΄ Γυμνασίου
+    672672178:  "https://www.ipedia.online/physics_BG/"  // Φυσική Β΄ Γυμνασίου
+  };
+
   const booksGrid = document.getElementById('booksGrid');
 
   function bookSkeleton(){
@@ -3456,7 +3462,7 @@ const SAMPLE_LINKS = {
     const img = (item.artworkUrl100 || item.artworkUrl60 || '').replace('100x100bb', '300x300bb');
     const price = item.formattedPrice || "";
     const sampleHref = (SAMPLE_LINKS && SAMPLE_LINKS[meta.id]) || meta.url || item.trackViewUrl || '#';
-    const bookWebsiteHref = meta.id === 6465691356 ? 'https://www.ipedia.online/physics_AG/' : '';
+    const bookWebsiteHref = BOOK_WEBSITES[meta.id] || '';
     const el = document.createElement('div');
     el.className = 'card book';
     el.dataset.cat = meta.cat;
@@ -3504,6 +3510,7 @@ const SAMPLE_LINKS = {
         booksGrid.appendChild(renderBookCard(r.data, r.meta));
       }else{
         const el = document.createElement('div');
+        const fallbackBookWebsiteHref = BOOK_WEBSITES[r.meta.id] || '';
         el.className = 'card book';
         el.dataset.cat = r.meta.cat;
         el.innerHTML = `
@@ -3514,6 +3521,7 @@ const SAMPLE_LINKS = {
             <p class="muted">Άνοιξε το βιβλίο από το κουμπί.</p>
             <div class="links">
               <a class="btn primary" href="${(SAMPLE_LINKS && SAMPLE_LINKS[r.meta.id]) || r.meta.url}" target="_blank" rel="noopener">Δωρεάν δείγμα</a>
+              ${fallbackBookWebsiteHref ? `<a class="btn" href="${fallbackBookWebsiteHref}" target="_blank" rel="noopener">Ιστοσελίδα Βιβλίου</a>` : ''}
             </div>
           </div>`;
         booksGrid.appendChild(el);
