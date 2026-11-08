@@ -1,0 +1,118 @@
+{
+  "source": "iPedia_BG_Landing_Apple_Button_Matched.zip",
+  "input_html_bytes": 4662153,
+  "output_html_bytes": 77266,
+  "image_count": 13,
+  "image_stats": [
+    [
+      "book-cover",
+      271572,
+      177530
+    ],
+    [
+      "page-072",
+      347082,
+      84738,
+      317660
+    ],
+    [
+      "page-143",
+      264303,
+      59348,
+      206176
+    ],
+    [
+      "page-153",
+      306087,
+      74740,
+      273426
+    ],
+    [
+      "page-181",
+      339858,
+      82718,
+      283080
+    ],
+    [
+      "page-205",
+      279351,
+      68654,
+      199126
+    ],
+    [
+      "page-207",
+      251094,
+      57408,
+      213680
+    ],
+    [
+      "page-262",
+      280158,
+      68280,
+      230718
+    ],
+    [
+      "page-276",
+      254631,
+      57004,
+      212526
+    ],
+    [
+      "page-284",
+      342687,
+      84116,
+      296506
+    ],
+    [
+      "page-292",
+      255840,
+      55828,
+      194242
+    ],
+    [
+      "page-300",
+      120990,
+      23650,
+      76786
+    ],
+    [
+      "teacher-example",
+      122028,
+      76728
+    ]
+  ],
+  "assets": {
+    "page-181-thumb-b96c562e2a.webp": 82718,
+    "page-300-full-9bf71244fe.webp": 76786,
+    "ipedia-mask-47c0c045ac.png": 3367,
+    "page-284-full-71e71845f6.webp": 296506,
+    "page-207-full-11877dd153.webp": 213680,
+    "page-181-full-d17b6153ce.webp": 283080,
+    "page-153-thumb-1ba92d5fe2.webp": 74740,
+    "page-262-thumb-bce91a6a60.webp": 68280,
+    "ipedia-favicon.png": 2288,
+    "page-284-thumb-39c16ff572.webp": 84116,
+    "page-300-thumb-a8d146c8cd.webp": 23650,
+    "page-205-thumb-194cafaee0.webp": 68654,
+    "page-143-thumb-86c60ba68d.webp": 59348,
+    "page-262-full-9b769311df.webp": 230718,
+    "teacher-example-adc82e81f4.webp": 76728,
+    "page-207-thumb-b5c2cad9bf.webp": 57408,
+    "page-292-full-4eee62777c.webp": 194242,
+    "page-292-thumb-6c199bba13.webp": 55828,
+    "page-143-full-2140b0b35f.webp": 206176,
+    "page-276-full-2e7036dbe2.webp": 212526,
+    "page-205-full-a2241e2d61.webp": 199126,
+    "og-physics-bg.jpg": 128911,
+    "page-072-thumb-a1639965ce.webp": 84738,
+    "page-276-thumb-048cfe57aa.webp": 57004,
+    "page-153-full-b2a4b07cd6.webp": 273426,
+    "book-cover-67188b4af3.webp": 177530,
+    "page-072-full-4ce6d89de8.webp": 317660
+  },
+  "canonical": "https://ipedia.online/physics_BG/",
+  "apple_books": {
+    "main": "https://apple.co/3vccl7h",
+    "footer": "https://apple.co/2Q7Blxq"
+  }
+}
