@@ -1,0 +1,5414 @@
+<!doctype html>
+<html lang="el">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, viewport-fit=cover" />
+  <title>LaplaceCircuit – Διαδραστικό</title>
+
+  <style>
+    :root{
+      --accent:#FF7E79;
+      --ink:#625C5C;
+      --glass: rgba(255,255,255,.92);
+      --shadow: 0 10px 30px rgba(0,0,0,.12);
+      --r: 16px;
+      --green: #22c55e;
+      --card-bg: #fff7f6;
+      --card-border: #ffc0bc;
+
+      /* ✅ “σύννεφο” */
+      --cloud-bg: rgba(255,255,255,.98);
+      --cloud-border: rgba(255,192,188,.95);
+      --cloud-shadow: 0 14px 34px rgba(0,0,0,.18);
+    }
+
+    html, body{
+      margin:0; height:100%;
+      background: #000;
+      overflow:hidden;
+      font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,Arial,sans-serif;
+    }
+
+    #wrap{ position:relative; width:100%; height:100%; touch-action:none; }
+    canvas{ display:block; width:100%; height:100%; }
+
+    /* =========================
+       HUD
+       ========================= */
+    .hud{
+      position:absolute;
+      top: max(10px, env(safe-area-inset-top));
+      left:max(10px, env(safe-area-inset-left));
+      right:max(10px, env(safe-area-inset-right));
+
+      padding:0;
+      border-radius: var(--r);
+      background: var(--glass);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(0,0,0,.06);
+
+      user-select:none;
+      -webkit-user-select:none;
+
+      z-index:90;
+      overflow:hidden;
+
+      display:flex !important;
+      flex-direction:column !important;
+      flex-wrap: nowrap !important;
+      align-items:stretch !important;
+      gap:0 !important;
+
+      max-height: var(--hud-maxh, none);
+    }
+
+    .hudbar{
+      display:flex;
+      align-items:center;
+      gap: calc(8px * var(--ui, 1));
+      padding: calc(8px * var(--ui, 1));
+      flex: 0 0 auto !important;
+      width:100%;
+      box-sizing:border-box;
+    }
+
+    .hudpanel{
+      width: 100%;
+      display:flex;
+      flex-wrap: wrap;
+      align-items:center;
+      gap: calc(8px * var(--ui, 1));
+      padding: 0 calc(8px * var(--ui, 1)) calc(8px * var(--ui, 1));
+      border-top: 1px solid rgba(0,0,0,.06);
+      box-sizing:border-box;
+
+      /* ✅ να μην “τεντώνει” (κενό κάτω) */
+      flex: 0 1 auto !important;
+      min-height: 0 !important;
+
+      max-height: calc(var(--hud-maxh, 70vh) - var(--hudbarh, 44px));
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+
+      align-content:flex-start !important;
+      justify-content:flex-start !important;
+    }
+
+    #btnHudToggle{ display:none; }
+    #wrap.tiny #btnHudToggle{ display:inline-flex; }
+    #wrap.micro #btnHudToggle{ display:inline-flex; }
+
+    .hud.is-collapsed .hudpanel{ display:none !important; border-top:0; }
+
+    #wrap.tiny .hudbar,
+    #wrap.micro .hudbar{
+      flex-wrap: nowrap !important;
+      overflow-x: auto !important;
+      overflow-y: hidden !important;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    #wrap.tiny .hudbar::-webkit-scrollbar,
+    #wrap.micro .hudbar::-webkit-scrollbar{ display:none; }
+
+    .hudpanel .ctl{
+      flex: 1 1 340px;
+      min-width: 260px;
+    }
+    #wrap.tiny .hudpanel .ctl,
+    #wrap.micro .hudpanel .ctl{
+      flex: 1 1 100%;
+      min-width: 0;
+    }
+
+    .hudpanel input[type="range"]{
+      width: auto !important;
+      flex: 1 1 180px;
+      min-width: 110px;
+    }
+
+    /* =========================
+       Buttons / Controls
+       ========================= */
+    .btn{
+      appearance:none;
+      border: 1px solid rgba(0,0,0,.12);
+      background:#fff;
+      color: var(--ink);
+      padding: calc(8px * var(--ui, 1)) calc(10px * var(--ui, 1));
+      border-radius: calc(12px * var(--ui, 1));
+      font-size: calc(13px * var(--ui, 1));
+      font-weight: 800;
+      line-height: 1;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+    .btn.primary{
+      border-color: rgba(255,126,121,.35);
+      background: rgba(255,126,121,.12);
+    }
+    .btn:active{ transform: translateY(1px); }
+
+    .ctl{
+      display:flex;
+      align-items:center;
+      gap: calc(8px * var(--ui, 1));
+      padding: calc(6px * var(--ui, 1)) calc(8px * var(--ui, 1));
+      border-radius: calc(12px * var(--ui, 1));
+      border: 1px solid rgba(0,0,0,.10);
+      background: rgba(255,255,255,.70);
+    }
+
+    .ctl label{
+      font-size: calc(12px * var(--ui, 1));
+      font-weight: 950;
+      color: rgba(0,0,0,.70);
+      white-space:nowrap;
+      min-width: calc(86px * var(--ui, 1));
+      text-align: left;
+    }
+    .ctl .minmax{
+      display:flex;
+      align-items:center;
+      gap: calc(8px * var(--ui, 1));
+      white-space:nowrap;
+      color: rgba(0,0,0,.62);
+      font-size: calc(11.5px * var(--ui, 1));
+      font-weight: 900;
+    }
+    .ctl .val{
+      min-width: calc(46px * var(--ui, 1));
+      text-align:right;
+      color: rgba(0,0,0,.72);
+      font-size: calc(12px * var(--ui, 1));
+      font-weight: 950;
+      white-space:nowrap;
+    }
+    input[type="range"]{ width: calc(140px * var(--ui, 1)); accent-color: var(--accent); }
+
+    /* =========================
+       Legend
+       ========================= */
+    .legend{
+      position:absolute;
+      left:max(10px, env(safe-area-inset-left));
+      bottom:max(10px, env(safe-area-inset-bottom));
+      padding:10px 12px;
+      border-radius: 14px;
+      background: var(--glass);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(0,0,0,.06);
+      z-index:5;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      color: rgba(0,0,0,.75);
+      font-size: 12.5px;
+      font-weight: 800;
+      user-select:none;
+      -webkit-user-select:none;
+      pointer-events:none;
+    }
+    .legend .arrow{
+      color: var(--green);
+      font-size: 18px;
+      line-height: 1;
+      filter: drop-shadow(0 2px 6px rgba(0,0,0,.18));
+    }
+    #wrap.micro .legend{ display:none; }
+
+    /* =========================
+       Overlay layers
+       ========================= */
+
+    /* ✅ layer με τα μικρά κουμπιά (κάτω από το HUD, όπως πριν) */
+    .overlay-btn-layer{
+      position:absolute;
+      inset:0;
+      z-index:30;
+      pointer-events:none;
+    }
+
+    /* ✅ layer με τα “σύννεφα” (ΠΑΝΩ από το HUD) */
+    .overlay-pop-layer{
+      position:absolute;
+      inset:0;
+      z-index:160; /* πάνω από το UI */
+      pointer-events:none;
+    }
+
+    .ov{
+      position:absolute;
+      transform: translate(-9999px,-9999px);
+      pointer-events:none;
+      z-index:31;
+    }
+
+    .ov-btn{
+      pointer-events:auto;
+      appearance:none;
+      border: 1px solid rgba(0,0,0,.12);
+      background: rgba(255,255,255,.96);
+      color: rgba(0,0,0,.80);
+      border-radius: 999px;
+      width: 28px;
+      height: 28px;
+
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:0;
+
+      font-size: 15px;
+      line-height: 1;
+      font-weight: 900;
+      font-family: "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji", Arial, sans-serif;
+
+      cursor:pointer;
+      box-shadow: 0 10px 26px rgba(0,0,0,.14);
+      -webkit-tap-highlight-color: transparent;
+      transform: translateZ(0);
+    }
+    .ov-btn:active{ transform: translateY(1px) translateZ(0); }
+
+    /* =========================
+       “Σύννεφο” overlay pop
+       ========================= */
+    .ov-pop{
+      pointer-events:auto;
+      position:absolute;
+
+      /* anchor */
+      left: var(--x, 0px);
+      top: var(--y, 0px);
+
+      /* above by default */
+      transform: translate(
+        calc(-50% + var(--shift-x, 0px)),
+        calc(-100% - var(--gap, 12px) + var(--shift-y, 0px))
+      );
+
+      min-width: min(360px, 78vw);
+      max-width: min(560px, 92vw);
+
+      max-height: var(--maxh, min(70vh, 520px));
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+
+      user-select:none;
+      -webkit-user-select:none;
+
+      filter: drop-shadow(0 12px 22px rgba(0,0,0,.16));
+    }
+
+    .ov-pop.below{
+      transform: translate(
+        calc(-50% + var(--shift-x, 0px)),
+        calc(var(--gap, 12px) + var(--shift-y, 0px))
+      );
+    }
+
+    /* ✅ cloud shape via background “puffs” */
+    .ov-pop.cloud{
+      border: 1px solid var(--cloud-border);
+      border-radius: 26px;
+      box-shadow: var(--cloud-shadow);
+
+      background:
+        radial-gradient(circle at 18% 40%, var(--cloud-bg) 0 22px, rgba(0,0,0,0) 23px),
+        radial-gradient(circle at 40% 22%, var(--cloud-bg) 0 30px, rgba(0,0,0,0) 31px),
+        radial-gradient(circle at 62% 24%, var(--cloud-bg) 0 28px, rgba(0,0,0,0) 29px),
+        radial-gradient(circle at 82% 44%, var(--cloud-bg) 0 22px, rgba(0,0,0,0) 23px),
+        linear-gradient(var(--cloud-bg), var(--cloud-bg));
+
+      padding: 14px 14px;
+    }
+
+    /* ✅ μικρό “puff” δείκτης προς το κουμπί (πάνω/κάτω) */
+    .ov-pop.cloud::after{
+      content:"";
+      position:absolute;
+      left: calc(50% - var(--shift-x, 0px));
+      width: 16px;
+      height: 16px;
+      background: var(--cloud-bg);
+      border: 1px solid var(--cloud-border);
+      border-radius: 999px;
+      filter: drop-shadow(0 8px 12px rgba(0,0,0,.12));
+      transform: translateX(-50%);
+      top: calc(100% - 7px); /* above: puff κάτω */
+    }
+    .ov-pop.cloud.below::after{
+      top: -9px; /* below: puff πάνω */
+    }
+
+    .ov-title,
+    .modal-title{
+      font-family: Arial, sans-serif !important;
+      font-weight: 700 !important;
+      font-size: 16px !important;
+      color: var(--accent) !important;
+      margin: 0 0 8px 0 !important;
+    }
+    .ov-text{
+      font-family: Arial, sans-serif !important;
+      font-weight: 400 !important;
+      font-size: 13px !important;
+      color: var(--ink) !important;
+      line-height: 1.35 !important;
+      white-space: pre-line;
+    }
+
+    .bat-row{ display:flex; align-items:center; gap:10px; margin-top:10px; }
+    .bat-shell{
+      position: relative;
+      width: 120px;
+      height: 32px;
+      border-radius: 9px;
+      border: 2px solid rgba(0,0,0,.30);
+      background: rgba(0,0,0,.06);
+      overflow: hidden;
+    }
+    .bat-cap{
+      position:absolute;
+      right: -10px;
+      top: 8px;
+      width: 12px;
+      height: 16px;
+      border-radius: 3px;
+      border: 2px solid rgba(0,0,0,.30);
+      background: rgba(0,0,0,.06);
+    }
+    .bat-fill{
+      position:absolute;
+      left: 3px;
+      top: 3px;
+      bottom: 3px;
+      width: 0%;
+      border-radius: 7px;
+      background: var(--accent);
+      transition: width 160ms linear;
+    }
+    .bat-text{
+      font-size: 13px;
+      font-weight: 950;
+      color: rgba(0,0,0,.72);
+      min-width: 54px;
+      text-align: right;
+    }
+
+    /* =========================
+       Loader
+       ========================= */
+    .loader{
+      position:absolute; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      background: radial-gradient(ellipse at center, rgba(255,255,255,.78), rgba(255,255,255,.35));
+      z-index:220;
+    }
+    .card{
+      background: var(--glass);
+      border: 1px solid rgba(0,0,0,.08);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 14px 16px;
+      min-width: min(360px, 86vw);
+      max-width: min(560px, 92vw);
+    }
+    .title{
+      font-weight: 900;
+      color: var(--ink);
+      margin: 0 0 8px 0;
+      font-size: 14px;
+    }
+    .bar{
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.08);
+      overflow:hidden;
+    }
+    .bar > i{
+      display:block;
+      height:100%;
+      width:0%;
+      background: var(--accent);
+      border-radius: 999px;
+    }
+    .small{
+      margin-top: 10px;
+      font-size: 12px;
+      color: rgba(0,0,0,.65);
+      white-space: pre-line;
+      line-height: 1.25;
+    }
+
+    /* =========================
+       Modal
+       ========================= */
+    .modal-backdrop{
+      position:absolute;
+      inset:0;
+      z-index:240;
+      background: rgba(0,0,0,.22);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+               max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+    }
+    .modal{
+      width: min(760px, 94vw);
+      max-height: min(78vh, 720px);
+      overflow:auto;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 14px 16px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .modal-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom: 10px;
+    }
+    .modal-close{
+      appearance:none;
+      border: 1px solid rgba(0,0,0,.12);
+      background:#fff;
+      color: rgba(0,0,0,.78);
+      border-radius: 12px;
+      width: 38px;
+      height: 38px;
+      font-size: 18px;
+      font-weight: 900;
+      cursor:pointer;
+    }
+    .modal h4{
+      margin: 12px 0 6px 0;
+      font-family: Arial, sans-serif !important;
+      font-weight: 700 !important;
+      font-size: 16px !important;
+      color: var(--accent) !important;
+    }
+    .modal p, .modal li{
+      font-family: Arial, sans-serif !important;
+      font-weight: 400 !important;
+      font-size: 13px !important;
+      color: var(--ink) !important;
+      line-height: 1.35 !important;
+    }
+    .modal ul{ margin: 6px 0 10px 18px; padding:0; }
+    .modal .callout{
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,126,121,.28);
+      background: rgba(255,126,121,.10);
+    }
+    .kbd{
+      display:inline-block;
+      padding: 1px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(0,0,0,.10);
+      background: rgba(255,255,255,.70);
+      font-weight: 950;
+      font-size: 12px;
+      color: rgba(0,0,0,.75);
+    }
+
+    [hidden]{ display:none !important; }
+  
+    /* ---------------------------
+       ✅ Modal backdrop (for XP lessons)
+    --------------------------- */
+    .modalBack{
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding:
+        max(14px, env(safe-area-inset-top))
+        max(14px, env(safe-area-inset-right))
+        max(14px, env(safe-area-inset-bottom))
+        max(14px, env(safe-area-inset-left));
+      background: rgba(0,0,0,.28);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 99998;
+    }
+    .modalBack.show{ display:flex; }
+    .btn.ghost{
+      background: rgba(255,255,255,.65);
+      border-color: rgba(0,0,0,.12);
+    }
+
+/* ---------------------------
+       ✅ XP Lessons Modal (Duolingo style) — scoped
+    --------------------------- */
+    #xpBack{
+      --ui: 1;
+      touch-action: auto;
+    }
+    #xpBack *{ -webkit-tap-highlight-color: transparent; }
+
+    #xpBack .xpModal{
+      width: min(980px, 100%);
+      height: min(860px, 100%);
+      max-height: 100%;
+      overflow:hidden;
+      background: rgba(255,255,255,.95);
+      border: 1px solid rgba(0,0,0,.10);
+      border-radius: var(--r);
+      box-shadow: 0 18px 60px rgba(0,0,0,.22);
+      display:flex;
+      flex-direction:column;
+    }
+
+    #xpBack .xpModalTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(0,0,0,.08);
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      flex: 0 0 auto;
+    }
+
+    #xpBack .topLeft{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      min-width: 0;
+    }
+    #xpBack .mH{
+      font-size: 14px;
+      font-weight: 900;
+      color: var(--accent);
+      margin: 0;
+      letter-spacing:.2px;
+    }
+    #xpBack .mP{
+      margin:0;
+      font-size: 10px;
+      color: rgba(0,0,0,.55);
+      font-weight: 600;
+      line-height: 1.25;
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+      max-width: 66vw;
+    }
+
+    #xpBack .topRight{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
+
+    #xpBack .btn{
+      appearance:none;
+      border: 1px solid rgba(0,0,0,.12);
+      background:#fff;
+      color: var(--ink);
+      padding: calc(9px * var(--ui)) calc(11px * var(--ui));
+      border-radius: calc(12px * var(--ui));
+      font-size: calc(13px * var(--ui));
+      font-weight: 900;
+      line-height: 1;
+      cursor:pointer;
+      white-space: nowrap;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap: calc(8px * var(--ui));
+      user-select:none;
+    }
+    #xpBack .btn.primary{
+      border-color: rgba(255,126,121,.35);
+      background: rgba(255,126,121,.12);
+    }
+    #xpBack .btn.ghost{ background: rgba(255,255,255,.7); }
+    #xpBack .btn:active{ transform: translateY(1px); }
+
+    #xpBack .xpContent{
+      flex: 1 1 auto;
+      overflow:auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 14px 14px 16px;
+      touch-action: auto;
+    }
+
+    /* =========================
+       ✅ Duolingo-style Lessons UI (scoped)
+       ========================= */
+    #xpBack .duoHome{
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+    }
+
+    #xpBack .duoHomeHeader{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(0,0,0,.08);
+      background: rgba(255,255,255,.85);
+    }
+    #xpBack .duoHomeHeader .t{
+      font-size: 13px;
+      font-weight: 900;
+      color: var(--accent);
+    }
+    #xpBack .duoHomeHeader .s{
+      font-size: 12px;
+      color: rgba(0,0,0,.55);
+      font-weight: 800;
+    }
+
+    #xpBack .duoUnit{
+      border-radius: 18px;
+      border: 1px solid rgba(0,0,0,.08);
+      background: rgba(255,255,255,.80);
+      padding: 10px 10px 12px;
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+    }
+
+    #xpBack .duoUnitHead{
+      font-size: 13px;
+      font-weight: 900;
+      color: var(--accent);
+      padding: 2px 4px;
+    }
+
+    #xpBack .duoLessonGrid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    @media (max-width: 720px){
+      #xpBack .duoLessonGrid{ grid-template-columns: 1fr; }
+    }
+
+    #xpBack .duoLessonBtn{
+      text-align:left;
+      border-radius: 16px;
+      border: 1px solid rgba(0,0,0,.10);
+      background: rgba(255,255,255,.90);
+      padding: 10px 12px;
+      cursor:pointer;
+      display:flex;
+      flex-direction:column;
+      gap: 6px;
+      transition: transform .08s ease;
+    }
+    #xpBack .duoLessonBtn:active{ transform: translateY(1px); }
+    #xpBack .duoLessonBtn.done{
+      border-color: rgba(52,199,89,.28);
+      background: rgba(52,199,89,.10);
+    }
+
+    #xpBack .duoLessonBtn .h{
+      font-size: 14px;
+      font-weight: 900;
+      color: var(--accent);
+    }
+    #xpBack .duoLessonBtn .p{
+      font-size: 12px;
+      color: rgba(0,0,0,.56);
+      font-weight: 800;
+    }
+    #xpBack .duoLessonBtn .tag{
+      font-size: 12px;
+      color: rgba(0,0,0,.62);
+      font-weight: 900;
+    }
+
+    /* Player */
+    #xpBack .duoPlayer{
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+    }
+
+    #xpBack .duoTopRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    #xpBack .duoMeta{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    #xpBack .duoLbl{
+      color: rgba(0,0,0,.55);
+      font-weight: 900;
+      font-size: 12px;
+    }
+    #xpBack .duoXp{
+      font-weight: 900;
+      font-size: 13px;
+      color: rgba(0,0,0,.74);
+      border: 1px solid rgba(0,0,0,.08);
+      background: rgba(255,255,255,.75);
+      padding: 6px 10px;
+      border-radius: 999px;
+    }
+
+    #xpBack .duoHearts{
+      display:flex;
+      align-items:center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(0,0,0,.08);
+      background: rgba(255,255,255,.75);
+          font-size: 14px;
+      font-weight: 900;
+      color: rgba(255,59,48,.88);
+    }
+    #xpBack .heart{
+      width: 18px;
+      height: 18px;
+      border-radius: 6px;
+      border: 1px solid rgba(0,0,0,.10);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1;
+      background: rgba(255,255,255,.9);
+    }
+    #xpBack .heart.on{ border-color: rgba(255,59,48,.25); background: rgba(255,59,48,.10); }
+    #xpBack .heart.off{ opacity:.35; }
+
+    #xpBack .duoProg{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+    }
+    #xpBack .duoProgBar{
+      width: 160px;
+      height: 12px;
+      background: rgba(0,0,0,.08);
+      border-radius: 999px;
+      overflow:hidden;
+      border: 1px solid rgba(0,0,0,.08);
+    }
+    #xpBack .duoProgBar i{
+      display:block;
+      height:100%;
+      width:0%;
+      background: rgba(255,126,121,.65);
+    }
+    #xpBack .duoProgTxt{
+      font-size: 12px;
+      font-weight: 900;
+      color: rgba(0,0,0,.60);
+    }
+
+    #xpBack .duoCard{
+      border-radius: 18px;
+      border: 1px solid rgba(0,0,0,.10);
+      background: rgba(255,255,255,.90);
+      padding: 12px 12px 12px;
+    }
+
+    #xpBack .duoLessonTitle{
+      font-size: 13px;
+      font-weight: 900;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+    #xpBack .duoPrompt{
+      font-size: 15px;
+      font-weight: 900;
+      color: rgba(0,0,0,.78);
+      margin-bottom: 10px;
+      line-height: 1.25;
+    }
+
+    #xpBack .duoBody{
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+      min-height: 120px;
+    }
+
+    #xpBack .duoBody .mP{
+      white-space: pre-wrap;
+      overflow: visible;
+      text-overflow: clip;
+      max-width: none;
+      font-size: 13px;
+      font-weight: 900;
+      color: rgba(0,0,0,.70);
+      line-height: 1.4;
+    }
+
+    #xpBack .duoChoices{
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+    }
+
+    #xpBack .duoChoice{
+      border-radius: 16px;
+      border: 1px solid rgba(0,0,0,.12);
+      background: rgba(255,255,255,.92);
+      padding: 12px 12px;
+      color: #111;
+      -webkit-text-fill-color: #111;
+      font-size: 14px;
+      font-weight: 900;
+      text-align:left;
+      cursor:pointer;
+      transition: transform .08s ease;
+    }
+    #xpBack .duoChoice:active{ transform: translateY(1px); }
+
+    #xpBack .duoChoice.selected{
+      border-color: rgba(255,126,121,.45);
+      background: rgba(255,126,121,.10);
+    }
+    #xpBack .duoChoice.correct{
+      border-color: rgba(52,199,89,.45);
+      background: rgba(52,199,89,.10);
+    }
+    #xpBack .duoChoice.wrong{
+      border-color: rgba(255,59,48,.45);
+      background: rgba(255,59,48,.10);
+    }
+
+    #xpBack .duoFillRow{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    #xpBack .duoFillRow input{
+      flex: 1 1 220px;
+      min-width: 160px;
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,.12);
+      padding: 10px 12px;
+      font-size: 14px;
+      font-weight: 900;
+      outline: none;
+      background: rgba(255,255,255,.95);
+    }
+    #xpBack .duoFillRow .hintTxt{
+      font-size: 12px;
+      font-weight: 900;
+      color: rgba(0,0,0,.55);
+    }
+
+    #xpBack .duoOrderList{
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+    }
+    #xpBack .duoOrderItem{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      border-radius: 16px;
+      border: 1px solid rgba(0,0,0,.12);
+      background: rgba(255,255,255,.92);
+      padding: 10px 12px;
+      font-size: 13px;
+      font-weight: 900;
+      color: rgba(0,0,0,.72);
+    }
+    #xpBack .duoOrderBtns{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
+    #xpBack .duoMiniBtn, #xpBack .miniBtn{
+      border: 1px solid rgba(0,0,0,.12);
+      background: #fff;
+      border-radius: 12px;
+      padding: 6px 8px;
+      font-weight: 900;
+      cursor:pointer;
+      line-height: 1;
+    }
+    #xpBack .duoMiniBtn:active, #xpBack .miniBtn:active{ transform: translateY(1px); }
+
+    #xpBack .duoFeedback{
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(0,0,0,.10);
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1.35;
+    }
+    #xpBack .duoFeedback.ok{
+      border-color: rgba(52,199,89,.35);
+      background: rgba(52,199,89,.10);
+      color: rgba(0,0,0,.78);
+    }
+    #xpBack .duoFeedback.bad{
+      border-color: rgba(255,59,48,.35);
+      background: rgba(255,59,48,.10);
+      color: rgba(0,0,0,.78);
+    }
+    #xpBack .duoFeedback.hint{
+      border-color: rgba(255,159,10,.35);
+      background: rgba(255,159,10,.10);
+      color: rgba(0,0,0,.78);
+    }
+
+    #xpBack .duoActions{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    #xpBack .duoSpacer{ flex: 1 1 auto; }
+
+    /* small screens scaling (scoped) */
+    @media (max-width: 560px), (max-height: 520px){
+      #xpBack{ --ui: 0.86; }
+      #xpBack .duoProgBar{ width: 130px; }
+    }
+    @media (max-width: 420px), (max-height: 360px){
+      #xpBack{ --ui: 0.78; }
+      #xpBack .duoProgBar{ width: 110px; }
+      #xpBack .mP{ max-width: 56vw; }
+    }
+
+
+    /* =========================
+       Practice mode helper (for TASK steps)
+       ========================= */
+    .practiceOverlay{
+      position: fixed;
+      inset: 0;
+      z-index: 95;
+      display: none;
+      pointer-events: none;
+      background:
+        radial-gradient(900px 520px at 50% 100%, rgba(255,126,121,.26), rgba(0,0,0,.28));
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+    }
+    .practiceOverlay.show{ display:block; }
+
+    body.isPractice .hudbar{
+      outline: 2px solid rgba(255,126,121,.32);
+      outline-offset: 3px;
+      border-radius: 18px;
+    }
+
+    .practiceBar{
+      position: fixed;
+      left: 50%;
+      bottom: calc(16px + env(safe-area-inset-bottom));
+      transform: translateX(-50%);
+      z-index: 9999;
+      display: none;
+      pointer-events: none;
+      max-width: min(92vw, 640px);
+    }
+    .practiceBar.show{ display:block; }
+
+    .practiceCard{
+      pointer-events: auto;
+      background: rgba(255,255,255,.94);
+      border: 1px solid rgba(0,0,0,.12);
+      border-left: 6px solid rgba(255,126,121,.72);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 12px 12px;
+      animation: practicePulse 2.4s ease-in-out infinite;
+    }
+    .practiceCard.nudge{
+      animation: practiceShake .55s ease 1, practicePulse 2.4s ease-in-out infinite;
+    }
+
+    .practiceBadge{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 1000;
+      font-size: 12px;
+      letter-spacing: .25px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,126,121,.14);
+      border: 1px solid rgba(255,126,121,.30);
+      color: rgba(0,0,0,.78);
+      margin-bottom: 8px;
+    }
+
+    .practiceTitle{
+      font-weight: 1000;
+      color: rgba(0,0,0,.86);
+      margin: 0 0 6px 0;
+      font-size: 14px;
+      letter-spacing: .15px;
+    }
+    .practiceHint{
+      font-weight: 900;
+      color: rgba(0,0,0,.62);
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.35;
+      white-space: normal;
+    }
+    .practiceMust{
+      margin-top: 8px;
+      font-weight: 1000;
+      font-size: 12px;
+      color: rgba(0,0,0,.62);
+    }
+    .practiceActions{
+      display:flex;
+      justify-content:flex-end;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    @keyframes practicePulse{
+      0%, 100% { box-shadow: var(--shadow), 0 0 0 0 rgba(255,126,121,.22); }
+      55%      { box-shadow: var(--shadow), 0 0 0 12px rgba(255,126,121,0); }
+    }
+    @keyframes practiceShake{
+      0%{ transform: translateX(0); }
+      15%{ transform: translateX(-6px); }
+      30%{ transform: translateX(6px); }
+      45%{ transform: translateX(-4px); }
+      60%{ transform: translateX(4px); }
+      100%{ transform: translateX(0); }
+    }
+
+
+  
+    /* =========================
+       Practice dock (BikeDynamo-style)
+       ========================= */
+    .lessonDock{
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      top: calc(max(10px, env(safe-area-inset-top)) + (var(--hudbarh) * var(--ui)) + 10px);
+      bottom: auto;
+      width: min(860px, calc(100vw - 20px));
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 10px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(0,0,0,.12);
+      box-shadow: 0 18px 60px rgba(0,0,0,.14);
+      z-index: 99999;
+    }
+    .lessonDockTxt{
+      flex: 1 1 auto;
+      font-weight: 900;
+      font-size: 13px;
+      color: rgba(0,0,0,.72);
+      line-height: 1.35;
+    }
+    @media (max-width: 520px){
+      .lessonDock{ flex-wrap: wrap; }
+      .lessonDock .btn{ flex: 1 1 120px; }
+    }
+
+
+</style>
+
+  <script async src="https://unpkg.com/es-module-shims@1.10.0/dist/es-module-shims.js"></script>
+  <script type="importmap-shim">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.180.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.180.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+
+<body>
+<div id="wrap">
+  <canvas id="c"></canvas>
+
+  <div class="hud" id="hud">
+    <div class="hudbar">
+      <button class="btn" id="btnHudToggle" title="Ρυθμίσεις">☰</button>
+      <button class="btn primary" id="btnReset">Επαναφορά</button>
+      <button class="btn" id="btnAuto">Περιστροφή: ΝΑΙ</button>
+      <button class="btn" id="btnGuide">📘 Οδηγίες</button>
+      <button class="btn primary" id="btnXP" title="Μαθήματα" aria-label="Μαθήματα">🏆</button>
+    </div>
+
+    <div class="hudpanel" id="hudPanel">
+
+      <div class="ctl" title="Διαφάνεια δυναμικών γραμμών">
+        <label for="linesOpacity">Γραμμές</label>
+        <input id="linesOpacity" type="range" min="0" max="0.5" step="0.01" value="0">
+        <span class="val" id="linesVal">0%</span>
+      </div>
+
+      <div class="ctl" title="Ισχύς μαγνητικού πεδίου (B)">
+        <label for="fieldStrength">Πεδίο B</label>
+        <span class="minmax">ασθενές</span>
+        <input id="fieldStrength" type="range" min="0" max="2" step="0.01" value="1">
+        <span class="minmax">ισχυρό</span>
+        <span class="val" id="bVal">1.00</span>
+      </div>
+
+      <div class="ctl" title="Αντίσταση αντιστάτη (R): όσο αυξάνεται το R, μειώνεται το ρεύμα και το μέτρο της FL">
+        <label for="resistorR">Αντίσταση R</label>
+        <span class="minmax">μικρή</span>
+        <input id="resistorR" type="range" min="0.5" max="3" step="0.01" value="1">
+        <span class="minmax">μεγάλη</span>
+        <span class="val" id="rVal">1.00Ω</span>
+      </div>
+
+      <div class="ctl" title="Γωνία (°) μεταξύ B (N→S) και I (rod) — θ της F = B I L sinθ">
+        <label for="magnetYaw">Γωνία</label>
+        <input id="magnetYaw" type="range" min="60" max="90" step="1" value="90">
+        <span class="val" id="yawVal">90°</span>
+      </div>
+
+      <div class="ctl" title="Πόσο επικαλύπτεται το κύκλωμα από το μαγνητικό πεδίο">
+        <label for="magnetBack">Επικάλυψη</label>
+        <span class="minmax">καμία</span>
+        <input id="magnetBack" type="range" min="0" max="1" step="0.01" value="1">
+        <span class="minmax">μεγάλη</span>
+        <span class="val" id="ovVal">100%</span>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="legend" aria-hidden="true">
+    <span class="arrow">➜</span>
+    <span>Το πράσινο βέλος υποδηλώνει τη φορά του ρεύματος.</span>
+  </div>
+
+  <!-- ✅ δύο layers: κουμπιά & σύννεφα -->
+  <div class="overlay-btn-layer" id="overlayBtnLayer" aria-hidden="false"></div>
+  <div class="overlay-pop-layer" id="overlayPopLayer" aria-hidden="false"></div>
+
+  <div class="loader" id="loader">
+    <div class="card">
+      <div class="title">Φόρτωση 3D μοντέλου…</div>
+      <div class="bar"><i id="prog"></i></div>
+      <div class="small" id="small">0%</div>
+    </div>
+  </div>
+
+
+    <!-- =========================
+         ✅ XP / Duolingo Lessons Modal
+         ========================= -->
+    <div class="modalBack" id="xpBack" aria-hidden="true">
+      <div class="xpModal" role="dialog" aria-modal="true" aria-label="Κέρδισε Εμπειρία — Δύναμη Laplace">
+        <div class="xpModalTop">
+          <div class="topLeft">
+            <h2 class="mH" style="margin:0;">Ολοκλήρωσε τα μαθήματα — Δύναμη Laplace</h2>
+            <p class="mP">Κάθε φορά που ολοκληρώνεις ένα μάθημα κερδίζεις εμπειρία.</p>
+            <p class="mP">Τα ολοκληρωμένα μαθήματα δεν ξαναδίνουν XP.</p>
+          </div>
+          <div class="topRight">
+            <button class="btn ghost" id="xpClose" type="button">✕ Κλείσιμο</button>
+          </div>
+        </div>
+
+        <div class="xpContent">
+          <!-- Home -->
+          <div class="duoHome" id="lessonHome"></div>
+
+          <!-- Player -->
+          <div class="duoPlayer" id="lessonPlayer" style="display:none;">
+            <div class="duoTopRow">
+              <div class="duoMeta">
+                <div class="duoXp"><span class="duoLbl">XP:</span> <span id="duoXp">0</span></div>
+                <div class="duoHearts" id="duoHearts" aria-label="Καρδιές"></div>
+              </div>
+    
+<div class="duoProg">
+                <div class="duoProgBar"><i id="duoProgFill"></i></div>
+                <div class="duoProgTxt"><span id="duoProgTxt">1/1</span></div>
+              </div>
+            </div>
+
+            <div class="duoCard" id="duoCard">
+              <div class="duoLessonTitle" id="duoLessonTitle">—</div>
+              <div class="duoPrompt" id="duoPrompt">—</div>
+
+              <div class="duoBody" id="duoBody"></div>
+
+              <div class="duoFeedback" id="duoFeedback" style="display:none;"></div>
+            </div>
+
+            <div class="duoActions">
+              <button class="btn" id="duoBackBtn" type="button">Πίσω</button>
+              <button class="btn" id="duoHintBtn" type="button">Υπόδειξη</button>
+              <span class="duoSpacer"></span>
+              <button class="btn primary" id="duoCheckBtn" type="button">Έλεγχος</button>
+              <button class="btn primary" id="duoNextBtn" type="button" style="display:none;">Συνέχεια</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    
+  <!-- Practice dock (BikeDynamo-style) -->
+  <div class="lessonDock" id="lessonDock" style="display:none;">
+    <div class="lessonDockTxt" id="lessonDockTxt">Δοκίμασε τώρα στην εφαρμογή…</div>
+    <button class="btn" id="lessonDockCheck" type="button">Έλεγχος</button>
+    <button class="btn primary" id="lessonDockReturn" type="button">Επιστροφή στο task του μαθήματος</button>
+  </div>
+
+
+
+</div>
+
+<script type="module-shim">
+  import * as THREE from 'three';
+  import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+  import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
+  import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+  // =========================
+  // Files
+  // =========================
+  const MODEL_FILE  = 'LaplaceCircuit.fbx';
+  const SWITCH_SFX  = 'switch01.mp3';
+  const CLICK_SFX   = 'AppClick.m4a';
+
+  // =========================
+  // Names (exact)
+  // =========================
+  const SWITCH_NAME   = 'switch';
+  const BUTTON_NAME   = 'button';
+  const LED_NAME      = 'led';
+
+  const ROD_NAME      = 'rod';
+  const STOP_NAME     = 'stop';
+  const STOP_POINTS   = ['stop1','stop2','stop3','stop4'];
+
+  const CIRCUIT_NAME  = 'circuit01';
+  const BATTERY_NAME  = 'battery';
+  const RESISTOR_NAME = 'resistant';
+
+  const MAGNET_NAME   = 'magnet';
+  const LINES_NAME    = 'lines';
+  const POLE_N_NAME   = 'N';
+  const POLE_S_NAME   = 'S';
+
+  const LAPLACE1_NAME = 'Lampace1';
+  const LAPLACE2_NAME = 'Lampace2';
+  const LAPLACE_LEGACY_NAME = 'Lampace';
+
+  const BUTTON_P_DEG = 2.8437;
+
+  // =========================
+  // Rod physics
+  // =========================
+  const LAP_SCALE = 0.30;
+  const FRICTION_SCALE = 0.12;
+  const STOP_EPS = 1e-7;
+
+  // =========================
+  // Field sliders
+  // =========================
+  let fieldStrength = 1.0;   // 0..2
+  const FIELD_EPS = 0.001;
+
+  // Resistance slider
+  let resistorOhm = 1.0;     // 0.5..3
+
+  // θ της F = B I L sinθ (60..90)
+  let magnetYawDeg = 90;
+
+  // magnetBack01 = ΕΠΙΚΑΛΥΨΗ (0..1)
+  let magnetBack01 = 1;
+
+  // Laplace vector base scales
+  let lap1BaseScale=null, lap2BaseScale=null, lapLegacyBaseScale=null;
+
+  let poleNObj = null;
+  let poleSObj = null;
+
+  // =========================
+  // Battery drain
+  // =========================
+  let batteryLevel = 1.0;
+  const DRAIN_PER_SEC = 0.0025;
+  const BAT_EMPTY_EPS = 0.001;
+
+  function clamp01(x){ return Math.max(0, Math.min(1, x)); }
+  function clamp(x,a,b){ return Math.max(a, Math.min(b, x)); }
+  function batteryHasCharge(){ return batteryLevel > BAT_EMPTY_EPS; }
+
+  // =========================
+  // Arrows
+  // =========================
+  const ARROW_COLOR_ON = 0x22c55e;
+  let ARROW_LEN_ROD  = 0.026;
+  let ARROW_LEN_WIRE = 0.020;
+  const HEAD_LEN_K = 0.14;
+  const HEAD_W_K   = 0.07;
+  let ARROW_LIFT = 0.002;
+
+  // =========================
+  // Resistor heat waves
+  // =========================
+  const HEAT_WAVE_COUNT   = 7;
+  const HEAT_MAX_OPACITY  = 0.50;
+  const HEAT_SPEED        = 0.85;
+  const HEAT_RISE_TAU     = 0.85;
+  const HEAT_FALL_TAU     = 2.6;
+
+  // =========================
+  // DOM
+  // =========================
+  const canvas   = document.getElementById('c');
+  const wrap     = document.getElementById('wrap');
+
+  const overlayBtnLayer = document.getElementById('overlayBtnLayer');
+  const overlayPopLayer = document.getElementById('overlayPopLayer');
+
+  const loaderEl = document.getElementById('loader');
+  const progEl   = document.getElementById('prog');
+  const smallEl  = document.getElementById('small');
+
+  const btnReset = document.getElementById('btnReset');
+  const btnAuto  = document.getElementById('btnAuto');
+  const btnGuide = document.getElementById('btnGuide');
+  const btnXPEl  = document.getElementById('btnXP');
+
+  const hudEl = document.getElementById('hud');
+  const btnHudToggle = document.getElementById('btnHudToggle');
+
+  let hudCollapsed = false;
+
+  function setStatusText(msg){ smallEl.textContent = msg; }
+  function setStatusPercent(pct){
+    const cl = Math.max(0, Math.min(100, pct|0));
+    progEl.style.width = cl + '%';
+    setStatusText(cl + '%');
+  }
+  setStatusPercent(0);
+
+  function setHudCollapsed(v){
+    hudCollapsed = !!v;
+    if (hudEl) hudEl.classList.toggle('is-collapsed', hudCollapsed);
+    if (btnHudToggle) btnHudToggle.textContent = hudCollapsed ? '☰' : '✕';
+    requestAnimationFrame(applyHudSizing);
+  }
+
+  const linesOpacityEl = document.getElementById('linesOpacity');
+  const fieldStrengthEl = document.getElementById('fieldStrength');
+  const resistorREl = document.getElementById('resistorR');
+
+  const magnetYawEl  = document.getElementById('magnetYaw');
+  const magnetBackEl = document.getElementById('magnetBack');
+
+  const linesValEl = document.getElementById('linesVal');
+  const bValEl = document.getElementById('bVal');
+  const rValEl = document.getElementById('rVal');
+  const yawValEl = document.getElementById('yawVal');
+  const ovValEl = document.getElementById('ovVal');
+
+  function refreshHudReadouts(){
+    const op = clamp01(Number(linesOpacityEl.value) / 0.5);
+    linesValEl.textContent = Math.round(op * 100) + '%';
+
+    bValEl.textContent = (Number(fieldStrengthEl.value) || 0).toFixed(2);
+    rValEl.textContent = (Number(resistorREl.value) || 0).toFixed(2) + 'Ω';
+
+    yawValEl.textContent = (Number(magnetYawEl.value) || 0) + '°';
+    ovValEl.textContent = Math.round(clamp01(Number(magnetBackEl.value) || 0) * 100) + '%';
+  }
+  refreshHudReadouts();
+
+  function applyHudSizing(){
+    if (!hudEl) return;
+
+    const wrapRect = wrap.getBoundingClientRect();
+    const H = wrapRect.height || window.innerHeight || 1;
+
+    const tiny  = wrap.classList.contains('tiny');
+    const micro = wrap.classList.contains('micro');
+
+    const open = tiny && !hudCollapsed;
+
+    if (open){
+      const ratio = micro ? 0.64 : 0.70;
+      const maxHpx = Math.max(160, Math.round(H * ratio));
+      hudEl.style.setProperty('--hud-maxh', maxHpx + 'px');
+    } else {
+      hudEl.style.removeProperty('--hud-maxh');
+    }
+
+    const bar = hudEl.querySelector('.hudbar');
+    const barH = bar ? Math.round(bar.getBoundingClientRect().height) : 44;
+    hudEl.style.setProperty('--hudbarh', barH + 'px');
+  }
+
+  // =========================
+  // Fallback paths
+  // =========================
+  function unique(arr){ return Array.from(new Set(arr.filter(Boolean))); }
+  function candidatePaths(file){
+    const base = String(document.baseURI || '');
+    const c = [
+      file, './' + file,
+      'resources/' + file, './resources/' + file,
+      '../' + file, '../resources/' + file,
+      'index.hyperesources/' + file,
+      'index.hyperesources/resources/' + file
+    ];
+    if (base.includes('.hyperesources/')) {
+      c.push('../' + file);
+      c.push('../resources/' + file);
+    }
+    return unique(c);
+  }
+
+  function loadFBXWithFallback(fbxLoader, file){
+    const paths = candidatePaths(file);
+    let i = 0;
+    return new Promise((resolve, reject)=>{
+      const tryNext = ()=>{
+        if (i >= paths.length) return reject(new Error('FBX load failed'));
+        const p = paths[i++];
+        setStatusPercent(0);
+        fbxLoader.load(
+          p,
+          (obj)=> resolve({obj, path:p}),
+          (xhr)=>{
+            if (!xhr || !xhr.total) return;
+            const pct = Math.round((xhr.loaded / xhr.total) * 100);
+            setStatusPercent(pct);
+          },
+          ()=> tryNext()
+        );
+      };
+      tryNext();
+    });
+  }
+
+  // =========================
+  // Audio
+  // =========================
+  function makeSfx(file){
+    const audio = new Audio();
+    audio.preload = 'auto';
+    const paths = candidatePaths(file);
+    let idx = 0;
+
+    function setSrc(i){
+      idx = i;
+      audio.src = paths[idx] || file;
+      audio.load();
+    }
+    setSrc(0);
+
+    audio.addEventListener('error', ()=>{
+      if (idx < paths.length - 1) setSrc(idx + 1);
+    });
+
+    return {
+      async unlock(){
+        try{
+          const v = audio.volume;
+          audio.volume = 0;
+          await audio.play();
+          audio.pause();
+          audio.currentTime = 0;
+          audio.volume = v;
+        }catch(_){}
+      },
+      play(){
+        try{
+          audio.currentTime = 0;
+          const p = audio.play();
+          if (p && p.catch) p.catch(()=>{});
+        }catch(_){}
+      }
+    };
+  }
+
+  const sfxSwitch = makeSfx(SWITCH_SFX);
+  const sfxClick  = makeSfx(CLICK_SFX);
+  let audioUnlocked = false;
+  async function unlockAudioOnce(){
+    if (audioUnlocked) return;
+    audioUnlocked = true;
+    await sfxSwitch.unlock();
+    await sfxClick.unlock();
+  }
+
+  // =========================
+  // Three.js
+  // =========================
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 5000);
+
+  const renderer = new THREE.WebGLRenderer({
+    canvas,
+    antialias:true,
+    alpha:true,
+    powerPreference:'high-performance'
+  });
+
+  const isIPad = /iPad/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const isMacDesktop = (/Mac/.test(navigator.platform || '') && !(navigator.maxTouchPoints > 0));
+  const __dpr = (window.devicePixelRatio || 1);
+  renderer.setPixelRatio(isIPad ? 1 : (isMacDesktop ? Math.min(__dpr, 1.5) : Math.min(__dpr, 2)));
+
+  renderer.setClearColor(0x000000, 1);
+  scene.background = new THREE.Color(0x000000);
+
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.06;
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x444444, 0.55));
+  const dL = new THREE.DirectionalLight(0xffffff, 1.0);
+  dL.position.set(2,3,2);
+  scene.add(dL);
+
+  const pmremGenerator = new THREE.PMREMGenerator(renderer);
+  const envTex = pmremGenerator.fromScene(new RoomEnvironment()).texture;
+  scene.environment = envTex;
+
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.rotateSpeed = 0.6;
+  controls.zoomSpeed = 0.9;
+  controls.panSpeed = 0.7;
+  controls.autoRotate = true;
+  controls.autoRotateSpeed = 1.0;
+
+  // =========================
+  // Camera clamp above floor
+  // =========================
+  let floorObj = null;
+  let floorYTop = null;
+  let floorMargin = 0.01;
+
+  let modelRoot=null;
+  let homeDistance = 1;
+
+  function findFloorObject(root){
+    if (!root) return null;
+    let best = null;
+    root.traverse(o=>{
+      const n = String(o.name || '').toLowerCase();
+      if (!best && n.includes('floor')) best = o;
+    });
+    return best;
+  }
+
+  function computeFloorY(){
+    if (!modelRoot) return;
+    floorObj = findFloorObject(modelRoot);
+    const box = new THREE.Box3();
+    if (floorObj){
+      box.setFromObject(floorObj);
+      floorYTop = box.max.y;
+    } else {
+      box.setFromObject(modelRoot);
+      floorYTop = box.min.y;
+    }
+  }
+
+  function clampCameraAboveFloor(){
+    if (floorYTop === null) return;
+    const yMin = floorYTop + floorMargin;
+    if (controls.target.y < yMin) controls.target.y = yMin;
+    if (camera.position.y < yMin) camera.position.y = yMin;
+  }
+
+  function updateResponsiveUI(w, h){
+    const baseW = 920;
+    const baseH = 650;
+
+    const s = clamp(Math.min(w / baseW, h / baseH), 0.55, 1);
+    wrap.style.setProperty('--ui', s.toFixed(3));
+
+    const tiny  = (w < 560 || h < 520);
+    const micro = (w < 420 || h < 360);
+
+    wrap.classList.toggle('tiny', tiny);
+    wrap.classList.toggle('micro', micro);
+
+    if (micro){
+      setHudCollapsed(true);
+    } else if (!tiny){
+      setHudCollapsed(false);
+    }
+
+    requestAnimationFrame(applyHudSizing);
+  }
+
+  function setSize(){
+    const w = wrap.clientWidth || 1;
+    const h = wrap.clientHeight || 1;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    updateResponsiveUI(w, h);
+    requestAnimationFrame(applyHudSizing);
+  }
+  if ('ResizeObserver' in window) new ResizeObserver(setSize).observe(wrap);
+  else { window.addEventListener('resize', setSize); setInterval(setSize, 250); }
+  setSize();
+
+  function fitToObject(root){
+    const box = new THREE.Box3().setFromObject(root);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+
+    root.position.sub(center);
+    root.updateMatrixWorld(true);
+
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const fov = THREE.MathUtils.degToRad(camera.fov);
+    const dist = (maxDim / (2 * Math.tan(fov/2))) * 1.35;
+
+    camera.position.set(dist * 0.9, dist * 0.65, dist * 1.05);
+    camera.near = Math.max(0.01, dist/200);
+    camera.far  = dist * 50;
+    camera.updateProjectionMatrix();
+
+    controls.target.set(0,0,0);
+    controls.update();
+  }
+
+  // =========================
+  // Procedural textures (kept)
+  // =========================
+  function makeCanvasTexture(size, drawFn, {srgb=false, repeat=2} = {}){
+    const c = document.createElement('canvas');
+    c.width = c.height = size;
+    const ctx = c.getContext('2d', { willReadFrequently:false });
+    drawFn(ctx, size);
+    const t = new THREE.CanvasTexture(c);
+    t.wrapS = t.wrapT = THREE.RepeatWrapping;
+    t.repeat.set(repeat, repeat);
+    t.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+    t.colorSpace = srgb ? THREE.SRGBColorSpace : THREE.NoColorSpace;
+    t.needsUpdate = true;
+    return t;
+  }
+  function drawNoise(ctx, size, baseRGB, amp){
+    const img = ctx.createImageData(size, size);
+    const d = img.data;
+    for (let i=0; i<d.length; i+=4){
+      const n = (Math.random()*2 - 1) * amp;
+      d[i]   = Math.max(0, Math.min(255, baseRGB[0] + n));
+      d[i+1] = Math.max(0, Math.min(255, baseRGB[1] + n));
+      d[i+2] = Math.max(0, Math.min(255, baseRGB[2] + n));
+      d[i+3] = 255;
+    }
+    ctx.putImageData(img, 0, 0);
+  }
+  function makeAO(size, strength=0.28, repeat=2){
+    return makeCanvasTexture(size, (ctx, S)=>{
+      ctx.fillStyle = 'rgb(240,240,240)';
+      ctx.fillRect(0,0,S,S);
+      ctx.globalAlpha = 0.35;
+      drawNoise(ctx, S, [240,240,240], 60);
+      ctx.globalAlpha = 1.0;
+      const g = ctx.createRadialGradient(S*0.5, S*0.5, S*0.12, S*0.5, S*0.5, S*0.82);
+      g.addColorStop(0, 'rgba(255,255,255,0.0)');
+      g.addColorStop(1, `rgba(0,0,0,${strength})`);
+      ctx.fillStyle = g;
+      ctx.fillRect(0,0,S,S);
+    }, { srgb:false, repeat });
+  }
+  function makeFlatNormal(size, repeat=3, noise=3){
+    return makeCanvasTexture(size, (ctx, S)=>{
+      const img = ctx.createImageData(S, S);
+      const d = img.data;
+      for (let i=0; i<d.length; i+=4){
+        const nx = 128 + (Math.random()*2-1)*noise;
+        const ny = 128 + (Math.random()*2-1)*noise;
+        d[i]   = nx; d[i+1] = ny; d[i+2] = 255; d[i+3] = 255;
+      }
+      ctx.putImageData(img, 0, 0);
+    }, { srgb:false, repeat });
+  }
+  function makeWoodAlbedo(size){
+    return makeCanvasTexture(size, (ctx, S)=>{
+      ctx.fillStyle = '#b57a4c';
+      ctx.fillRect(0,0,S,S);
+      const img = ctx.getImageData(0,0,S,S);
+      const d = img.data;
+      const freq = 0.10 + Math.random()*0.06;
+      let phase = Math.random()*1000;
+      for (let y=0; y<S; y++){
+        phase += (Math.random()*0.4 - 0.2);
+        const wave = Math.sin((y*freq) + phase) * 18;
+        for (let x=0; x<S; x++){
+          const i = (y*S + x) * 4;
+          const n = (Math.random()*2 - 1) * 6;
+          const shade = wave + n;
+          d[i]   = Math.max(0, Math.min(255, d[i]   + shade));
+          d[i+1] = Math.max(0, Math.min(255, d[i+1] + shade*0.65));
+          d[i+2] = Math.max(0, Math.min(255, d[i+2] + shade*0.35));
+        }
+      }
+      ctx.putImageData(img,0,0);
+      const g = ctx.createRadialGradient(S*0.5, S*0.5, S*0.10, S*0.5, S*0.5, S*0.85);
+      g.addColorStop(0, 'rgba(0,0,0,0.0)');
+      g.addColorStop(1, 'rgba(0,0,0,0.10)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0,0,S,S);
+    }, { srgb:true, repeat: 1.6 });
+  }
+  function makeTextureSets(){
+    const S = 256;
+    const metal = {
+      map: makeCanvasTexture(S, (ctx, s)=> drawNoise(ctx, s, [205,205,210], 18), {srgb:true, repeat: 3}),
+      roughnessMap: makeCanvasTexture(S, (ctx, s)=> drawNoise(ctx, s, [92,92,92], 35), {srgb:false, repeat: 3}),
+      metalnessMap: makeCanvasTexture(S, (ctx, s)=> drawNoise(ctx, s, [245,245,245], 12), {srgb:false, repeat: 3}),
+      normalMap: makeFlatNormal(S, 3, 4),
+      aoMap: makeAO(S, 0.30, 2),
+      defaults: {
+        roughness: 0.32, metalness: 0.92,
+        envMapIntensity: 1.25, aoMapIntensity: 1.0,
+        normalScale: new THREE.Vector2(0.35,0.35)
+      }
+    };
+    const wood = {
+      map: makeWoodAlbedo(S),
+      roughnessMap: makeCanvasTexture(S, (ctx, s)=> drawNoise(ctx, s, [205,205,205], 35), {srgb:false, repeat: 1.6}),
+      metalnessMap: makeCanvasTexture(S, (ctx, s)=> drawNoise(ctx, s, [5,5,5], 8), {srgb:false, repeat: 1.6}),
+      normalMap: makeFlatNormal(S, 2, 2),
+      aoMap: makeAO(S, 0.22, 1.4),
+      defaults: {
+        roughness: 0.72, metalness: 0.0,
+        envMapIntensity: 0.65, aoMapIntensity: 1.1,
+        normalScale: new THREE.Vector2(0.18,0.18)
+      }
+    };
+    const plastic = {
+      map: makeCanvasTexture(S, (ctx, s)=> drawNoise(ctx, s, [235,235,235], 18), {srgb:true, repeat: 2.4}),
+      roughnessMap: makeCanvasTexture(S, (ctx, s)=> drawNoise(ctx, s, [135,135,135], 30), {srgb:false, repeat: 2.4}),
+      metalnessMap: makeCanvasTexture(S, (ctx, s)=> drawNoise(ctx, s, [5,5,5], 8), {srgb:false, repeat: 2.4}),
+      normalMap: makeFlatNormal(S, 3, 3),
+      aoMap: makeAO(S, 0.22, 2.0),
+      defaults: {
+        roughness: 0.38, metalness: 0.0,
+        envMapIntensity: 1.05, aoMapIntensity: 1.0,
+        normalScale: new THREE.Vector2(0.22,0.22),
+        clearcoat: 0.75, clearcoatRoughness: 0.22
+      }
+    };
+    return { metal, wood, plastic };
+  }
+  const TEX = makeTextureSets();
+
+  function ensureUV2(mesh){
+    if (!mesh || !mesh.isMesh || !mesh.geometry) return;
+    const g = mesh.geometry;
+    if (!g.attributes) return;
+    if (!g.attributes.uv || g.attributes.uv2) return;
+    g.setAttribute('uv2', new THREE.BufferAttribute(g.attributes.uv.array, 2));
+  }
+
+  function nameStackLower(o){
+    let s = '';
+    let p = o;
+    while(p){
+      if (p.name) s += '|' + String(p.name).toLowerCase();
+      p = p.parent;
+    }
+    return s;
+  }
+
+  function classifyMaterialSet(mesh){
+    const ns = nameStackLower(mesh);
+    if (ns.includes('floor')) return 'wood';
+    if (ns.includes('sweep')) return 'plastic';
+    return 'metal';
+  }
+
+  function makeMaterialFromSet(oldMat, setKey){
+    const set = TEX[setKey] || TEX.metal;
+    const baseColor = (oldMat && oldMat.color && oldMat.color.isColor) ? oldMat.color.clone() : new THREE.Color(0xffffff);
+    const opacity = (oldMat && typeof oldMat.opacity === 'number') ? oldMat.opacity : 1;
+    const transparent = !!(oldMat && oldMat.transparent);
+
+    const usePhysical = (setKey === 'plastic');
+    const m = usePhysical
+      ? new THREE.MeshPhysicalMaterial({ color: baseColor, transparent, opacity })
+      : new THREE.MeshStandardMaterial({ color: baseColor, transparent, opacity });
+
+    m.map = set.map;
+    m.roughnessMap = set.roughnessMap;
+    m.metalnessMap = set.metalnessMap;
+    m.normalMap = set.normalMap;
+    m.aoMap = set.aoMap;
+
+    m.roughness = set.defaults.roughness;
+    m.metalness = set.defaults.metalness;
+    m.envMapIntensity = set.defaults.envMapIntensity;
+    m.aoMapIntensity = set.defaults.aoMapIntensity;
+    m.normalScale = set.defaults.normalScale.clone();
+
+    if (usePhysical){
+      m.clearcoat = set.defaults.clearcoat;
+      m.clearcoatRoughness = set.defaults.clearcoatRoughness;
+    }
+    m.needsUpdate = true;
+    return m;
+  }
+
+  function applySetToMesh(mesh){
+    if (!mesh || !mesh.isMesh) return;
+    ensureUV2(mesh);
+    const setKey = classifyMaterialSet(mesh);
+    if (Array.isArray(mesh.material)){
+      mesh.material = mesh.material.map(mat => makeMaterialFromSet(mat, setKey));
+    } else {
+      mesh.material = makeMaterialFromSet(mesh.material, setKey);
+    }
+  }
+
+  function makeWhitePoleMaterial(){
+    const m = new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color(0xffffff),
+      metalness: 0.0,
+      roughness: 0.32,
+      clearcoat: 0.65,
+      clearcoatRoughness: 0.18
+    });
+    m.normalMap = TEX.plastic.normalMap;
+    m.aoMap = TEX.plastic.aoMap;
+    m.aoMapIntensity = 1.0;
+    m.normalScale = new THREE.Vector2(0.20, 0.20);
+    m.envMapIntensity = 1.1;
+    m.needsUpdate = true;
+    return m;
+  }
+  function paintObjectWhite(root){
+    if (!root) return;
+    const whiteMat = makeWhitePoleMaterial();
+    root.traverse(o=>{
+      if (!o.isMesh) return;
+      ensureUV2(o);
+      if (Array.isArray(o.material)){
+        o.material = o.material.map(()=> whiteMat.clone());
+      } else {
+        o.material = whiteMat.clone();
+      }
+    });
+  }
+
+  // =========================
+  // Opacity helper
+  // =========================
+  function isDescendant(child, ancestor){
+    let p = child;
+    while (p){
+      if (p === ancestor) return true;
+      p = p.parent;
+    }
+    return false;
+  }
+  function isDescendantOfAny(obj, arr){
+    for (const a of arr){
+      if (a && isDescendant(obj, a)) return true;
+    }
+    return false;
+  }
+
+  function setObjectOpacity(root, opacity, opts = {}){
+    if (!root) return;
+    const a = Math.max(0, Math.min(1, opacity));
+    const excludeRoots = (opts.excludeRoots || []).filter(Boolean);
+    const keepRootVisible = !!opts.keepRootVisible;
+
+    if (!keepRootVisible) root.visible = a > 0.001;
+    else root.visible = true;
+
+    root.traverse(o=>{
+      if (excludeRoots.length && isDescendantOfAny(o, excludeRoots)) return;
+      if (!(o.isMesh || o.isLine || o.isLineSegments || o.isPoints)) return;
+
+      if (!(keepRootVisible && o === root)) o.visible = a > 0.001;
+
+      const mats = o.material ? (Array.isArray(o.material) ? o.material : [o.material]) : [];
+      for (const m of mats){
+        if (!m) continue;
+        m.transparent = a < 0.999;
+        m.opacity = a;
+        m.depthWrite = a >= 0.999 ? true : false;
+        m.needsUpdate = true;
+      }
+    });
+  }
+
+  function setLinesOpacity(opacity){
+    if (!linesObj) return;
+    setObjectOpacity(linesObj, opacity);
+  }
+
+  // =========================
+  // Lines glow
+  // =========================
+  const LINES_GLOW_FACTOR = 0.5;
+
+  function applyGlowToLines(root){
+    if (!root) return;
+    root.traverse(o=>{
+      if (!(o.isLine || o.isLineSegments || o.isMesh || o.isPoints)) return;
+      const mats = o.material ? (Array.isArray(o.material) ? o.material : [o.material]) : [];
+      for (const m of mats){
+        if (!m) continue;
+        m.userData = m.userData || {};
+        if (m.userData.__linesGlowApplied) continue;
+        m.userData.__linesGlowApplied = true;
+
+        if (m.color && m.color.isColor){
+          m.userData.__baseColor = m.color.clone();
+          m.color.copy(m.userData.__baseColor).multiplyScalar(LINES_GLOW_FACTOR);
+        }
+
+        if ('emissive' in m && m.emissive && m.emissive.isColor){
+          m.userData.__baseEmissive = m.emissive.clone();
+          m.emissive.copy(m.color && m.color.isColor ? m.color : new THREE.Color(0xffffff));
+          if (typeof m.emissiveIntensity === 'number'){
+            m.emissiveIntensity = Math.max(0.01, m.emissiveIntensity * 1.0);
+          } else {
+            m.emissiveIntensity = 0.9;
+          }
+        }
+
+        m.transparent = true;
+        m.depthWrite = false;
+        m.blending = THREE.AdditiveBlending;
+        if ('toneMapped' in m) m.toneMapped = false;
+        m.needsUpdate = true;
+      }
+    });
+  }
+
+  // =========================
+  // Geometry helpers
+  // =========================
+  function getStopPointsWorld(stopRoot){
+    if (!stopRoot) return null;
+    const pts = [];
+    for (const nm of STOP_POINTS){
+      const o = stopRoot.getObjectByName(nm);
+      if (!o) return null;
+      pts.push(o.getWorldPosition(new THREE.Vector3()));
+    }
+    return pts;
+  }
+  function normalizeOr(v, fallback){
+    const len = v.length();
+    if (len < 1e-9) return fallback.clone();
+    return v.multiplyScalar(1/len);
+  }
+  function bestPlaneNormalFrom4(p1,p2,p3,p4){
+    const n1 = new THREE.Vector3().subVectors(p2,p1).cross(new THREE.Vector3().subVectors(p3,p1));
+    const n2 = new THREE.Vector3().subVectors(p3,p2).cross(new THREE.Vector3().subVectors(p4,p2));
+    return normalizeOr(n1.add(n2), new THREE.Vector3(0,1,0));
+  }
+  function projectPointToPlane(p, p0, n){
+    const d = p.clone().sub(p0).dot(n);
+    return p.clone().sub(n.clone().multiplyScalar(d));
+  }
+  function computeBoxSkippingMarked(root){
+    const box = new THREE.Box3();
+    let has = false;
+    root.traverse((o)=>{
+      if (!o.isMesh || !o.geometry) return;
+      let p = o;
+      while (p){
+        if (p.userData && p.userData.__skipBounds) return;
+        p = p.parent;
+      }
+      const g = o.geometry;
+      if (!g.boundingBox) g.computeBoundingBox();
+      const b = g.boundingBox.clone().applyMatrix4(o.matrixWorld);
+      if (!has){ box.copy(b); has = true; }
+      else box.union(b);
+    });
+    if (!has) return new THREE.Box3().setFromObject(root);
+    return box;
+  }
+  function getBoxCorners(box){
+    const min = box.min, max = box.max;
+    return [
+      new THREE.Vector3(min.x,min.y,min.z),
+      new THREE.Vector3(max.x,min.y,min.z),
+      new THREE.Vector3(min.x,max.y,min.z),
+      new THREE.Vector3(max.x,max.y,min.z),
+      new THREE.Vector3(min.x,min.y,max.z),
+      new THREE.Vector3(max.x,min.y,max.z),
+      new THREE.Vector3(min.x,max.y,max.z),
+      new THREE.Vector3(max.x,max.y,max.z),
+    ];
+  }
+  function axisExtentFromCorners(corners, axisUnit){
+    let mn = Infinity, mx = -Infinity;
+    for (const c of corners){
+      const d = c.dot(axisUnit);
+      if (d < mn) mn = d;
+      if (d > mx) mx = d;
+    }
+    return mx - mn;
+  }
+  function markSkipBoundsDeep(root){
+    if (!root) return;
+    root.traverse(o => { o.userData = o.userData || {}; o.userData.__skipBounds = true; });
+    root.userData = root.userData || {};
+    root.userData.__skipBounds = true;
+  }
+
+  // =========================
+  // Switch button pitch
+  // =========================
+  const pitchOff = THREE.MathUtils.degToRad(-BUTTON_P_DEG);
+  const pitchOn  = THREE.MathUtils.degToRad(+BUTTON_P_DEG);
+  let buttonKeepY = 0, buttonKeepZ = 0;
+
+  // =========================
+  // Scene objects
+  // =========================
+  let switchRoot=null, stopRoot=null, rodObj=null;
+  let circuitObj=null, batteryBranchObj=null, resistorBranchObj=null, ledObj=null;
+
+  let linesObj=null;
+  let magnetObj=null;
+
+  let lampace1Obj=null, lampace2Obj=null, lampaceLegacyObj=null;
+  let buttonObj = null;
+  let fuseObj = null;
+
+  function setSwitchButton(on){
+    if (!buttonObj) return;
+    buttonObj.rotation.x = on ? pitchOn : pitchOff;
+    buttonObj.rotation.y = buttonKeepY;
+    buttonObj.rotation.z = buttonKeepZ;
+  }
+
+  // =========================
+  // Battery polarity rotation
+  // =========================
+  let batteryReversed = false;
+  let batteryFlipAxisLocal = new THREE.Vector3(0,1,0);
+  let batteryBaseQuat = new THREE.Quaternion();
+  let batteryBaseWorldQuat = new THREE.Quaternion();
+
+  // =========================
+  // Rod rail
+  // =========================
+  let railReady = false;
+  let railMean=null, railN=null, railU=null, railV=null;
+  let railSLine=0;
+  let rodNOff=0;
+  let tMin=0, tMax=0;
+  let rodT=0;
+  let rodVel=0;
+  let aLap=0, aFric=0;
+
+  let rodBasePosL=null, rodBaseCenterW=null, invParent3=null;
+  const rodCenterWCurrent = new THREE.Vector3();
+  let rodAxisW = new THREE.Vector3(1,0,0);
+  let rodHalfLen = 0.1;
+
+  let batteryTAlongU = 0;
+
+  // circuit state
+  let circuitOn = false;
+  let laplaceOn = false;
+  let energizedPrev = null;
+
+  function isEnergized(){
+    return circuitOn && batteryHasCharge();
+  }
+
+  // =========================
+  // Circuit plane
+  // =========================
+  const circuitPlaneN = new THREE.Vector3(0,1,0);
+  const circuitPlaneP = new THREE.Vector3(0,0,0);
+
+  function updateCircuitPlaneFromStops(outP, outN){
+    if (!stopRoot) return false;
+    const pts = getStopPointsWorld(stopRoot);
+    if (!pts) return false;
+
+    outP.copy(pts[0]);
+    outN.copy(bestPlaneNormalFrom4(pts[0],pts[1],pts[2],pts[3])).normalize();
+
+    const up = new THREE.Vector3(0,1,0);
+    if (outN.dot(up) < 0) outN.multiplyScalar(-1);
+
+    return true;
+  }
+
+  // =========================
+  // Magnet rig
+  // =========================
+  let magnetRig = null;
+  let magnetRigBasePos = new THREE.Vector3();
+  let magnetRigBaseQuat = new THREE.Quaternion();
+  let magnetRigParentWorldQ = new THREE.Quaternion();
+  let magnetRigInvParentWorldQ = new THREE.Quaternion();
+
+  let magnetBackAxisWorld = new THREE.Vector3(0,0,1);
+  let magnetBackMaxDist = 0.2;
+
+  const WORLD_UP = new THREE.Vector3(0,1,0);
+
+  let magnetB0Local = new THREE.Vector3(0,0,1);
+  let magnetHasB0 = false;
+
+  function getBDirWorld(){
+    if (!poleNObj || !poleSObj) return null;
+
+    poleNObj.updateMatrixWorld(true);
+    poleSObj.updateMatrixWorld(true);
+
+    const nPos = poleNObj.getWorldPosition(new THREE.Vector3());
+    const sPos = poleSObj.getWorldPosition(new THREE.Vector3());
+
+    const Bw = nPos.sub(sPos);
+    if (Bw.length() < 1e-8) return null;
+    return Bw.normalize();
+  }
+
+  function sinThetaFromGeometry3D(){
+    if (!railReady) return 0;
+    const Bw = getBDirWorld();
+    if (!Bw) return 0;
+    const Iw = rodAxisW.clone().normalize();
+    const cross = new THREE.Vector3().crossVectors(Iw, Bw);
+    const s = cross.length();
+    return Math.max(0, Math.min(1, s));
+  }
+
+  function findFirstByNameTokens(root, tokens){
+    if (!root) return null;
+    const toks = (tokens || []).map(t=>String(t).toLowerCase()).filter(Boolean);
+    let found = null;
+    root.traverse(o=>{
+      if (found) return;
+      const n = String(o.name || '').toLowerCase();
+      for (const t of toks){
+        if (n.includes(t)){ found = o; return; }
+      }
+    });
+    return found;
+  }
+
+  function findMagnetObject(root){
+    const direct = root.getObjectByName(MAGNET_NAME);
+    if (direct) return direct;
+
+    const m = findFirstByNameTokens(root, ['magnet','magn']);
+    if (m) return m;
+
+    const nObj = root.getObjectByName(POLE_N_NAME);
+    const sObj = root.getObjectByName(POLE_S_NAME);
+    if (nObj && sObj && nObj.parent && nObj.parent === sObj.parent) return nObj.parent;
+
+    return nObj || sObj || null;
+  }
+
+  function findFuseObject(root){
+    return findFirstByNameTokens(root, ['fuse','ασφάλ','asfal','safety','insurance']);
+  }
+
+  function getMagnetPivotWorld(root){
+    if (magnetObj){
+      const box = new THREE.Box3().setFromObject(magnetObj);
+      return box.getCenter(new THREE.Vector3());
+    }
+
+    if (poleNObj && poleSObj){
+      poleNObj.updateMatrixWorld(true);
+      poleSObj.updateMatrixWorld(true);
+      const nPos = poleNObj.getWorldPosition(new THREE.Vector3());
+      const sPos = poleSObj.getWorldPosition(new THREE.Vector3());
+      return nPos.add(sPos).multiplyScalar(0.5);
+    }
+
+    const ref = root;
+    const box = new THREE.Box3().setFromObject(ref);
+    return box.getCenter(new THREE.Vector3());
+  }
+
+  function getMagnetRigItems(){
+    const list = [magnetObj, poleNObj, poleSObj].filter(Boolean);
+    return list.filter(o => !list.some(other => other !== o && isDescendant(o, other)));
+  }
+
+  function setupMagnetRig(root){
+    if (!root) return;
+
+    const items = getMagnetRigItems();
+    if (!items.length) return;
+
+    const pivotW = getMagnetPivotWorld(root);
+    root.updateMatrixWorld(true);
+
+    const pivotL = pivotW.clone();
+    root.worldToLocal(pivotL);
+
+    magnetRig = new THREE.Group();
+    magnetRig.name = '__magnetRig';
+    root.add(magnetRig);
+
+    magnetRig.position.copy(pivotL);
+    magnetRig.quaternion.identity();
+    magnetRig.updateMatrixWorld(true);
+
+    for (const o of items){
+      if (o && o.parent !== magnetRig) magnetRig.attach(o);
+    }
+
+    magnetRigBasePos.copy(magnetRig.position);
+    magnetRigBaseQuat.copy(magnetRig.quaternion);
+
+    const box = new THREE.Box3().setFromObject(magnetRig);
+    const s = box.getSize(new THREE.Vector3()).length();
+    magnetBackMaxDist = Math.max(homeDistance * 0.12, s * 0.95, homeDistance * 0.24);
+  }
+
+  function computeParentInvQuat(){
+    if (!magnetRig) return false;
+    const parent = magnetRig.parent || modelRoot;
+    if (!parent) return false;
+    parent.getWorldQuaternion(magnetRigParentWorldQ);
+    magnetRigInvParentWorldQ.copy(magnetRigParentWorldQ).invert();
+    return true;
+  }
+
+  function captureMagnetB0Local(){
+    if (!magnetRig) return false;
+    if (!poleNObj || !poleSObj) return false;
+    if (!computeParentInvQuat()) return false;
+
+    const Bw = getBDirWorld();
+    if (!Bw) return false;
+
+    magnetB0Local.copy(Bw).applyQuaternion(magnetRigInvParentWorldQ).normalize();
+    magnetHasB0 = magnetB0Local.length() > 0.9;
+    return magnetHasB0;
+  }
+
+  function computeBTargetLocal(thetaDeg){
+    if (!railReady) return null;
+    if (!computeParentInvQuat()) return null;
+
+    const theta = THREE.MathUtils.degToRad(clamp(thetaDeg, 0, 90));
+    const I = rodAxisW.clone().normalize().applyQuaternion(magnetRigInvParentWorldQ).normalize();
+
+    let up = WORLD_UP.clone().applyQuaternion(magnetRigInvParentWorldQ).normalize();
+    if (Math.abs(I.dot(up)) > 0.985){
+      up = new THREE.Vector3(1,0,0).applyQuaternion(magnetRigInvParentWorldQ).normalize();
+    }
+
+    let U = up.clone().sub(I.clone().multiplyScalar(I.dot(up)));
+    if (U.length() < 1e-7){
+      U = new THREE.Vector3(0,0,1).applyQuaternion(magnetRigInvParentWorldQ).normalize();
+      U = U.sub(I.clone().multiplyScalar(I.dot(U)));
+    }
+    U.normalize();
+
+    const B = I.clone().multiplyScalar(Math.cos(theta)).add(U.multiplyScalar(Math.sin(theta))).normalize();
+    return B;
+  }
+
+  function computeMagnetBackAxisWorld(){
+    if (!railReady){
+      magnetBackAxisWorld.set(0,0,1);
+      return;
+    }
+
+    const vWorld = railV.clone().normalize();
+    let sign = +1;
+
+    if (magnetRig && stopRoot){
+      const pts = getStopPointsWorld(stopRoot);
+      if (pts && pts.length){
+        let vMin = Infinity, vMax = -Infinity;
+        for (const pW of pts){
+          const pP = projectPointToPlane(pW, railMean, railN);
+          const vv = pP.clone().sub(railMean).dot(vWorld);
+          vMin = Math.min(vMin, vv);
+          vMax = Math.max(vMax, vv);
+        }
+        const vCircuitCenter = (vMin + vMax) * 0.5;
+
+        const boxMag = new THREE.Box3().setFromObject(magnetRig);
+        const cMagW = boxMag.getCenter(new THREE.Vector3());
+        const cMagP = projectPointToPlane(cMagW, railMean, railN);
+        const vMag = cMagP.clone().sub(railMean).dot(vWorld);
+
+        sign = (vMag - vCircuitCenter) >= 0 ? +1 : -1;
+      }
+    }
+
+    magnetBackAxisWorld.copy(vWorld.multiplyScalar(sign));
+  }
+
+  function overlapToDistance01(){
+    return 1 - clamp01(magnetBack01);
+  }
+
+  function applyMagnetTransform(){
+    if (!magnetRig) return;
+
+    const BtargetLocal = computeBTargetLocal(magnetYawDeg);
+
+    if (magnetHasB0 && BtargetLocal){
+      const qAlign = new THREE.Quaternion().setFromUnitVectors(magnetB0Local, BtargetLocal);
+      magnetRig.quaternion.copy(magnetRigBaseQuat);
+      magnetRig.quaternion.premultiply(qAlign);
+    } else {
+      magnetRig.quaternion.copy(magnetRigBaseQuat);
+    }
+
+    const dist01 = overlapToDistance01();
+    const dist = dist01 * magnetBackMaxDist;
+
+    if (!computeParentInvQuat()) return;
+
+    const backWorld = magnetBackAxisWorld.clone().multiplyScalar(dist);
+    const backLocal = backWorld.applyQuaternion(magnetRigInvParentWorldQ);
+
+    magnetRig.position.copy(magnetRigBasePos).add(backLocal);
+    magnetRig.updateMatrixWorld(true);
+  }
+
+  // =========================
+  // Overlap calibration from LINES
+  // =========================
+  function calibrateMagnetBackMaxDistFromLines(){
+    if (!railReady || !stopRoot || !magnetRig || !linesObj) return false;
+
+    const uAxis = railU.clone().normalize();
+    const vAxis = magnetBackAxisWorld.clone().normalize();
+
+    const pts = getStopPointsWorld(stopRoot);
+    if (!pts) return false;
+
+    let cuMin = Infinity, cuMax = -Infinity, cvMin = Infinity, cvMax = -Infinity;
+    for (const pW of pts){
+      const pP = projectPointToPlane(pW, railMean, railN);
+      const rel = pP.clone().sub(railMean);
+      const u = rel.dot(uAxis);
+      const v = rel.dot(vAxis);
+      cuMin = Math.min(cuMin, u); cuMax = Math.max(cuMax, u);
+      cvMin = Math.min(cvMin, v); cvMax = Math.max(cvMax, v);
+    }
+
+    const savedPos = magnetRig.position.clone();
+    magnetRig.position.copy(magnetRigBasePos);
+    magnetRig.updateMatrixWorld(true);
+
+    let vMinInCircuitU = Infinity;
+    let anyInCircuitU = false;
+
+    const tmpW = new THREE.Vector3();
+    const tmpP = new THREE.Vector3();
+
+    linesObj.updateMatrixWorld(true);
+    linesObj.traverse(o=>{
+      const g = o.geometry;
+      const pos = g && g.attributes && g.attributes.position;
+      if (!pos) return;
+
+      const idx = g.index;
+      const total = idx ? idx.count : pos.count;
+      const step = Math.max(1, Math.floor(total / 2500));
+
+      const mW = o.matrixWorld;
+
+      if (idx){
+        const a = idx.array;
+        for (let i=0; i<idx.count; i+=step){
+          const vi = a[i];
+          tmpW.fromBufferAttribute(pos, vi).applyMatrix4(mW);
+          tmpP.copy(projectPointToPlane(tmpW, railMean, railN));
+          const rel = tmpP.sub(railMean);
+          const u = rel.dot(uAxis);
+          if (u < cuMin || u > cuMax) continue;
+
+          const v = rel.dot(vAxis);
+          anyInCircuitU = true;
+          if (v < vMinInCircuitU) vMinInCircuitU = v;
+        }
+      } else {
+        for (let i=0; i<pos.count; i+=step){
+          tmpW.fromBufferAttribute(pos, i).applyMatrix4(mW);
+          tmpP.copy(projectPointToPlane(tmpW, railMean, railN));
+          const rel = tmpP.sub(railMean);
+          const u = rel.dot(uAxis);
+          if (u < cuMin || u > cuMax) continue;
+
+          const v = rel.dot(vAxis);
+          anyInCircuitU = true;
+          if (v < vMinInCircuitU) vMinInCircuitU = v;
+        }
+      }
+    });
+
+    magnetRig.position.copy(savedPos);
+    magnetRig.updateMatrixWorld(true);
+
+    if (!anyInCircuitU || !isFinite(vMinInCircuitU)){
+      magnetBackMaxDist = 0;
+      return true;
+    }
+
+    const eps = Math.max(homeDistance * 0.00002, 1e-7);
+    const distNeed = (cvMax - vMinInCircuitU) + eps;
+
+    magnetBackMaxDist = Math.max(0, distNeed);
+    return true;
+  }
+
+  function recalibrateOverlapRangePreserveDistance(){
+    const oldMax = magnetBackMaxDist || 0;
+    const distCurrent = overlapToDistance01() * oldMax;
+
+    const ok = calibrateMagnetBackMaxDistFromLines();
+    if (!ok) return false;
+
+    const newMax = magnetBackMaxDist || 0;
+    if (newMax <= 1e-9){
+      magnetBack01 = 0;
+    } else {
+      magnetBack01 = 1 - clamp01(distCurrent / newMax);
+    }
+
+    magnetBackEl.value = String(magnetBack01);
+    refreshHudReadouts();
+    return true;
+  }
+
+  // =========================
+  // Laplace factor: F ∝ B * I * L_eff * sinθ
+  // =========================
+  function overlapFactor(){ return clamp01(magnetBack01); }
+
+  function effectiveB(){
+    const s = Math.max(0, fieldStrength);
+    const orient = sinThetaFromGeometry3D();
+    const d01 = overlapToDistance01();
+    const dist = 1 / Math.pow(1 + 1.8 * d01, 2);
+    return s * orient * dist;
+  }
+
+  function currentFactor(){
+    const R = Math.max(0.05, resistorOhm);
+    return 1 / R;
+  }
+
+  function laplaceFactor(){
+    return effectiveB() * overlapFactor() * currentFactor();
+  }
+
+  function hasEffectiveField(){
+    return laplaceFactor() > FIELD_EPS;
+  }
+
+  // =========================
+  // LED glow
+  // =========================
+  const matBaseline = new WeakMap();
+  const meshCloned  = new WeakSet();
+  const ledGreen = new THREE.Color(0x22c55e);
+
+  function ensureCloneMaterials(mesh){
+    if (!mesh || !mesh.material || meshCloned.has(mesh)) return;
+    const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+    const clones = mats.map(m=>{
+      let c = m;
+      try { c = m.clone(); } catch(_){}
+      if (!matBaseline.has(c)){
+        matBaseline.set(c, {
+          color: (c.color && c.color.clone) ? c.color.clone() : null,
+          emissive: (c.emissive && c.emissive.clone) ? c.emissive.clone() : null,
+          emissiveIntensity: (typeof c.emissiveIntensity === 'number') ? c.emissiveIntensity : null
+        });
+      }
+      return c;
+    });
+    mesh.material = Array.isArray(mesh.material) ? clones : clones[0];
+    meshCloned.add(mesh);
+  }
+
+  function applyLedGlow(on){
+    if (!ledObj) return;
+    ledObj.traverse(o=>{
+      if (!o.isMesh) return;
+      ensureCloneMaterials(o);
+      const mats = Array.isArray(o.material) ? o.material : [o.material];
+      for (const m of mats){
+        const b = matBaseline.get(m);
+        if (!b) continue;
+        if (on){
+          if (m.emissive){
+            m.emissive.copy(ledGreen);
+            m.emissiveIntensity = 1.8;
+          }
+          if (m.color && b.color){
+            m.color.copy(b.color).lerp(ledGreen, 0.35);
+          }
+        }else{
+          if (b.color && m.color) m.color.copy(b.color);
+          if (b.emissive && m.emissive) m.emissive.copy(b.emissive);
+          if (b.emissiveIntensity !== null && typeof m.emissiveIntensity === 'number') m.emissiveIntensity = b.emissiveIntensity;
+        }
+        m.needsUpdate = true;
+      }
+    });
+  }
+
+  function updateLaplaceVisibility(){
+    const on = isEnergized() && hasEffectiveField();
+    if (lampace1Obj) lampace1Obj.visible = on && !batteryReversed;
+    if (lampace2Obj) lampace2Obj.visible = on &&  batteryReversed;
+    const has12 = !!(lampace1Obj || lampace2Obj);
+    if (lampaceLegacyObj) lampaceLegacyObj.visible = on && !has12;
+  }
+
+  function applyLaplaceVectorScale(){
+    const s = Math.max(0.0001, laplaceFactor());
+    if (lampace1Obj && lap1BaseScale){
+      lampace1Obj.scale.copy(lap1BaseScale).multiplyScalar(s);
+      lampace1Obj.updateMatrixWorld(true);
+    }
+    if (lampace2Obj && lap2BaseScale){
+      lampace2Obj.scale.copy(lap2BaseScale).multiplyScalar(s);
+      lampace2Obj.updateMatrixWorld(true);
+    }
+    if (lampaceLegacyObj && lapLegacyBaseScale){
+      lampaceLegacyObj.scale.copy(lapLegacyBaseScale).multiplyScalar(s);
+      lampaceLegacyObj.updateMatrixWorld(true);
+    }
+  }
+
+  function syncEnergizedState(){
+    const en = isEnergized();
+    if (en === energizedPrev) {
+      laplaceOn = en && hasEffectiveField();
+      return;
+    }
+    energizedPrev = en;
+    applyLedGlow(en);
+    laplaceOn = en && hasEffectiveField();
+    updateLaplaceVisibility();
+  }
+
+  // =========================
+  // Rod rail helpers
+  // =========================
+  function rodCenterWorldAtT(t){
+    return railMean.clone()
+      .add(railU.clone().multiplyScalar(t))
+      .add(railV.clone().multiplyScalar(railSLine))
+      .add(railN.clone().multiplyScalar(rodNOff));
+  }
+
+  function setRodFromT(t){
+    if (!railReady || !rodObj) return;
+    const clamped = Math.max(tMin, Math.min(tMax, t));
+    const targetCenterW = rodCenterWorldAtT(clamped);
+    rodCenterWCurrent.copy(targetCenterW);
+
+    const deltaW = targetCenterW.clone().sub(rodBaseCenterW);
+    const deltaL = deltaW.applyMatrix3(invParent3);
+    rodObj.position.copy(rodBasePosL).add(deltaL);
+  }
+
+  function setRodT(t){
+    rodT = Math.max(tMin, Math.min(tMax, t));
+    setRodFromT(rodT);
+  }
+
+  function setupRodRail(){
+    if (!modelRoot || !rodObj || !stopRoot) return false;
+
+    modelRoot.updateMatrixWorld(true);
+    rodObj.updateMatrixWorld(true);
+    stopRoot.updateMatrixWorld(true);
+
+    const pts = getStopPointsWorld(stopRoot);
+    if (!pts) return false;
+
+    const p1=pts[0], p2=pts[1], p3=pts[2], p4=pts[3];
+
+    const mean = new THREE.Vector3().add(p1).add(p2).add(p3).add(p4).multiplyScalar(0.25);
+    const n = bestPlaneNormalFrom4(p1,p2,p3,p4);
+
+    const mid13 = p1.clone().add(p3).multiplyScalar(0.5);
+    const mid24 = p2.clone().add(p4).multiplyScalar(0.5);
+
+    const mid13P = projectPointToPlane(mid13, mean, n);
+    const mid24P = projectPointToPlane(mid24, mean, n);
+
+    let u = mid24P.clone().sub(mid13P);
+    u = u.sub(n.clone().multiplyScalar(u.dot(n)));
+    u = normalizeOr(u, new THREE.Vector3(1,0,0));
+
+    let v = new THREE.Vector3().crossVectors(n, u);
+    if (v.length() < 1e-9) return false;
+    v.normalize();
+
+    const baseBoxW = computeBoxSkippingMarked(rodObj);
+    const cRodW = baseBoxW.getCenter(new THREE.Vector3());
+
+    const cRodP = projectPointToPlane(cRodW, mean, n);
+    rodNOff = cRodW.clone().sub(cRodP).dot(n);
+    railSLine = cRodP.clone().sub(mean).dot(v);
+
+    const parent = rodObj.parent || modelRoot;
+    parent.updateMatrixWorld(true);
+    const invParent = new THREE.Matrix4().copy(parent.matrixWorld).invert();
+    invParent3 = new THREE.Matrix3().setFromMatrix4(invParent);
+
+    rodBasePosL = rodObj.position.clone();
+    rodBaseCenterW = cRodW.clone();
+
+    const curT = cRodP.clone().sub(mean).dot(u);
+
+    const corners = getBoxCorners(baseBoxW);
+    let projMn = Infinity, projMx = -Infinity;
+    for (const c of corners){
+      const d = c.dot(u);
+      if (d < projMn) projMn = d;
+      if (d > projMx) projMx = d;
+    }
+
+    const stopUminAbs = 0.5 * (p1.dot(u) + p3.dot(u));
+    const stopUmaxAbs = 0.5 * (p2.dot(u) + p4.dot(u));
+
+    const tMinLocal = curT + (stopUminAbs - projMn);
+    const tMaxLocal = curT + (stopUmaxAbs - projMx);
+
+    tMin = Math.min(tMinLocal, tMaxLocal);
+    tMax = Math.max(tMinLocal, tMaxLocal);
+
+    rodT = Math.max(tMin, Math.min(tMax, curT));
+
+    const Lphys = Math.max(1e-6, tMax - tMin);
+    aLap  = LAP_SCALE * Lphys;
+    aFric = FRICTION_SCALE * Lphys;
+
+    const q = rodObj.getWorldQuaternion(new THREE.Quaternion());
+    const axX = new THREE.Vector3(1,0,0).applyQuaternion(q).normalize();
+    const axY = new THREE.Vector3(0,1,0).applyQuaternion(q).normalize();
+    const axZ = new THREE.Vector3(0,0,1).applyQuaternion(q).normalize();
+
+    const ex = axisExtentFromCorners(corners, axX);
+    const ey = axisExtentFromCorners(corners, axY);
+    const ez = axisExtentFromCorners(corners, axZ);
+
+    rodAxisW = axX; let e = ex;
+    if (ey > e){ e = ey; rodAxisW = axY; }
+    if (ez > e){ e = ez; rodAxisW = axZ; }
+    rodHalfLen = Math.max(0.001, e * 0.5);
+
+    railMean = mean; railN = n; railU = u; railV = v;
+    railReady = true;
+
+    setRodFromT(rodT);
+    return true;
+  }
+
+  function computeBatteryTAlongRail(){
+    if (!railReady || !batteryBranchObj) return;
+    const box = new THREE.Box3().setFromObject(batteryBranchObj);
+    const c = box.getCenter(new THREE.Vector3());
+    const cP = projectPointToPlane(c, railMean, railN);
+    batteryTAlongU = cP.sub(railMean).dot(railU);
+  }
+
+  // =========================
+  // Drag
+  // =========================
+  let draggingRod = false;
+  let dragPointerId = null;
+
+  function updateRodPhysics(dt){
+    if (!railReady || !rodObj || dt <= 0) return;
+    if (draggingRod) return;
+
+    if (Math.abs(rodVel) < 1e-10) rodVel = 0;
+
+    let a = 0;
+    if (laplaceOn){
+      const dTB = (batteryTAlongU - rodT);
+      const towardSign = (dTB >= 0) ? +1 : -1;
+
+      const lapSign = batteryReversed ? -towardSign : towardSign;
+      const lapA = aLap * laplaceFactor() * lapSign;
+
+      if (rodVel !== 0){
+        a = lapA - aFric * Math.sign(rodVel);
+      } else {
+        if (Math.abs(lapA) <= aFric || !hasEffectiveField()){
+          return;
+        }
+        a = lapA - aFric * Math.sign(lapA);
+      }
+    } else {
+      if (rodVel === 0) return;
+      a = -aFric * Math.sign(rodVel);
+    }
+
+    const vPrev = rodVel;
+    rodVel = rodVel + a * dt;
+
+    if (!laplaceOn && vPrev !== 0 && Math.sign(rodVel) !== Math.sign(vPrev)){
+      rodVel = 0;
+    }
+
+    rodT = rodT + rodVel * dt;
+
+    if (rodT >= tMax){ rodT = tMax; rodVel = 0; }
+    if (rodT <= tMin){ rodT = tMin; rodVel = 0; }
+
+    if (laplaceOn && hasEffectiveField()){
+      const dTB = (batteryTAlongU - rodT);
+      const towardSign = (dTB >= 0) ? +1 : -1;
+      const lapSign = batteryReversed ? -towardSign : towardSign;
+
+      if (rodT >= tMax - STOP_EPS && lapSign > 0){ rodT = tMax; rodVel = 0; }
+      if (rodT <= tMin + STOP_EPS && lapSign < 0){ rodT = tMin; rodVel = 0; }
+    }
+
+    setRodFromT(rodT);
+  }
+
+  // =========================
+  // Battery flip
+  // =========================
+  function applyBatteryRotation(){
+    if (!batteryBranchObj) return;
+    const rotQ = new THREE.Quaternion().setFromAxisAngle(
+      batteryFlipAxisLocal,
+      batteryReversed ? Math.PI : 0
+    );
+    batteryBranchObj.quaternion.copy(batteryBaseQuat).multiply(rotQ);
+    batteryBranchObj.updateMatrixWorld(true);
+  }
+
+  function toggleBatteryPolarity(){
+    sfxClick.play();
+    batteryReversed = !batteryReversed;
+    applyBatteryRotation();
+    updateLaplaceVisibility();
+    updateArrows();
+  }
+
+  function updateBatteryDrain(dt){
+    if (!dt || dt <= 0) return;
+    if (!circuitOn) return;
+    if (!batteryHasCharge()) return;
+
+    batteryLevel = clamp01(batteryLevel - DRAIN_PER_SEC * dt);
+    if (!batteryHasCharge()){
+      syncEnergizedState();
+    }
+  }
+
+  // =========================
+  // Heat waves
+  // =========================
+  let heatGroup = null;
+  let heatWaves = [];
+  let heatLevel = 0;
+  let heatTexture = null;
+
+  const _heatBox = new THREE.Box3();
+  const _heatCenter = new THREE.Vector3();
+  const _heatSize = new THREE.Vector3();
+  const _heatAnchor = new THREE.Vector3();
+
+  function makeHeatWaveTexture(size=256){
+    const c = document.createElement('canvas');
+    c.width = c.height = size;
+    const ctx = c.getContext('2d');
+
+    ctx.clearRect(0,0,size,size);
+    const cx = size/2, cy = size/2;
+
+    const g0 = ctx.createRadialGradient(cx, cy, size*0.05, cx, cy, size*0.50);
+    g0.addColorStop(0.00, 'rgba(255,255,255,0.16)');
+    g0.addColorStop(0.55, 'rgba(255,255,255,0.07)');
+    g0.addColorStop(1.00, 'rgba(255,255,255,0.00)');
+    ctx.fillStyle = g0;
+    ctx.fillRect(0,0,size,size);
+
+    ctx.lineWidth = Math.max(2, size*0.010);
+    for (let k=0; k<4; k++){
+      const r = size*(0.12 + k*0.10);
+      ctx.beginPath();
+      ctx.strokeStyle = `rgba(255,255,255,${0.20 - k*0.04})`;
+      ctx.arc(cx, cy, r, 0, Math.PI*2);
+      ctx.stroke();
+    }
+
+    ctx.lineWidth = Math.max(2, size*0.008);
+    for (let k=0; k<6; k++){
+      const r = size*(0.18 + k*0.06);
+      const a0 = (k*0.9) % (Math.PI*2);
+      const a1 = a0 + Math.PI*0.85;
+      ctx.beginPath();
+      ctx.strokeStyle = `rgba(255,255,255,${0.18 - k*0.02})`;
+      ctx.arc(cx, cy, r, a0, a1);
+      ctx.stroke();
+    }
+
+    const img = ctx.getImageData(0,0,size,size);
+    const d = img.data;
+    for (let i=0; i<d.length; i+=4){
+      const n = (Math.random()*2-1) * 9;
+      d[i]   = Math.min(255, Math.max(0, d[i]   + n));
+      d[i+1] = Math.min(255, Math.max(0, d[i+1] + n));
+      d[i+2] = Math.min(255, Math.max(0, d[i+2] + n));
+    }
+    ctx.putImageData(img,0,0);
+
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.needsUpdate = true;
+    return tex;
+  }
+
+  function setupHeatWaves(){
+    if (heatGroup && heatGroup.parent) heatGroup.parent.remove(heatGroup);
+    heatGroup = new THREE.Group();
+    scene.add(heatGroup);
+
+    heatTexture = makeHeatWaveTexture(256);
+
+    heatWaves = [];
+    for (let i=0; i<HEAT_WAVE_COUNT; i++){
+      const mat = new THREE.SpriteMaterial({
+        map: heatTexture,
+        color: new THREE.Color(0x7dfcff),
+        transparent: true,
+        opacity: 0,
+        depthWrite: false,
+        depthTest: false,
+        blending: THREE.AdditiveBlending
+      });
+      const sp = new THREE.Sprite(mat);
+      sp.visible = false;
+      sp.renderOrder = 9998;
+      heatGroup.add(sp);
+      heatWaves.push(sp);
+    }
+
+    heatGroup.visible = false;
+    heatLevel = 0;
+  }
+
+  function getResistorAnchorWorld(){
+    if (!resistorBranchObj) return null;
+
+    _heatBox.setFromObject(resistorBranchObj);
+    _heatBox.getCenter(_heatCenter);
+    _heatBox.getSize(_heatSize);
+
+    const ok = updateCircuitPlaneFromStops(circuitPlaneP, circuitPlaneN);
+    if (ok) _heatAnchor.copy(projectPointToPlane(_heatCenter, circuitPlaneP, circuitPlaneN));
+    else _heatAnchor.copy(_heatCenter);
+
+    const baseR = Math.max(_heatSize.x, _heatSize.y, _heatSize.z) * 0.95;
+    return { pos: _heatAnchor.clone(), baseR };
+  }
+
+  function updateHeatWaves(dt, tNow){
+    if (!heatGroup || !heatWaves.length) return;
+
+    const target = isEnergized() ? 1 : 0;
+    const tau = target ? HEAT_RISE_TAU : (HEAT_FALL_TAU * (1.0 + 0.9 * heatLevel));
+    const a = 1 - Math.exp(-dt / Math.max(1e-4, tau));
+    heatLevel = heatLevel + (target - heatLevel) * a;
+
+    if (heatLevel < 0.003){
+      heatGroup.visible = false;
+      for (const sp of heatWaves) sp.visible = false;
+      return;
+    }
+
+    const anchor = getResistorAnchorWorld();
+    if (!anchor){
+      heatGroup.visible = false;
+      return;
+    }
+
+    heatGroup.visible = true;
+    heatGroup.position.copy(anchor.pos);
+
+    const base = Math.max(anchor.baseR, homeDistance * 0.055);
+
+    for (let i=0; i<heatWaves.length; i++){
+      const sp = heatWaves[i];
+      sp.visible = true;
+
+      const phase = (tNow * HEAT_SPEED + i / heatWaves.length) % 1;
+
+      const k = 0.25 + phase * 2.10;
+      const s = base * k;
+      sp.scale.set(s, s, 1);
+
+      const fade = (1 - phase);
+      const pulse = 0.25 + 0.75 * (fade * fade);
+      const flicker = 0.92 + 0.08 * Math.sin(tNow * 7.0 + i * 1.4);
+
+      sp.material.opacity = HEAT_MAX_OPACITY * heatLevel * pulse * flicker;
+      sp.material.rotation = tNow * 0.22 + i * 0.85;
+    }
+  }
+
+  // =========================
+  // Arrows
+  // =========================
+  let arrowsGroup=null;
+  let arrowRod=null, arrowResistor=null, arrowRailTop=null, arrowRailBottom=null;
+
+  function styleArrowHelper(ah){
+    ah.line.material.transparent = true;
+    ah.line.material.depthTest = false;
+    ah.line.material.depthWrite = false;
+    ah.line.material.opacity = 1.0;
+
+    ah.cone.material.transparent = true;
+    ah.cone.material.depthTest = false;
+    ah.cone.material.depthWrite = false;
+    ah.cone.material.opacity = 1.0;
+
+    ah.renderOrder = 9999;
+    ah.line.renderOrder = 9999;
+    ah.cone.renderOrder = 9999;
+    return ah;
+  }
+  function makeArrow(len){
+    const headLen = Math.max(0.0038, len * HEAD_LEN_K);
+    const headW   = Math.max(0.0030, len * HEAD_W_K);
+    const ah = new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), len, ARROW_COLOR_ON, headLen, headW);
+    return styleArrowHelper(ah);
+  }
+  function setupArrows(){
+    if (arrowsGroup && arrowsGroup.parent) arrowsGroup.parent.remove(arrowsGroup);
+    arrowsGroup = new THREE.Group();
+    scene.add(arrowsGroup);
+    arrowsGroup.visible = false;
+
+    arrowRod = makeArrow(ARROW_LEN_ROD);
+    arrowResistor = makeArrow(ARROW_LEN_WIRE);
+    arrowRailTop = makeArrow(ARROW_LEN_WIRE);
+    arrowRailBottom = makeArrow(ARROW_LEN_WIRE);
+
+    arrowsGroup.add(arrowRod, arrowResistor, arrowRailTop, arrowRailBottom);
+  }
+
+  function placeArrowOnSegment(ah, A, B, baseLen){
+    if (!ah) return;
+    const seg = B.clone().sub(A);
+    const L = seg.length();
+    if (L < 1e-6){ ah.visible = false; return; }
+
+    const dir = seg.clone().multiplyScalar(1/L);
+    const alen = Math.max(baseLen * 0.55, Math.min(baseLen * 1.00, L * 0.42));
+    const mid = A.clone().add(B).multiplyScalar(0.5);
+
+    const midP = projectPointToPlane(mid, circuitPlaneP, circuitPlaneN)
+      .add(circuitPlaneN.clone().multiplyScalar(ARROW_LIFT));
+
+    ah.position.copy(midP);
+    ah.setDirection(dir);
+    ah.setLength(alen, Math.max(0.0038, alen*HEAD_LEN_K), Math.max(0.0030, alen*HEAD_W_K));
+    ah.visible = true;
+  }
+
+  function getGroupAxisEndsProjected(groupObj){
+    if (!groupObj) return null;
+
+    const box = new THREE.Box3().setFromObject(groupObj);
+    const center = box.getCenter(new THREE.Vector3());
+    const corners = getBoxCorners(box);
+
+    const q = groupObj.getWorldQuaternion(new THREE.Quaternion());
+    const axX = new THREE.Vector3(1,0,0).applyQuaternion(q).normalize();
+    const axY = new THREE.Vector3(0,1,0).applyQuaternion(q).normalize();
+    const axZ = new THREE.Vector3(0,0,1).applyQuaternion(q).normalize();
+
+    const axes = [axX, axY, axZ];
+    let bestAxis = axX;
+    let bestE = -1;
+
+    for (const ax of axes){
+      const axP = ax.clone().sub(circuitPlaneN.clone().multiplyScalar(ax.dot(circuitPlaneN)));
+      if (axP.length() < 1e-6) continue;
+      axP.normalize();
+      const e = axisExtentFromCorners(corners, axP);
+      if (e > bestE){ bestE = e; bestAxis = axP; }
+    }
+
+    const half = Math.max(0.001, bestE * 0.5);
+    let A = center.clone().add(bestAxis.clone().multiplyScalar(half));
+    let B = center.clone().add(bestAxis.clone().multiplyScalar(-half));
+
+    A = projectPointToPlane(A, circuitPlaneP, circuitPlaneN);
+    B = projectPointToPlane(B, circuitPlaneP, circuitPlaneN);
+    return { A, B };
+  }
+
+  function updateArrows(){
+    if (!arrowsGroup) return;
+
+    const en = isEnergized();
+    arrowsGroup.visible = en;
+
+    if (!en){
+      for (const ch of arrowsGroup.children) ch.visible = false;
+      return;
+    }
+
+    updateCircuitPlaneFromStops(circuitPlaneP, circuitPlaneN);
+
+    // Rod
+    if (railReady && rodObj){
+      const A = rodCenterWCurrent.clone().add(rodAxisW.clone().multiplyScalar(rodHalfLen));
+      const B = rodCenterWCurrent.clone().add(rodAxisW.clone().multiplyScalar(-rodHalfLen));
+      let start = projectPointToPlane(A, circuitPlaneP, circuitPlaneN);
+      let end   = projectPointToPlane(B, circuitPlaneP, circuitPlaneN);
+      if (batteryReversed){ const t=start; start=end; end=t; }
+      placeArrowOnSegment(arrowRod, start, end, ARROW_LEN_ROD);
+    } else arrowRod.visible = false;
+
+    // Resistor
+    const resEnds = getGroupAxisEndsProjected(resistorBranchObj);
+    if (resEnds){
+      let start = resEnds.B.clone(), end = resEnds.A.clone();
+      if (batteryReversed){ const t=start; start=end; end=t; }
+      placeArrowOnSegment(arrowResistor, start, end, ARROW_LEN_WIRE);
+    } else arrowResistor.visible = false;
+
+    // Rails from stops
+    const pts = stopRoot ? getStopPointsWorld(stopRoot) : null;
+    if (pts){
+      const p1 = projectPointToPlane(pts[0], circuitPlaneP, circuitPlaneN);
+      const p2 = projectPointToPlane(pts[1], circuitPlaneP, circuitPlaneN);
+      const p3 = projectPointToPlane(pts[2], circuitPlaneP, circuitPlaneN);
+      const p4 = projectPointToPlane(pts[3], circuitPlaneP, circuitPlaneN);
+
+      let topA = p2, topB = p1;
+      let botA = p3, botB = p4;
+      if (batteryReversed){
+        [topA, topB] = [topB, topA];
+        [botA, botB] = [botB, botA];
+      }
+      placeArrowOnSegment(arrowRailTop, topA, topB, ARROW_LEN_WIRE);
+      placeArrowOnSegment(arrowRailBottom, botA, botB, ARROW_LEN_WIRE);
+    } else {
+      arrowRailTop.visible = false;
+      arrowRailBottom.visible = false;
+    }
+  }
+
+  // =========================
+  // Current state
+  // =========================
+  function setCurrent(on){
+    circuitOn = !!on;
+    syncEnergizedState();
+    updateArrows();
+  }
+  function toggleCircuit(){
+    sfxSwitch.play();
+    const next = !circuitOn;
+    setCurrent(next);
+    setSwitchButton(next);
+  }
+
+  // =========================
+  // Raycast + pointer helpers
+  // =========================
+  const raycaster = new THREE.Raycaster();
+  const ndc = new THREE.Vector2();
+
+  function pointerToNDC(ev){
+    const rect = renderer.domElement.getBoundingClientRect();
+    const x = (ev.clientX - rect.left) / rect.width;
+    const y = (ev.clientY - rect.top) / rect.height;
+    ndc.set(x*2 - 1, -(y*2 - 1));
+  }
+
+  function isSwitchAncestry(obj){
+    while (obj){
+      const n = (obj.name || '').toLowerCase();
+      if (n === 'switch' || n === 'button' || n === 'led') return true;
+      obj = obj.parent;
+    }
+    return false;
+  }
+
+  function isBatteryAncestry(obj){
+    while (obj){
+      if (obj === batteryBranchObj) return true;
+      const n = (obj.name || '').toLowerCase();
+      if (n === 'battery') return true;
+      obj = obj.parent;
+    }
+    return false;
+  }
+
+  function isRodAncestry(obj){
+    while (obj){
+      if (obj === lampace1Obj || obj === lampace2Obj || obj === lampaceLegacyObj) return false;
+      if (obj === rodObj) return true;
+      const n = (obj.name || '').toLowerCase();
+      if (n === 'rod') return true;
+      obj = obj.parent;
+    }
+    return false;
+  }
+
+  function hitTestKind(ev){
+    if (!modelRoot) return null;
+    pointerToNDC(ev);
+    raycaster.setFromCamera(ndc, camera);
+    const hits = raycaster.intersectObject(modelRoot, true);
+    if (!hits || !hits.length) return null;
+    for (const h of hits){
+      const o = h.object;
+      if (isSwitchAncestry(o)) return 'switch';
+      if (isBatteryAncestry(o)) return 'battery';
+      if (railReady && isRodAncestry(o)) return 'rod';
+    }
+    return null;
+  }
+
+  function updateRodFromPointer(ev){
+    if (!railReady) return false;
+    const dragPlane = new THREE.Plane().setFromNormalAndCoplanarPoint(railN, railMean);
+
+    pointerToNDC(ev);
+    raycaster.setFromCamera(ndc, camera);
+
+    const tmpHit = new THREE.Vector3();
+    const ok = raycaster.ray.intersectPlane(dragPlane, tmpHit);
+    if (!ok) return false;
+
+    const t = tmpHit.clone().sub(railMean).dot(railU);
+    rodVel = 0;
+    setRodT(t);
+    return true;
+  }
+
+  // =========================
+  // Overlays as “clouds”
+  // ✅ popups live in a TOP layer, and are positioned to never sit under the HUD.
+  // =========================
+  const overlays = new Map();
+  const tmpBox = new THREE.Box3();
+  const tmpSize = new THREE.Vector3();
+  const tmpCenter = new THREE.Vector3();
+  const ANCHOR = { CENTER:'center', TOP:'top' };
+
+
+  let openOverlayKey = null;
+
+  function closeAllOverlays(exceptKey=null){
+    overlays.forEach((ov, key)=>{
+      if (key !== exceptKey){
+        ov.pop.hidden = true;
+        ov.pop.classList.remove('below');
+        ov.pop.style.removeProperty('--shift-x');
+        ov.pop.style.removeProperty('--shift-y');
+        ov.pop.style.removeProperty('--maxh');
+      }
+    });
+    openOverlayKey = exceptKey;
+  }
+
+  function worldToWrap(posW){
+    const rect = renderer.domElement.getBoundingClientRect();
+    const v = posW.clone().project(camera);
+    const x = (v.x * 0.5 + 0.5) * rect.width;
+    const y = (-v.y * 0.5 + 0.5) * rect.height;
+    return { x, y, behind: (v.z > 1) };
+  }
+
+  function getAnchorCenterWorld(obj){
+    if (!obj) return null;
+
+    tmpBox.setFromObject(obj);
+    tmpBox.getCenter(tmpCenter);
+    tmpBox.getSize(tmpSize);
+
+    const ok = updateCircuitPlaneFromStops(circuitPlaneP, circuitPlaneN);
+    const n = ok ? circuitPlaneN : WORLD_UP;
+
+    let p = tmpCenter.clone();
+    if (ok) p = projectPointToPlane(p, circuitPlaneP, circuitPlaneN);
+
+    const lift = Math.max(tmpSize.length() * 0.03, homeDistance * 0.010);
+    return p.add(n.clone().multiplyScalar(lift));
+  }
+
+  function getAnchorTopWorld(obj){
+    if (!obj) return null;
+
+    tmpBox.setFromObject(obj);
+    tmpBox.getSize(tmpSize);
+
+    const ok = updateCircuitPlaneFromStops(circuitPlaneP, circuitPlaneN);
+    const n = ok ? circuitPlaneN : WORLD_UP;
+
+    const corners = getBoxCorners(tmpBox);
+    let best = corners[0];
+    let bestD = best.dot(n);
+    for (let i=1; i<corners.length; i++){
+      const d = corners[i].dot(n);
+      if (d > bestD){ bestD = d; best = corners[i]; }
+    }
+
+    const lift = Math.max(tmpSize.length() * 0.02, homeDistance * 0.008);
+    return best.clone().add(n.clone().multiplyScalar(lift));
+  }
+
+  function getAnchorWorldFor(obj, anchorMode){
+    return (anchorMode === ANCHOR.TOP) ? getAnchorTopWorld(obj) : getAnchorCenterWorld(obj);
+  }
+
+  function makeOverlay(key, iconText, title, description, getObj, opts = {}){
+    const { extraHtml = '', anchorMode = ANCHOR.CENTER } = opts;
+
+    const el = document.createElement('div');
+    el.className = 'ov';
+    el.dataset.key = key;
+
+    const btn = document.createElement('button');
+    btn.className = 'ov-btn';
+    btn.type = 'button';
+    btn.textContent = iconText;
+    btn.title = title;
+
+    el.appendChild(btn);
+    overlayBtnLayer.appendChild(el);
+
+    const pop = document.createElement('div');
+    pop.className = 'ov-pop cloud';
+    pop.hidden = true;
+    pop.innerHTML = `
+      <div class="ov-title">${title}</div>
+      <div class="ov-text">${description}</div>
+      ${extraHtml}
+    `;
+    overlayPopLayer.appendChild(pop);
+
+    btn.addEventListener('click', async (ev)=>{
+      await unlockAudioOnce();
+      sfxClick.play();
+      ev.preventDefault();
+      ev.stopPropagation();
+
+      const next = pop.hidden;
+
+      closeAllOverlays(next ? key : null);
+      pop.hidden = !next;
+
+      if (!pop.hidden){
+        openOverlayKey = key;
+        requestAnimationFrame(()=> fitOverlayCloud(overlays.get(key)));
+      } else {
+        openOverlayKey = null;
+      }
+    }, { passive:false });
+
+    overlays.set(key, { key, el, btn, pop, getObj, anchorMode });
+    return overlays.get(key);
+  }
+
+  function updateOverlays(){
+    if (!modelRoot) return;
+
+    overlays.forEach((ov)=>{
+      const obj = ov.getObj();
+      if (!obj){
+        ov.el.style.transform = 'translate(-9999px,-9999px)';
+        ov.pop.hidden = true;
+        return;
+      }
+
+      const anchorW = getAnchorWorldFor(obj, ov.anchorMode);
+      if (!anchorW){
+        ov.el.style.transform = 'translate(-9999px,-9999px)';
+        ov.pop.hidden = true;
+        return;
+      }
+
+      const p = worldToWrap(anchorW);
+      if (p.behind){
+        ov.el.style.transform = 'translate(-9999px,-9999px)';
+        return;
+      }
+
+      const rect = renderer.domElement.getBoundingClientRect();
+      const W = rect.width || 1;
+      const H = rect.height || 1;
+      const margin = 2;
+      const x = Math.max(margin, Math.min(W - margin, p.x));
+      const y = Math.max(margin, Math.min(H - margin, p.y));
+
+      ov.el.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
+
+      // keep pop tracking if open
+      if (!ov.pop.hidden && openOverlayKey === ov.key){
+        fitOverlayCloud(ov);
+      }
+    });
+  }
+
+  /* ✅ fit “cloud” so it NEVER sits under the HUD (no overlap with UI),
+        prefer ABOVE its button; if impossible, it flips below. */
+  function fitOverlayCloud(ov){
+    if (!ov || ov.pop.hidden) return;
+
+    const pop = ov.pop;
+    const btn = ov.btn;
+
+    const wrapRect = wrap.getBoundingClientRect();
+    const btnRect  = btn.getBoundingClientRect();
+    const hudRect  = hudEl ? hudEl.getBoundingClientRect() : null;
+
+    const PAD = 10;
+    const GAP = 12;
+
+    const leftLimit = PAD;
+    const rightLimit = wrapRect.width - PAD;
+    const bottomLimit = wrapRect.height - PAD;
+
+    // top limit must be BELOW HUD (avoid overlap)
+    let topLimit = PAD;
+    if (hudRect){
+      const hudBottom = (hudRect.bottom - wrapRect.top);
+      topLimit = Math.max(topLimit, hudBottom + PAD);
+    }
+
+    // anchor x (center of button) in wrap coords
+    const x = (btnRect.left - wrapRect.left) + btnRect.width * 0.5;
+    const yTop = (btnRect.top - wrapRect.top);
+    const yBottom = (btnRect.bottom - wrapRect.top);
+
+    // reset
+    pop.style.setProperty('--gap', GAP + 'px');
+    pop.style.setProperty('--x', x + 'px');
+    pop.style.setProperty('--shift-x', '0px');
+    pop.style.setProperty('--shift-y', '0px');
+    pop.style.removeProperty('--maxh');
+    pop.classList.remove('below');
+
+    // measure natural size
+    pop.hidden = false;
+
+    // Try ABOVE
+    pop.style.setProperty('--y', yTop + 'px');
+    pop.classList.remove('below');
+    pop.style.setProperty('--shift-x', '0px');
+    pop.style.setProperty('--shift-y', '0px');
+    let r = pop.getBoundingClientRect();
+
+    const aboveTop = (r.top - wrapRect.top);
+    const aboveBottom = (r.bottom - wrapRect.top);
+
+    const aboveFitsTop = aboveTop >= topLimit;
+    const aboveFitsBottom = aboveBottom <= bottomLimit;
+
+    // Try BELOW measurement (without committing yet)
+    pop.classList.add('below');
+    pop.style.setProperty('--y', yBottom + 'px');
+    pop.style.setProperty('--shift-x', '0px');
+    pop.style.setProperty('--shift-y', '0px');
+    let rB = pop.getBoundingClientRect();
+
+    const belowTop = (rB.top - wrapRect.top);
+    const belowBottom = (rB.bottom - wrapRect.top);
+
+    const belowFitsTop = belowTop >= topLimit;
+    const belowFitsBottom = belowBottom <= bottomLimit;
+
+    // Decide: prefer ABOVE, but must not overlap HUD region
+    let placeBelow = false;
+    if (!(aboveFitsTop && aboveFitsBottom)){
+      if (belowFitsTop && belowFitsBottom){
+        placeBelow = true;
+      } else {
+        // both don't fully fit: choose the side with more available vertical space
+        const spaceAbove = Math.max(0, (yTop - GAP) - topLimit);
+        const spaceBelow = Math.max(0, bottomLimit - (yBottom + GAP));
+        placeBelow = spaceBelow > spaceAbove;
+      }
+    }
+
+    // Commit side
+    if (placeBelow){
+      pop.classList.add('below');
+      pop.style.setProperty('--y', yBottom + 'px');
+    } else {
+      pop.classList.remove('below');
+      pop.style.setProperty('--y', yTop + 'px');
+    }
+
+    // Set max-height based on available space (so we avoid UI overlap without moving camera)
+    const spaceAbove = Math.max(0, (yTop - GAP) - topLimit);
+    const spaceBelow = Math.max(0, bottomLimit - (yBottom + GAP));
+    const avail = placeBelow ? spaceBelow : spaceAbove;
+    if (avail > 0){
+      const maxH = Math.max(140, Math.min(avail, wrapRect.height * 0.78));
+      pop.style.setProperty('--maxh', maxH + 'px');
+    }
+
+    // Re-measure after commit
+    r = pop.getBoundingClientRect();
+
+    // Horizontal clamp with shift
+    let shiftX = 0;
+    const popLeft = (r.left - wrapRect.left);
+    const popRight = (r.right - wrapRect.left);
+
+    if (popLeft < leftLimit) shiftX = (leftLimit - popLeft);
+    else if (popRight > rightLimit) shiftX = (rightLimit - popRight);
+
+    // Vertical clamp with shift (still respecting topLimit/bottomLimit)
+    let shiftY = 0;
+    const popTop = (r.top - wrapRect.top);
+    const popBottom = (r.bottom - wrapRect.top);
+
+    if (popTop < topLimit) shiftY = (topLimit - popTop);
+    else if (popBottom > bottomLimit) shiftY = (bottomLimit - popBottom);
+
+    pop.style.setProperty('--shift-x', shiftX + 'px');
+    pop.style.setProperty('--shift-y', shiftY + 'px');
+
+    // last safety re-check (rare)
+    const r2 = pop.getBoundingClientRect();
+    const top2 = (r2.top - wrapRect.top);
+    const bottom2 = (r2.bottom - wrapRect.top);
+    if (top2 < topLimit){
+      pop.style.setProperty('--shift-y', (shiftY + (topLimit - top2)) + 'px');
+    } else if (bottom2 > bottomLimit){
+      pop.style.setProperty('--shift-y', (shiftY + (bottomLimit - bottom2)) + 'px');
+    }
+  }
+
+  // battery overlay refs
+  let batFillEl=null, batPctEl=null;
+  function renderBatteryGauge(){
+    if (!batFillEl || !batPctEl) return;
+    const pct = Math.round(clamp01(batteryLevel) * 100);
+    batFillEl.style.width = pct + '%';
+    batPctEl.textContent = pct + '%';
+  }
+
+  // =========================
+  // Guide Modal
+  // =========================
+  const guideBackdrop = document.createElement('div');
+  guideBackdrop.className = 'modal-backdrop';
+  guideBackdrop.hidden = true;
+  guideBackdrop.style.display = 'none';
+
+  guideBackdrop.innerHTML = `
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+      <div class="modal-head">
+        <div class="modal-title" id="guideTitle">📘 Παράγοντες από τους οποίους εξαρτάται η δύναμη Laplace</div>
+        <button class="modal-close" type="button" id="btnGuideClose" aria-label="Κλείσιμο">✕</button>
+      </div>
+
+      <p>
+        <b>Στόχος:</b> Να αναδειχθούν οι παράγοντες από τους οποίους εξαρτάται η δύναμη Laplace που αναπτύσσεται στη ράβδο.
+      </p>
+
+      <h4>Πειραματική διαδικασία</h4>
+      <ul>
+        <li><b>Χωρίς ρεύμα (I = 0):</b> Άφησε τον διακόπτη <b>OFF</b>. Η ράβδος δεν ολισθαίνει.</li>
+        <li><b>Με ρεύμα (I ≠ 0):</b> Κάνε τον διακόπτη <b>ON</b>. Η ράβδος ξεκινά να ολισθαίνει λόγω της FL.</li>
+        <li><b>Αντιστροφή πολικότητας της μπαταρίας:</b> Πάτησε τη <b>μπαταρία</b>. Παρατήρησε ότι αλλάζει η φορά του ρεύματος και η κατεύθυνση της FL.</li>
+        <li><b>Ένταση Μαγνητικού πεδίου (B):</b> Μεγαλύτερο <b>B</b> ⇒ μεγαλύτερη δύναμη (ρυθμιστικό <b>Πεδίο B</b>).</li>
+        <li><b>Αντίσταση (R):</b> Μεγαλύτερο <b>R</b> ⇒ μικρότερο ρεύμα ⇒ μικρότερη δύναμη (ρυθμιστικό <b>Αντίσταση R</b>).</li>
+        <li><b>Γωνία (θ):</b> Μέγιστη όταν θ = 90° (ρυθμιστικό <b>Γωνία</b>).</li>
+        <li><b>Ενεργό μήκος (L):</b> Όσο μεγαλύτερο τμήμα της ράβδου βρίσκεται μέσα στο πεδίο, τόσο μεγαλύτερη δύναμη FL (ρυθμιστικό <b>Επικάλυψη</b>).</li>
+      </ul>
+
+      <div class="callout">
+        <h4>Συμπεράσματα</h4>
+        <div class="ov-text">F = B · I · L · ημθ <b>(1)<b></div>
+        <ul>
+          <li>Η δύναμη <b>αυξάνεται</b> όταν αυξάνεται το <b>B</b>, το <b>I</b> ή το <b>L</b>.</li>
+          <li>Αν <b>I = 0</b> ή <b>B = 0</b> ⇒ <b>F = 0</b>.</li>
+          <li>Αντιστρέφοντας τη φορά του ρεύματος, αντιστρέφεται και η <b>φορά της δύναμης</b>.</li>
+        </ul>
+        <p style="margin:10px 0 0 0;">Κλείσιμο: πάτησε έξω από το παράθυρο ή το <span class="kbd">Esc</span>.</p>
+      </div>
+    </div>
+  `;
+  wrap.appendChild(guideBackdrop);
+
+  function openGuide(){ closeAllOverlays(); guideBackdrop.hidden = false; guideBackdrop.style.display = 'flex'; }
+  function closeGuide(){ guideBackdrop.hidden = true; guideBackdrop.style.display = 'none'; }
+  closeGuide();
+
+  guideBackdrop.addEventListener('pointerdown', (ev)=>{
+    if (ev.target === guideBackdrop) closeGuide();
+  }, { passive:true });
+
+  const btnGuideCloseEl = guideBackdrop.querySelector('#btnGuideClose');
+  btnGuideCloseEl.addEventListener('pointerdown', (ev)=>{
+    ev.preventDefault();
+    ev.stopPropagation();
+    closeGuide();
+  }, { passive:false });
+
+  document.addEventListener('keydown', (ev)=>{
+    if (ev.key === 'Escape' && !guideBackdrop.hidden) closeGuide();
+  });
+
+  btnGuide.addEventListener('click', async ()=>{
+    await unlockAudioOnce();
+    sfxClick.play();
+    openGuide();
+  });
+  // =========================================================
+  // 🏆 XP Lessons (Duolingo style) — LaplaceExp
+  // =========================================================
+  const xpBackEl  = document.getElementById('xpBack');
+  const xpCloseEl = document.getElementById('xpClose');
+
+  const lessonDockEl        = document.getElementById('lessonDock');
+  const lessonDockTxtEl     = document.getElementById('lessonDockTxt');
+  const lessonDockCheckEl   = document.getElementById('lessonDockCheck');
+  const lessonDockReturnEl  = document.getElementById('lessonDockReturn');
+
+  function positionDock(){
+    if (!lessonDockEl || !hudEl) return;
+
+    // Place the dock just κάτω από το UI (HUD). Works even when the sliders panel is open.
+    const hudRect = hudEl.getBoundingClientRect();
+
+    // Ensure it has a measurable height
+    const dockRect = lessonDockEl.getBoundingClientRect();
+    const dockH = dockRect.height || 0;
+
+    const margin = 10;
+    let top = Math.round(hudRect.bottom + margin);
+
+    // Clamp inside viewport
+    const maxTop = Math.max(8, Math.round(window.innerHeight - dockH - 12));
+    top = Math.min(top, maxTop);
+    top = Math.max(8, top);
+
+    lessonDockEl.style.top = top + 'px';
+    lessonDockEl.style.bottom = 'auto';
+  }
+
+  function showDock(text){
+    if (!lessonDockEl) return;
+    if (lessonDockTxtEl) lessonDockTxtEl.textContent = text || 'Δοκίμασε τώρα στην εφαρμογή…';
+    lessonDockEl.style.display = 'flex';
+
+    requestAnimationFrame(positionDock);
+    setTimeout(positionDock, 50);
+  }
+
+  function hideDock(){
+    if (!lessonDockEl) return;
+    lessonDockEl.style.display = 'none';
+  }
+
+  // Keep dock positioned if layout changes
+  window.addEventListener('resize', () => {
+    try{
+      if (!lessonDockEl) return;
+      if (lessonDockEl.style.display !== 'none') positionDock();
+    }catch(e){}
+  }, { passive:true });
+
+  try{
+    if (window.ResizeObserver && hudEl){
+      const __dockRO = new ResizeObserver(() => {
+        try{
+          if (lessonDockEl && lessonDockEl.style.display !== 'none') positionDock();
+        }catch(e){}
+      });
+      __dockRO.observe(hudEl);
+    }
+  }catch(e){}
+
+  function openXP(opts){
+    const skipRender = !!(opts && opts.skipRender);
+
+    try{ closeAllOverlays(); }catch(_){}
+    try{ closeGuide(); }catch(_){}
+
+    // leaving practice
+    hideDock();
+    if (typeof lessonRuntime !== 'undefined' && lessonRuntime) lessonRuntime.practiceMode = false;
+
+    xpBackEl.classList.add('show');
+    xpBackEl.setAttribute('aria-hidden', 'false');
+
+    // prevent orbit control while modal is open
+    try{ controls.enabled = false; }catch(_){}
+
+    if (!skipRender){
+      // render current view (home or continue lesson)
+      try{
+        if (lessonRuntime && lessonRuntime.view === 'player' && lessonRuntime.lessonId){
+          enterPlayer();
+          renderStep();
+        }else{
+          renderHome();
+        }
+      }catch(e){
+        try{ renderHome(); }catch(_){}
+      }
+    }
+
+    try{ xpCloseEl.focus?.(); }catch(_){}
+  }
+
+  function closeXP(){
+    xpBackEl.classList.remove('show');
+    xpBackEl.setAttribute('aria-hidden', 'true');
+    try{ clearLessonTimers(); }catch(_){}
+    try{ controls.enabled = true; }catch(_){}
+  }
+
+  function beginPractice(){
+    // close XP modal so user can interact with the 3D model / HUD
+    xpBackEl.classList.remove('show');
+    xpBackEl.setAttribute('aria-hidden','true');
+    try{ controls.enabled = true; }catch(_){}
+
+    if (lessonRuntime) lessonRuntime.practiceMode = true;
+
+    const st = (typeof stepData === 'function') ? stepData() : null;
+    const hint = (st && st.hint) ? ('Υπόδειξη: ' + st.hint) : 'Ολοκλήρωσε το task στην εφαρμογή και πάτα «Έλεγχος».';
+    showDock('⚙️ PRACTICE MODE — ' + hint);
+  }
+
+  function returnFromPractice(){
+    hideDock();
+    if (lessonRuntime) lessonRuntime.practiceMode = false;
+    // reopen modal without rerendering the step (so the “Συνέχεια” state stays)
+    openXP({ skipRender:true });
+  }
+
+  if (btnXPEl){
+    btnXPEl.addEventListener('click', async () => {
+      await unlockAudioOnce();
+      sfxClick.play();
+
+      // ✅ Only if we are truly in practice mode
+      if (lessonRuntime && lessonRuntime.practiceMode){
+        returnFromPractice();
+        return;
+      }
+
+      // Safety: if dock is open for any reason, close it
+      if (lessonDockEl && lessonDockEl.style.display !== 'none') hideDock();
+
+      openXP();
+    });
+  }
+
+  xpCloseEl?.addEventListener('click', async () => { await unlockAudioOnce(); sfxClick.play(); closeXP(); });
+  xpBackEl?.addEventListener('pointerdown', (e) => { if (e.target === xpBackEl) closeXP(); }, { passive:true });
+
+  lessonDockReturnEl?.addEventListener('click', async () => { await unlockAudioOnce(); sfxClick.play(); returnFromPractice(); });
+
+  lessonDockCheckEl?.addEventListener('click', async () => {
+    await unlockAudioOnce();
+    sfxClick.play();
+
+    const ok = (typeof checkCurrentStep === 'function') ? !!checkCurrentStep() : false;
+    if (ok){
+      returnFromPractice();
+    } else {
+      const st = (typeof stepData === 'function') ? stepData() : null;
+      const base = (st && st.hint) ? ('Υπόδειξη: ' + st.hint) : 'Ολοκλήρωσε το task στην εφαρμογή και ξαναπάτα «Έλεγχος».';
+      showDock('⚙️ PRACTICE MODE — ' + base + ' (δεν ολοκληρώθηκε ακόμη)');
+    }
+  });
+
+  // Escape: dock -> back to modal, modal -> close
+  window.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+
+    if (lessonDockEl && lessonDockEl.style.display !== 'none'){
+      returnFromPractice();
+      return;
+    }
+    if (xpBackEl && xpBackEl.classList.contains('show')){
+      closeXP();
+      return;
+    }
+  });
+
+// =========================================================
+  // ✅ Duolingo-style Lessons Engine (Laplace Experiment)
+  // =========================================================
+
+  // storage key (separate from other apps)
+  const LS_KEY = 'LaplaceExp_DuoLessons_v1';
+
+  function loadCourseState(){
+    try{
+      const raw = localStorage.getItem(LS_KEY);
+      if (!raw) return { xp:0, completed:{}, lessonXp:{} };
+      const o = JSON.parse(raw);
+      return {
+        xp: Number(o?.xp || 0),
+        completed: (o?.completed && typeof o.completed === 'object') ? o.completed : {},
+        lessonXp: (o?.lessonXp && typeof o.lessonXp === 'object') ? o.lessonXp : {}
+      };
+    }catch{
+      return { xp:0, completed:{}, lessonXp:{} };
+    }
+  }
+  function saveCourseState(){
+    try{ localStorage.setItem(LS_KEY, JSON.stringify(courseState)); }catch{}
+  }
+  const courseState = loadCourseState();
+  // GG-XP identity for parent
+
+  /* =========================
+     GG-XP Bridge (to parent) — same format as SimpleElectricMotor.html
+     ========================= */
+  var GG_XP_APP_ID = 'LaplaceExp.html';
+  var GG_XP_APP_TITLE = 'Πείραμα Δύναμης Laplace FL';
+
+  function ggXpSafePost(msg){
+    try{
+      if (window.parent && window.parent !== window){
+        window.parent.postMessage(msg, '*');
+      }
+    }catch(e){}
+  }
+
+  function ggXpFlattenLessons(){
+    var out = [];
+    try{
+      for (const unit of (LESSONS || [])){
+        for (const les of (unit.lessons || [])){
+          out.push({
+            id: les.id,
+            title: les.title,
+            completed: !!(courseState.completed && courseState.completed[les.id])
+          });
+        }
+      }
+    }catch(e){}
+    return out;
+  }
+
+  function ggXpGetState(){
+    var totalXp = Number(courseState?.xp || 0);
+    var lessons = ggXpFlattenLessons().map(function(L){
+      var lx = Number((courseState.lessonXp && courseState.lessonXp[L.id]) || 0);
+      return {
+        id: L.id,
+        title: L.title,
+        xp: lx,
+        completed: L.completed
+      };
+    });
+    return { totalXp: totalXp, lessons: lessons };
+  }
+
+  function ggXpEmitState(){
+    var st = ggXpGetState();
+    ggXpSafePost({
+      source: 'GG-XP',
+      type: 'XP_STATE',
+      appId: GG_XP_APP_ID,
+      appTitle: GG_XP_APP_TITLE,
+      totalXp: Number(st.totalXp || 0),
+      lessons: st.lessons || [],
+      time: Date.now()
+    });
+  }
+
+  function ggXpEarned(lessonId, lessonTitle, delta, lessonXp, totalXp, completed){
+    ggXpSafePost({
+      source: 'GG-XP',
+      type: 'XP_EARNED',
+      appId: GG_XP_APP_ID,
+      appTitle: GG_XP_APP_TITLE,
+      lessonId: lessonId,
+      lessonTitle: lessonTitle,
+      delta: Number(delta || 0),
+      lessonXp: (lessonXp == null ? undefined : Number(lessonXp || 0)),
+      totalXp: Number(totalXp || 0),
+      completed: !!completed,
+      time: Date.now()
+    });
+
+    try{ ggXpEmitState(); }catch(e){}
+  }
+
+  window.addEventListener('message', (ev) => {
+    const d = ev?.data;
+    if (!d || d.source !== 'GG-XP') return;
+
+    if (d.type === 'REQUEST_STATE'){
+      ggXpEmitState();
+    }
+  });
+
+  // expose helpers
+  window.ggXpEmitState = ggXpEmitState;
+  window.ggXpEarned = ggXpEarned;
+
+
+
+  // ---------------------------
+  // Lessons content
+  // ---------------------------
+    const LESSONS = [
+    {
+      unit: 'Ενότητα 1 — Πείραμα Laplace',
+      lessons: [
+        {
+          id:'L1',
+          title:'Κλείσιμο κυκλώματος & παρατήρηση',
+          blurb:'Ρεύμα σε αγωγό + μαγνητικό πεδίο → δύναμη Laplace.',
+          steps:[
+            { type:'info', prompt:'Τι εξετάζουμε;', text:'Στο πείραμα Laplace ένας ευθύς αγωγός (ράβδος) διαρρέεται από ρεύμα μέσα σε μαγνητικό πεδίο. Τότε ασκείται δύναμη Laplace, που μπορεί να μετακινήσει τη ράβδο πάνω στις ράγες.' },
+            { type:'mcq', prompt:'Πότε εμφανίζεται δύναμη Laplace στη ράβδο;', choices:['Όταν διαρρέεται από ρεύμα και βρίσκεται μέσα σε μαγνητικό πεδίο','Μόνο όταν είναι ακίνητη','Μόνο όταν δεν υπάρχει μαγνητικό πεδίο'], answer:0, explain:'Απαιτούνται και ρεύμα (I) και μαγνητικό πεδίο (B).' },
+            { type:'fill', prompt:'Συμπλήρωσε: Η δύναμη που ασκείται σε αγωγό με ρεύμα μέσα σε μαγνητικό πεδίο λέγεται δύναμη…', answer:'laplace|λαπλας|λαπλάς|λαπλάς', hint:'L…' },
+            { type:'task', prompt:'Task: κλείσε το κύκλωμα', actions:[
+              'Πάτησε τον διακόπτη πάνω στο 3D μοντέλο ώστε να κλείσει το κύκλωμα.',
+              'Βεβαιώσου ότι το κύκλωμα τροφοδοτείται (δεν είναι άδεια η μπαταρία) και παρατήρησε τη ράβδο.'
+            ], task:'switch_on', hint:'Κάνε tap/click στο κουμπί του διακόπτη.' },
+            { type:'task', prompt:'Task: εμφάνισε δυναμικές γραμμές', actions:[
+              'Σύρε το ρυθμιστικό «Γραμμές» προς τα δεξιά (π.χ. ≥ 0.12).',
+              'Παρατήρησε ότι γίνονται πιο ορατές οι γραμμές πεδίου.'
+            ], task:'lines_show', hint:'Βρίσκεται στο μενού (☰) στη μπάρα.' }
+          ]
+        },
+        {
+          id:'L2',
+          title:'Από τι εξαρτάται η Fₗ',
+          blurb:'B, I, L, sinθ και επικάλυψη.',
+          steps:[
+            { type:'info', prompt:'Εξίσωση', text:'Το μέτρο της δύναμης Laplace (στον αγωγό) αυξάνεται όταν αυξάνει το B ή το ρεύμα I. Επίσης εξαρτάται από τη γωνία θ: F ∝ B·I·L·sinθ. Αν η ράβδος δεν “βρίσκεται” αρκετά μέσα στο πεδίο (μικρή επικάλυψη), το αποτέλεσμα μειώνεται.' },
+            { type:'order', prompt:'Βάλε με σωστή σειρά τους παράγοντες στην εξίσωση (ως γινόμενο)', items:[
+              'B (μαγνητικό πεδίο)',
+              'I (ένταση ρεύματος)',
+              'L (μήκος αγωγού μέσα στο πεδίο)',
+              'sinθ (γωνιακός παράγοντας)'
+            ], answerOrder:[0,1,2,3] },
+            { type:'mcq', prompt:'Αν αυξήσουμε την αντίσταση R, τι συμβαίνει συνήθως στο ρεύμα και στη δύναμη;', choices:['Μειώνεται το ρεύμα, άρα μειώνεται και η δύναμη','Αυξάνεται το ρεύμα, άρα αυξάνεται και η δύναμη','Δεν αλλάζει τίποτα'], answer:0 },
+            { type:'task', prompt:'Task: κάνε το πεδίο ισχυρότερο', actions:[
+              'Άνοιξε το μενού (☰) και αύξησε το «Πεδίο B» (π.χ. ≥ 1.60).',
+              'Παρατήρησε ότι η ράβδος τείνει να δέχεται μεγαλύτερη δύναμη.'
+            ], task:'b_high', hint:'Ρύθμισε το «Πεδίο B».' },
+            { type:'task', prompt:'Task: αύξησε την αντίσταση', actions:[
+              'Αύξησε την «Αντίσταση R» (π.χ. ≥ 2.20 Ω).',
+              'Παρατήρησε ότι μειώνεται η ένταση του ρεύματος και η ώθηση στη ράβδο.'
+            ], task:'r_high', hint:'Ρύθμισε το «Αντίσταση R».' },
+            { type:'fill', prompt:'Συμπλήρωσε: Για θ = 90°, sinθ = …', answer:'1|ένα|1.0', hint:'Μέγιστη τιμή.' }
+          ]
+        }
+      ]
+    },
+    {
+      unit: 'Ενότητα 2 — Φορά δύναμης & ρυθμίσεις',
+      lessons: [
+        {
+          id:'L3',
+          title:'Πολικότητα & φορά κίνησης',
+          blurb:'Αλλάζοντας πολικότητα αλλάζει η φορά του ρεύματος και της δύναμης.',
+          steps:[
+            { type:'info', prompt:'Ιδέα', text:'Αν αντιστρέψουμε την πολικότητα της μπαταρίας, αντιστρέφεται η φορά του ρεύματος στη ράβδο. Αυτό αλλάζει και τη φορά της δύναμης Laplace, άρα μπορεί να αλλάξει η φορά κίνησης.' },
+            { type:'task', prompt:'Task: αντιστρέψε πολικότητα', actions:[
+              'Πάτησε πάνω στην μπαταρία για να αλλάξει πολικότητα.',
+              'Παρατήρησε ότι αλλάζει η φορά του ρεύματος (βέλος) και η κατεύθυνση δράσης.'
+            ], task:'pol_flip', hint:'Tap/click στην μπαταρία.' },
+            { type:'mcq', prompt:'Τι αλλάζει πρώτο όταν αλλάξει πολικότητα;', choices:['Η φορά του ρεύματος','Το μέτρο του B','Το μήκος L'], answer:0 },
+            { type:'order', prompt:'Σωστή αλληλουχία όταν αντιστρέφουμε πολικότητα', items:[
+              'Αλλάζει η κατεύθυνση κίνησης της ράβδου',
+              'Αντιστρέφεται η φορά του ρεύματος στη ράβδο',
+              'Αντιστρέφεται η φορά της δύναμης Laplace',
+              'Αντιστρέφεται η πολικότητα της μπαταρίας'
+            ], answerOrder:[3,1,2,0] },
+            { type:'task', prompt:'Task: επέστρεψε στην κανονική πολικότητα', actions:[
+              'Ξαναπάτησε την μπαταρία ώστε να επιστρέψει στην αρχική πολικότητα.'
+            ], task:'pol_norm', hint:'Tap/click ξανά στην μπαταρία.' }
+          ]
+        },
+        {
+          id:'L4',
+          title:'Γωνία & επικάλυψη πεδίου',
+          blurb:'sinθ και “πόσο” μπαίνει το κύκλωμα στο πεδίο.',
+          steps:[
+            { type:'info', prompt:'Δύο κρίσιμες ρυθμίσεις', text:'Η γωνία θ μεταξύ της διεύθυνσης του μαγνητικού πεδίου και του ρεύματος επηρεάζει το sinθ. Επίσης, αν το κύκλωμα δεν επικαλύπτεται αρκετά από την περιοχή του πεδίου, η δράση μειώνεται.' },
+            { type:'task', prompt:'Task: μείωσε τη γωνία (θ)', actions:[
+              'Ρύθμισε τη «Γωνία» κοντά στις 60°.',
+              'Παρατήρησε ότι η δύναμη μειώνεται (μικρότερο sinθ).'
+            ], task:'yaw_60', hint:'Slider «Γωνία» (60°–90°).' },
+            { type:'mcq', prompt:'Πότε είναι μέγιστο το sinθ;', choices:['Στις 90°','Στις 0°','Στις 180°'], answer:0 },
+            { type:'fill', prompt:'Συμπλήρωσε: Αν μειώσουμε την “Επικάλυψη”, το αποτέλεσμα της δύναμης Laplace γίνεται…', answer:'μικροτερο|μειωνεται|μειώνεται|λιγοτερο|λιγότερο', hint:'Μ… (μειώνεται).' },
+            { type:'task', prompt:'Task: μείωσε την επικάλυψη', actions:[
+              'Ρύθμισε το slider «Επικάλυψη» ώστε να πέσει κάτω από 30%.',
+              'Παρατήρησε ότι η δράση του πεδίου στο κύκλωμα μειώνεται.'
+            ], task:'overlap_low', hint:'Slider «Επικάλυψη» (0%–100%).' },
+            { type:'order', prompt:'Βάλε σε σωστή σειρά τι κάνουμε για να “μεγιστοποιήσουμε” τη δράση', items:[
+              'Κλείνουμε το κύκλωμα (ρεύμα στη ράβδο)',
+              'Αυξάνουμε το πεδίο B',
+              'Μειώνουμε την αντίσταση R (ώστε να αυξηθεί το I)',
+              'Φέρνουμε τη γωνία κοντά στις 90°',
+              'Αυξάνουμε την επικάλυψη του κυκλώματος από το πεδίο'
+            ], answerOrder:[0,1,2,3,4] }
+          ]
+        }
+      ]
+    }
+  ];
+
+  /* =========================
+     DOM refs (duo)
+     ========================= */
+  const lessonHomeEl   = document.getElementById('lessonHome');
+  const lessonPlayerEl = document.getElementById('lessonPlayer');
+
+  const duoXpEl        = document.getElementById('duoXp');
+  const duoHeartsEl    = document.getElementById('duoHearts');
+  const duoProgFillEl  = document.getElementById('duoProgFill');
+  const duoProgTxtEl   = document.getElementById('duoProgTxt');
+
+  const duoLessonTitleEl = document.getElementById('duoLessonTitle');
+  const duoPromptEl      = document.getElementById('duoPrompt');
+  const duoBodyEl        = document.getElementById('duoBody');
+  const duoFeedbackEl    = document.getElementById('duoFeedback');
+
+  const duoBackBtn     = document.getElementById('duoBackBtn');
+  const duoHintBtn     = document.getElementById('duoHintBtn');
+  const duoCheckBtn    = document.getElementById('duoCheckBtn');
+  const duoNextBtn     = document.getElementById('duoNextBtn');
+
+  /* =========================
+     Runtime state
+     ========================= */
+  const lessonRuntime = {
+    view: 'home',
+    lessonId: null,
+    stepIndex: 0,
+    lives: 3,
+    stepCtx: null,
+    selectedIndex: null,
+    fillValue: '',
+    orderList: null,
+    canNext: false,
+    repeatMode: false,
+    practiceMode: false,
+    _taskTimer: null,
+    _stepToken: 0
+  };
+
+  function courseCompleted(id){
+    return !!courseState.completed?.[id];
+  }
+
+  function findLessonById(id){
+    for (const u of LESSONS){
+      for (const l of (u.lessons || [])){
+        if (l.id === id) return { unit:u.unit, lesson:l };
+      }
+    }
+    return null;
+  }
+
+  function currentLesson(){
+    return findLessonById(lessonRuntime.lessonId)?.lesson || null;
+  }
+  function stepCount(){
+    return currentLesson()?.steps?.length || 0;
+  }
+  function stepData(){
+    const les = currentLesson();
+    return les?.steps?.[lessonRuntime.stepIndex] || null;
+  }
+
+  /* =========================
+     Text normalization (Greek-friendly)
+     ========================= */
+  function stripDiacritics(s){
+    return (s ?? '')
+      .toString()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+  }
+  function normalizeText(s){
+    return stripDiacritics(s).toLowerCase().trim();
+  }
+
+  /* =========================
+     UI helpers
+     ========================= */
+  function renderHearts(){
+    const full = lessonRuntime.lives;
+    let s = '';
+    for (let i=0;i<3;i++) s += (i < full) ? '❤' : '♡';
+    duoHeartsEl.textContent = s;
+  }
+
+  function setFeedback(kind, text){
+    duoFeedbackEl.style.display = '';
+    duoFeedbackEl.className = 'duoFeedback ' + (kind || '');
+    duoFeedbackEl.textContent = text;
+  }
+  function clearFeedback(){
+    duoFeedbackEl.style.display = 'none';
+    duoFeedbackEl.className = 'duoFeedback';
+    duoFeedbackEl.textContent = '';
+  }
+  function setProgress(step, total){
+    const p = total <= 0 ? 0 : Math.round((step / total) * 100);
+    duoProgFillEl.style.width = p + '%';
+    duoProgTxtEl.textContent = `${step}/${total}`;
+  }
+
+  function enterHome(){
+    lessonRuntime.view = 'home';
+    lessonRuntime.practiceMode = false;
+    clearLessonTimers();
+    hideDock();
+    lessonHomeEl.style.display = '';
+    lessonPlayerEl.style.display = 'none';
+  }
+  function enterPlayer(){
+    lessonRuntime.view = 'player';
+    lessonHomeEl.style.display = 'none';
+    lessonPlayerEl.style.display = '';
+  }
+
+  function clearLessonTimers(){
+    // Clear any running intervals/timeouts from previous steps (BikeDynamo-style)
+    try{
+      if (lessonRuntime && lessonRuntime._taskTimer){
+        clearInterval(lessonRuntime._taskTimer);
+        lessonRuntime._taskTimer = null;
+      }
+    }catch(e){}
+  }
+
+  function resetLessonRuntime(){
+    lessonRuntime.stepIndex = 0;
+    lessonRuntime.lives = 3;
+    lessonRuntime.stepCtx = null;
+    lessonRuntime.selectedIndex = null;
+    lessonRuntime.fillValue = '';
+    lessonRuntime.orderList = null;
+    lessonRuntime.canNext = false;
+    lessonRuntime.practiceMode = false;
+    clearLessonTimers();
+    hideDock();
+    clearFeedback();
+    renderHearts();
+  }
+
+  /* =========================
+     XP logic (NO XP on repeat)
+     ========================= */
+  function awardXp(x){
+    const delta = Number(x || 0);
+    if (!delta) return;
+
+    courseState.xp = Number(courseState.xp || 0) + delta;
+
+    if (!courseState.lessonXp || typeof courseState.lessonXp !== 'object'){
+      courseState.lessonXp = {};
+    }
+    const lid = lessonRuntime.lessonId || '';
+    if (lid){
+      courseState.lessonXp[lid] = Number(courseState.lessonXp[lid] || 0) + delta;
+    }
+
+    duoXpEl.textContent = String(courseState.xp);
+    saveCourseState();
+
+    try{
+      const lt  = (findLessonById(lid)?.lesson?.title) || '';
+      const done = !!(courseState.completed && courseState.completed[lid]);
+      const lessonXpNow = lid ? Number(courseState.lessonXp[lid] || 0) : undefined;
+
+      if (typeof ggXpEarned === 'function'){
+        ggXpEarned(lid, lt, delta, lessonXpNow, Number(courseState.xp || 0), done);
+      }
+    }catch(e){}
+  }
+
+  function maybeAwardXp(x){
+    if (lessonRuntime.repeatMode) return false;
+    awardXp(x);
+    return true;
+  }
+
+  /* =========================
+     Home renderer
+     ========================= */
+  function renderHome(){
+    enterHome();
+
+    duoXpEl.textContent = String(courseState.xp || 0);
+
+    const completedMap = courseState.completed || {};
+    const lessonXpMap  = courseState.lessonXp  || {};
+
+    let totalLessons = 0;
+    for (const unit of LESSONS) totalLessons += (unit.lessons?.length || 0);
+    const totalDone = Object.keys(completedMap).length;
+
+    const lessonIndexMap = new Map();
+    (function buildLessonIndexMap(){
+      let n = 0;
+      for (const u of LESSONS){
+        for (const l of (u.lessons || [])){
+          n++;
+          lessonIndexMap.set(l.id, n);
+        }
+      }
+    })();
+
+    let html = `
+      <div class="duoHomeHeader">
+        <div>
+          <div class="t">Μαθήματα</div>
+          <div class="s">Ολοκληρωμένα: ${totalDone} / ${totalLessons}</div>
+        </div>
+        <div class="s">Σύνολο XP: <b>${courseState.xp || 0}</b></div>
+      </div>
+    `;
+
+    for (const unit of LESSONS){
+      html += `<div class="duoUnit">
+        <div class="duoUnitHead">${unit.unit}</div>
+        <div class="duoLessonGrid">
+      `;
+
+      for (const les of (unit.lessons || [])){
+        const done = !!completedMap[les.id];
+        const lx   = Number(lessonXpMap[les.id] || 0);
+        const idx  = lessonIndexMap.get(les.id) || 0;
+        const label = idx ? `Μάθημα ${idx}` : 'Μάθημα';
+
+        html += `
+          <button class="duoLessonBtn ${done ? 'done' : ''}" data-lesson="${les.id}">
+            <div class="h">${les.title}</div>
+            <div class="p">${label} • ${les.blurb || ''}</div>
+            <div class="tag">${done ? '✅ Ολοκληρώθηκε' : '≈ 1–2′'} • XP: <b>${lx}</b></div>
+          </button>
+        `;
+      }
+
+      html += `</div></div>`;
+    }
+
+    lessonHomeEl.innerHTML = html;
+
+    lessonHomeEl.querySelectorAll('.duoLessonBtn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-lesson');
+        startLesson(id);
+      }, { passive:true });
+    });
+
+    try{ if (typeof ggXpEmitState === 'function') ggXpEmitState(); }catch(e){}
+  }
+
+  /* =========================
+     Step rendering
+     ========================= */
+  function renderStep(){
+    const les = currentLesson();
+    const st  = stepData();
+    if (!les || !st) return;
+
+    // ensure no stale timers from previous steps
+    clearLessonTimers();
+    lessonRuntime._stepToken = (lessonRuntime._stepToken || 0) + 1;
+
+    clearFeedback();
+    duoNextBtn.style.display = 'none';
+    duoCheckBtn.style.display = '';
+    duoHintBtn.style.display = '';
+    lessonRuntime.canNext = false;
+
+    duoLessonTitleEl.textContent = les.title;
+    duoXpEl.textContent = String(courseState.xp || 0);
+
+    setProgress(lessonRuntime.stepIndex + 1, stepCount());
+    renderHearts();
+
+    lessonRuntime.selectedIndex = null;
+    lessonRuntime.fillValue = '';
+    lessonRuntime.orderList = null;
+    lessonRuntime.stepCtx = null;
+
+    duoPromptEl.textContent = st.prompt || st.title || '—';
+    duoBodyEl.innerHTML = '';
+
+    if (st.type === 'info'){
+      duoBodyEl.innerHTML = `<div class="mP" style="margin:0; font-weight:900; color: rgba(0,0,0,.70)">${st.text || ''}</div>`;
+      duoCheckBtn.style.display = 'none';
+      duoHintBtn.style.display = 'none';
+      duoNextBtn.style.display = '';
+      duoNextBtn.textContent = 'Συνέχεια';
+      lessonRuntime.canNext = true;
+      return;
+    }
+
+    if (st.type === 'task'){
+      const box = document.createElement('div');
+      box.className = 'mP';
+      box.style.margin = '0';
+      box.style.color = 'rgba(0,0,0,.70)';
+      box.style.fontWeight = '900';
+
+      const lines = (st.actions && st.actions.length) ? st.actions : [st.text || 'Κάνε την ενέργεια στην εφαρμογή και πάτα Έλεγχος.'];
+      box.innerHTML = lines.map(x => `• ${x}`).join('<br>');
+      duoBodyEl.appendChild(box);
+
+      const note = document.createElement('div');
+      note.className = 'mP';
+      note.style.margin = '0';
+      note.style.color = 'rgba(0,0,0,.55)';
+      note.style.fontWeight = '900';
+      note.textContent = 'Όταν το ολοκληρώσεις, πάτα “Έλεγχος”. (Το task δεν αφαιρεί καρδιές.)';
+      duoBodyEl.appendChild(note);
+
+      // live status (BikeDynamo-style) — optional
+      if (typeof st.status === 'function'){
+        const s = document.createElement('div');
+        s.className = 'mP';
+        s.style.margin = '0';
+        s.style.color = 'rgba(0,0,0,.55)';
+        s.style.fontWeight = '900';
+        s.id = 'taskStatusLine';
+        try{ s.textContent = st.status(lessonRuntime.stepCtx || {}); }catch(e){ s.textContent = ''; }
+        duoBodyEl.appendChild(s);
+
+        if (lessonRuntime._taskTimer) clearInterval(lessonRuntime._taskTimer);
+        lessonRuntime._taskTimer = setInterval(() => {
+          const st2 = stepData();
+          if (!st2 || st2.type !== 'task') return;
+          const el = document.getElementById('taskStatusLine');
+          if (!el) return;
+          try{ el.textContent = st2.status ? st2.status(lessonRuntime.stepCtx || {}) : ''; }catch(e){}
+        }, 180);
+      }
+
+      return;
+    }
+
+    if (st.type === 'mcq'){
+      const wrap = document.createElement('div');
+      wrap.className = 'duoChoices';
+      st.choices.forEach((c, idx) => {
+        const b = document.createElement('button');
+        b.className = 'duoChoice';
+        b.textContent = c;
+        b.addEventListener('click', () => {
+          lessonRuntime.selectedIndex = idx;
+          wrap.querySelectorAll('.duoChoice').forEach(x => x.classList.remove('selected'));
+          b.classList.add('selected');
+          clearFeedback();
+        });
+        wrap.appendChild(b);
+      });
+      duoBodyEl.appendChild(wrap);
+      return;
+    }
+
+    if (st.type === 'tf'){
+      const wrap = document.createElement('div');
+      wrap.className = 'duoChoices';
+      ['Σωστό','Λάθος'].forEach((label, idx) => {
+        const b = document.createElement('button');
+        b.className = 'duoChoice';
+        b.textContent = label;
+        b.addEventListener('click', () => {
+          lessonRuntime.selectedIndex = idx; // 0 => true, 1 => false
+          wrap.querySelectorAll('.duoChoice').forEach(x => x.classList.remove('selected'));
+          b.classList.add('selected');
+          clearFeedback();
+        });
+        wrap.appendChild(b);
+      });
+      duoBodyEl.appendChild(wrap);
+      return;
+    }
+
+    if (st.type === 'fill'){
+      const row = document.createElement('div');
+      row.className = 'duoFillRow';
+
+      const inp = document.createElement('input');
+      inp.type = 'text';
+      inp.placeholder = 'Γράψε έως 3 λέξεις…';
+      inp.addEventListener('input', () => {
+        lessonRuntime.fillValue = inp.value || '';
+        clearFeedback();
+      });
+
+      row.appendChild(inp);
+      duoBodyEl.appendChild(row);
+
+      const note = document.createElement('div');
+      note.className = 'mP';
+      note.style.margin = '0';
+      note.style.color = 'rgba(0,0,0,.55)';
+      note.style.fontWeight = '900';
+      note.textContent = 'Tip: γράψε σύντομα (έως 3 λέξεις).';
+      duoBodyEl.appendChild(note);
+      return;
+    }
+
+    if (st.type === 'fill2'){
+      const row = document.createElement('div');
+      row.className = 'duoFillRow';
+
+      const inp1 = document.createElement('input');
+      inp1.type = 'text';
+      inp1.placeholder = '1ο κενό…';
+      const inp2 = document.createElement('input');
+      inp2.type = 'text';
+      inp2.placeholder = '2ο κενό…';
+
+      inp1.addEventListener('input', clearFeedback);
+      inp2.addEventListener('input', clearFeedback);
+
+      row.appendChild(inp1);
+      row.appendChild(inp2);
+      duoBodyEl.appendChild(row);
+
+      lessonRuntime.stepCtx = { inp1, inp2 };
+      return;
+    }
+
+    if (st.type === 'order'){
+      const list = st.items.slice();
+      lessonRuntime.orderList = list;
+
+      const box = document.createElement('div');
+      box.className = 'duoOrder';
+
+      function draw(){
+        box.innerHTML = '';
+        list.forEach((txt, i) => {
+          const it = document.createElement('div');
+          it.className = 'duoOrderItem';
+
+          const left = document.createElement('div');
+          left.textContent = txt;
+
+          const btns = document.createElement('div');
+          btns.className = 'duoOrderBtns';
+
+          const up = document.createElement('button');
+          up.className = 'duoMiniBtn';
+          up.textContent = '↑';
+          up.disabled = (i === 0);
+          up.addEventListener('click', () => {
+            if (i<=0) return;
+            const t = list[i-1]; list[i-1]=list[i]; list[i]=t;
+            clearFeedback();
+            draw();
+          });
+
+          const dn = document.createElement('button');
+          dn.className = 'duoMiniBtn';
+          dn.textContent = '↓';
+          dn.disabled = (i === list.length - 1);
+          dn.addEventListener('click', () => {
+            if (i>=list.length-1) return;
+            const t = list[i+1]; list[i+1]=list[i]; list[i]=t;
+            clearFeedback();
+            draw();
+          });
+
+          btns.appendChild(up);
+          btns.appendChild(dn);
+
+          it.appendChild(left);
+          it.appendChild(btns);
+          box.appendChild(it);
+        });
+      }
+
+      draw();
+      duoBodyEl.appendChild(box);
+
+      const note = document.createElement('div');
+      note.className = 'mP';
+      note.style.margin = '0';
+      note.style.color = 'rgba(0,0,0,.55)';
+      note.style.fontWeight = '900';
+      note.textContent = 'Χρησιμοποίησε ↑ ↓ για να αλλάξεις σειρά.';
+      duoBodyEl.appendChild(note);
+      return;
+    }
+  }
+
+  /* =========================
+     Check logic
+     ========================= */
+  function failOneLife(){
+    lessonRuntime.lives = Math.max(0, lessonRuntime.lives - 1);
+    renderHearts();
+
+    if (lessonRuntime.lives <= 0){
+      setFeedback('bad', 'Τέλος καρδιών 💔  Ξεκίνα το μάθημα από την αρχή.');
+      duoCheckBtn.style.display = 'none';
+      duoHintBtn.style.display = 'none';
+      duoNextBtn.style.display = '';
+      duoNextBtn.textContent = 'Επανάληψη';
+      lessonRuntime.canNext = true;
+    }
+  }
+
+  function checkFillAnswer(st){
+    const user = normalizeText(lessonRuntime.fillValue);
+
+    // allow: 'a|b|c' alternatives OR 'a;b' meaning "user contains all"
+    const rawTarget = (st.answer || '').toString().trim();
+    if (!rawTarget) return false;
+
+    const parts = rawTarget.split('|').map(x => normalizeText(x));
+    const requiredAll = rawTarget.includes(';');
+
+    if (requiredAll){
+      const req = rawTarget.split(';').map(x => normalizeText(x)).filter(Boolean);
+      return req.every(r => user.includes(r));
+    }
+
+    return parts.some(t => t && user === t);
+  }
+
+  function checkFill2(st){
+    const inp1 = lessonRuntime.stepCtx?.inp1;
+    const inp2 = lessonRuntime.stepCtx?.inp2;
+    if (!inp1 || !inp2) return false;
+
+    const a1 = normalizeText(inp1.value || '');
+    const a2 = normalizeText(inp2.value || '');
+
+    const t1alts = (st.answer1 || '').toString().split('|').map(x => normalizeText(x)).filter(Boolean);
+    const t2alts = (st.answer2 || '').toString().split('|').map(x => normalizeText(x)).filter(Boolean);
+
+    const ok1 = t1alts.length ? t1alts.includes(a1) : false;
+    const ok2 = t2alts.length ? t2alts.includes(a2) : false;
+    return ok1 && ok2;
+  }
+
+  function markLessonComplete(){
+    if (!courseState.completed) courseState.completed = {};
+    courseState.completed[lessonRuntime.lessonId] = true;
+    saveCourseState();
+    try{ if (typeof ggXpEmitState === 'function') ggXpEmitState(); }catch(e){}
+  }
+
+    function checkTask(st){
+    const t = (st.task || '').toString();
+    if (!t) return false;
+
+    // circuit / energy
+    if (t === 'switch_on') return (typeof isEnergized === 'function') ? !!isEnergized() : !!circuitOn;
+    if (t === 'switch_off') return !circuitOn;
+
+    // polarity
+    if (t === 'pol_flip') return !!batteryReversed;
+    if (t === 'pol_norm') return !batteryReversed;
+
+    // lines
+    if (t === 'lines_show') return (Number(linesOpacityEl?.value || 0) >= 0.12);
+    if (t === 'lines_hide') return (Number(linesOpacityEl?.value || 0) <= 0.02);
+
+    // field strength (B)
+    if (t === 'b_high') return (Number(fieldStrength || 0) >= 1.60);
+    if (t === 'b_low')  return (Number(fieldStrength || 0) <= 0.60);
+
+    // resistance (R)
+    if (t === 'r_high') return (Number(resistorOhm || 0) >= 2.20);
+    if (t === 'r_low')  return (Number(resistorOhm || 0) <= 0.80);
+
+    // angle (theta)
+    if (t === 'yaw_90') return (Number(magnetYawDeg || 0) >= 88);
+    if (t === 'yaw_60') return (Number(magnetYawDeg || 0) <= 62);
+
+    // overlap
+    if (t === 'overlap_high') return (Number(magnetBack01 || 0) >= 0.90);
+    if (t === 'overlap_low')  return (Number(magnetBack01 || 0) <= 0.30);
+
+    // rod movement
+    if (t === 'rod_moving') return (Math.abs(Number(rodVel || 0)) > 0.02);
+
+    return false;
+  }
+
+  function advance(){
+    const les = currentLesson();
+    if (!les) return;
+
+    if (lessonRuntime.lives <= 0){
+      resetLessonRuntime();
+      renderStep();
+      return;
+    }
+
+    if (lessonRuntime.stepIndex < les.steps.length - 1){
+      lessonRuntime.stepIndex++;
+      renderStep();
+      return;
+    }
+
+    // finished lesson
+    markLessonComplete();
+
+    if (!lessonRuntime.repeatMode){
+      awardXp(20);
+      setFeedback('ok', 'Μάθημα ολοκληρώθηκε! +20 XP ✅');
+    } else {
+      setFeedback('ok', 'Μάθημα ολοκληρώθηκε ξανά ✅ (χωρίς XP — είναι ήδη ολοκληρωμένο)');
+    }
+
+    duoCheckBtn.style.display = 'none';
+    duoHintBtn.style.display = 'none';
+    duoNextBtn.style.display = '';
+    duoNextBtn.textContent = 'Πίσω στα μαθήματα';
+    lessonRuntime.canNext = true;
+  }
+
+  function checkCurrentStep(){
+    const st = stepData();
+    if (!st) return false;
+
+    if (lessonRuntime.lives <= 0) return false;
+
+    if (st.type === 'info') return true;
+
+    if (st.type === 'task'){
+      const ok = checkTask(st);
+      if (ok){
+        const got = maybeAwardXp(5);
+        const msg = st.explain || 'Ολοκληρώθηκε!';
+        setFeedback('ok', got ? (msg + ' +5 XP ✅') : (msg + ' ✅'));
+
+        duoNextBtn.style.display = '';
+        duoCheckBtn.style.display = 'none';
+        lessonRuntime.canNext = true;
+        return true;
+      } else {
+        setFeedback('hint', st.hint ? ('Υπόδειξη: ' + st.hint) : 'Κάνε το task στην εφαρμογή και ξαναπάτα Έλεγχος.');
+        return false;
+      }
+    }
+
+    if (st.type === 'mcq'){
+      if (lessonRuntime.selectedIndex == null){
+        setFeedback('hint', 'Διάλεξε μία απάντηση πρώτα.');
+        return false;
+      }
+
+      const ok = (Number(lessonRuntime.selectedIndex) === Number(st.answer));
+      const choicesEls = duoBodyEl.querySelectorAll('.duoChoice');
+
+      choicesEls.forEach((el, idx) => {
+        el.classList.remove('correct','wrong');
+        if (idx === st.answer) el.classList.add('correct');
+        if (idx === lessonRuntime.selectedIndex && !ok) el.classList.add('wrong');
+      });
+
+      if (ok){
+        const got = maybeAwardXp(5);
+        const msg = st.explain || 'Σωστό!';
+        setFeedback('ok', got ? (msg + ' +5 XP ✅') : (msg + ' ✅'));
+
+        duoNextBtn.style.display = '';
+        duoCheckBtn.style.display = 'none';
+        lessonRuntime.canNext = true;
+        return true;
+      } else {
+        failOneLife();
+        if (lessonRuntime.lives > 0) setFeedback('bad', 'Όχι ακόμη. Δοκίμασε ξανά.');
+        return false;
+      }
+    }
+
+    if (st.type === 'tf'){
+      if (lessonRuntime.selectedIndex == null){
+        setFeedback('hint', 'Διάλεξε Σωστό ή Λάθος.');
+        return false;
+      }
+
+      const userBool = (lessonRuntime.selectedIndex == 0);
+      const ok = (userBool === !!st.answer);
+
+      const choicesEls = duoBodyEl.querySelectorAll('.duoChoice');
+      choicesEls.forEach((el, idx) => {
+        el.classList.remove('correct','wrong');
+        const idxBool = (idx === 0);
+        if (idxBool === !!st.answer) el.classList.add('correct');
+        if (idx === lessonRuntime.selectedIndex && !ok) el.classList.add('wrong');
+      });
+
+      if (ok){
+        const got = maybeAwardXp(5);
+        setFeedback('ok', got ? 'Σωστό! +5 XP ✅' : 'Σωστό! ✅');
+
+        duoNextBtn.style.display = '';
+        duoCheckBtn.style.display = 'none';
+        lessonRuntime.canNext = true;
+        return true;
+      } else {
+        failOneLife();
+        if (lessonRuntime.lives > 0) setFeedback('bad', 'Λάθος. Θυμήσου το μάθημα.');
+        return false;
+      }
+    }
+
+    if (st.type === 'fill'){
+      const ok = checkFillAnswer(st);
+      if (ok){
+        const got = maybeAwardXp(5);
+        setFeedback('ok', got ? 'Σωστό! +5 XP ✅' : 'Σωστό! ✅');
+
+        duoNextBtn.style.display = '';
+        duoCheckBtn.style.display = 'none';
+        lessonRuntime.canNext = true;
+        return true;
+      } else {
+        failOneLife();
+        if (lessonRuntime.lives > 0) setFeedback('bad', 'Όχι ακόμη. Πρόσεξε τη λέξη/έννοια.');
+        return false;
+      }
+    }
+
+    if (st.type === 'fill2'){
+      const ok = checkFill2(st);
+      if (ok){
+        const got = maybeAwardXp(5);
+        setFeedback('ok', got ? 'Σωστό! +5 XP ✅' : 'Σωστό! ✅');
+
+        duoNextBtn.style.display = '';
+        duoCheckBtn.style.display = 'none';
+        lessonRuntime.canNext = true;
+        return true;
+      } else {
+        failOneLife();
+        if (lessonRuntime.lives > 0) setFeedback('bad', 'Όχι ακόμη. Δοκίμασε ξανά.');
+        return false;
+      }
+    }
+
+    if (st.type === 'order'){
+      const list = lessonRuntime.orderList || [];
+      const ok = list.every((txt, i) => {
+        const idxWanted = st.answerOrder[i];
+        return txt === st.items[idxWanted];
+      });
+
+      if (ok){
+        const got = maybeAwardXp(5);
+        setFeedback('ok', got ? 'Σωστή σειρά! +5 XP ✅' : 'Σωστή σειρά! ✅');
+
+        duoNextBtn.style.display = '';
+        duoCheckBtn.style.display = 'none';
+        lessonRuntime.canNext = true;
+        return true;
+      } else {
+        failOneLife();
+        if (lessonRuntime.lives > 0) setFeedback('bad', 'Η σειρά δεν είναι σωστή ακόμη. Δοκίμασε ξανά.');
+        return false;
+      }
+    }
+
+    return false;
+  }
+
+  function startLesson(id){
+    const found = findLessonById(id);
+    if (!found) return;
+
+    lessonRuntime.lessonId = id;
+    lessonRuntime.repeatMode = courseCompleted(id); // ✅ already completed => NO XP
+
+    resetLessonRuntime();
+    enterPlayer();
+    renderStep();
+  }
+
+  /* =========================
+     Buttons
+     ========================= */
+  duoCheckBtn.addEventListener('click', () => {
+    checkCurrentStep();
+  });
+
+  duoNextBtn.addEventListener('click', () => {
+    if (!lessonRuntime.canNext) return;
+
+    const txt = duoNextBtn.textContent || '';
+    if (txt.includes('Πίσω στα μαθήματα')){
+      renderHome();
+      return;
+    }
+    advance();
+  });
+
+  duoHintBtn.addEventListener('click', () => {
+    const st = stepData();
+    if (!st) return;
+
+    // ✅ TASK: με Υπόδειξη πάμε σε practice dock για να εκτελεστεί η ενέργεια στην εφαρμογή
+    if (st.type === 'task'){
+      beginPractice();
+      return;
+    }
+
+    if (st.hint){
+      setFeedback('hint', 'Υπόδειξη: ' + st.hint);
+    } else {
+      setFeedback('hint', 'Υπόδειξη: Ξαναδιάβασε την κάρτα του μαθήματος.');
+    }
+  });
+
+  duoBackBtn.addEventListener('click', () => {
+    const les = currentLesson();
+    if (!les) { renderHome(); return; }
+
+    if (lessonRuntime.stepIndex <= 0){
+      renderHome();
+      return;
+    }
+
+    lessonRuntime.stepIndex = Math.max(0, lessonRuntime.stepIndex - 1);
+    renderStep();
+  });
+
+  // init
+  try{ renderHome(); }catch(e){}
+  try{ setTimeout(() => { if (typeof ggXpEmitState === 'function') ggXpEmitState(); }, 150); }catch(e){}
+
+  // XP modal close handlers
+  if (xpCloseEl){
+    xpCloseEl.addEventListener('click', async () => {
+      await unlockAudioOnce();
+      try{ sfxClick.play(); }catch(_){}
+      closeXP();
+    });
+  }
+  if (xpBackEl){
+    xpBackEl.addEventListener('click', (e) => {
+      if (e.target === xpBackEl) closeXP();
+    });
+  }
+
+  // Practice dock handlers (exactly like SimpleElectricMotor)
+  if (lessonDockReturnEl){
+    lessonDockReturnEl.addEventListener('click', async () => {
+      await unlockAudioOnce();
+      try{ sfxClick.play(); }catch(_){}
+      returnFromPractice();
+    });
+  }
+
+  if (lessonDockCheckEl){
+    lessonDockCheckEl.addEventListener('click', async () => {
+      await unlockAudioOnce();
+      try{ sfxClick.play(); }catch(_){}
+      const ok = (typeof checkCurrentStep === 'function') ? !!checkCurrentStep() : false;
+
+      if (ok){
+        returnFromPractice();
+      } else {
+        const st = (typeof stepData === 'function') ? stepData() : null;
+        const base = (st && st.hint) ? ('Υπόδειξη: ' + st.hint) : 'Ολοκλήρωσε το task στην εφαρμογή και ξαναπάτα «Έλεγχος».';
+        showDock('⚙️ PRACTICE MODE — ' + base + ' (δεν ολοκληρώθηκε ακόμη)');
+      }
+    });
+  }
+
+  // Escape: dock -> back to task, modal -> close, help -> close
+  window.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+
+    if (lessonDockEl && lessonDockEl.style.display !== 'none'){
+      returnFromPractice();
+      return;
+    }
+    if (xpBackEl && xpBackEl.classList.contains('show')){
+      closeXP();
+      return;
+    }
+    try{ if (typeof closeGuide === 'function') closeGuide(); }catch(_){}
+  });
+
+
+  /* =========================
+     Pointer (Switch + Battery + Rod)
+     ========================= */
+
+  // =========================
+  // Pointer (Switch + Battery + Rod)
+  // =========================
+  let downX=0, downY=0, downTms=0;
+  let downMode = null;
+  let downPointerId = null;
+
+  function cancelPointerInteraction(){
+    downMode = null;
+    downPointerId = null;
+    draggingRod = false;
+    dragPointerId = null;
+    try{ controls.enabled = true; }catch(_){ }
+  }
+
+  renderer.domElement.addEventListener('pointerdown', async (ev)=>{
+    // ✅ tap στη σκηνή κλείνει οποιοδήποτε “σύννεφο”
+    closeAllOverlays();
+
+    // ✅ σε tiny, tap εκτός HUD κλείνει το panel
+    if (wrap.classList.contains('tiny') && hudEl){
+      const r = hudEl.getBoundingClientRect();
+      const insideHud = (ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= r.bottom);
+      if (!insideHud) setHudCollapsed(true);
+    }
+
+    await unlockAudioOnce();
+
+    downX = ev.clientX; downY = ev.clientY; downTms = performance.now();
+    downPointerId = ev.pointerId;
+
+    const kind = hitTestKind(ev);
+
+    if (kind === 'switch'){
+      downMode = 'switch';
+      draggingRod = false;
+      controls.enabled = false;
+      try { renderer.domElement.setPointerCapture(ev.pointerId); } catch(_){}
+      ev.preventDefault();
+      return;
+    }
+
+    if (kind === 'battery'){
+      downMode = 'battery';
+      draggingRod = false;
+      controls.enabled = false;
+      try { renderer.domElement.setPointerCapture(ev.pointerId); } catch(_){}
+      ev.preventDefault();
+      return;
+    }
+
+    if (kind === 'rod'){
+      downMode = 'rod';
+      draggingRod = true;
+      dragPointerId = ev.pointerId;
+
+      controls.enabled = false;
+      try { renderer.domElement.setPointerCapture(ev.pointerId); } catch(_){}
+      updateRodFromPointer(ev);
+      ev.preventDefault();
+      return;
+    }
+
+    downMode = null;
+  }, { passive:false });
+
+  renderer.domElement.addEventListener('pointermove', (ev)=>{
+    if (!draggingRod) return;
+    if (dragPointerId !== ev.pointerId) return;
+    updateRodFromPointer(ev);
+    ev.preventDefault();
+  }, { passive:false });
+
+  renderer.domElement.addEventListener('pointerup', (ev)=>{
+    const wasPointer = (downPointerId === ev.pointerId);
+
+    try { renderer.domElement.releasePointerCapture(ev.pointerId); } catch(_){}
+    controls.enabled = true;
+
+    if (draggingRod && dragPointerId === ev.pointerId){
+      draggingRod = false;
+      dragPointerId = null;
+      rodVel = 0;
+      downMode = null;
+      downPointerId = null;
+      ev.preventDefault();
+      return;
+    }
+
+    if (wasPointer && (downMode === 'switch' || downMode === 'battery')){
+      const dx = ev.clientX - downX;
+      const dy = ev.clientY - downY;
+      const dt = performance.now() - downTms;
+      const isTap = (dx*dx + dy*dy) <= (24*24) && dt <= 950;
+
+      if (isTap){
+        const kindUp = hitTestKind(ev);
+
+        if (downMode === 'switch' && kindUp === 'switch'){
+          toggleCircuit();
+          ev.preventDefault();
+        }
+
+        if (downMode === 'battery' && kindUp === 'battery'){
+          toggleBatteryPolarity();
+          ev.preventDefault();
+        }
+      }
+    }
+
+    downMode = null;
+    downPointerId = null;
+  }, { passive:false });
+
+  // ✅ Safety: cancel drag if pointer capture is lost (Mac/Safari) or tab loses focus
+  renderer.domElement.addEventListener('lostpointercapture', () => { cancelPointerInteraction(); }, { passive:true });
+  window.addEventListener('blur', () => { cancelPointerInteraction(); }, { passive:true });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) cancelPointerInteraction(); }, { passive:true });
+
+
+  renderer.domElement.addEventListener('pointercancel', ()=>{
+    try { renderer.domElement.releasePointerCapture(downPointerId); } catch(_){}
+    controls.enabled = true;
+    draggingRod = false;
+    dragPointerId = null;
+    downMode = null;
+    downPointerId = null;
+  }, { passive:true });
+
+  // =========================
+  // UI
+  // =========================
+  btnReset.addEventListener('click', async ()=>{
+    await unlockAudioOnce();
+    sfxClick.play();
+
+    controls.enabled = true;
+    controls.reset();
+    controls.update();
+    controls.autoRotate = true;
+    btnAuto.textContent = 'Περιστροφή: ΝΑΙ';
+
+    linesOpacityEl.value = '0.2';
+    setLinesOpacity(Number(linesOpacityEl.value));
+
+    fieldStrengthEl.value = '1';
+    fieldStrength = 1.0;
+
+    resistorREl.value = '1';
+    resistorOhm = 1.0;
+
+    magnetYawEl.value = '90';
+    magnetYawDeg = 90;
+
+    magnetBackEl.value = '1';
+    magnetBack01 = 1;
+
+    refreshHudReadouts();
+
+    computeMagnetBackAxisWorld();
+    calibrateMagnetBackMaxDistFromLines();
+    applyMagnetTransform();
+    applyLaplaceVectorScale();
+    updateLaplaceVisibility();
+
+    draggingRod = false;
+    dragPointerId = null;
+    rodVel = 0;
+    if (railReady) setRodT(tMin);
+
+    batteryLevel = 1.0;
+    batteryReversed = false;
+    applyBatteryRotation();
+
+    circuitOn = false;
+    setSwitchButton(false);
+    energizedPrev = null;
+    syncEnergizedState();
+
+    if (arrowsGroup){
+      arrowsGroup.visible = false;
+      for (const ch of arrowsGroup.children) ch.visible = false;
+    }
+
+    heatLevel = 0;
+    if (heatGroup){
+      heatGroup.visible = false;
+      for (const sp of heatWaves) sp.visible = false;
+    }
+
+    closeAllOverlays();
+    closeGuide();
+  });
+
+  btnAuto.addEventListener('click', async ()=>{
+    await unlockAudioOnce();
+    sfxClick.play();
+    controls.autoRotate = !controls.autoRotate;
+    btnAuto.textContent = 'Περιστροφή: ' + (controls.autoRotate ? 'ΝΑΙ' : 'ΟΧΙ');
+  });
+
+  linesOpacityEl.addEventListener('input', ()=>{
+    setLinesOpacity(Number(linesOpacityEl.value));
+    refreshHudReadouts();
+  });
+
+  function refreshFieldDependent(recalibrateOverlap=false){
+    computeMagnetBackAxisWorld();
+
+    if (recalibrateOverlap){
+      recalibrateOverlapRangePreserveDistance();
+    }
+
+    applyMagnetTransform();
+    applyLaplaceVectorScale();
+    updateLaplaceVisibility();
+    laplaceOn = isEnergized() && hasEffectiveField();
+  }
+
+  fieldStrengthEl.addEventListener('input', ()=>{
+    fieldStrength = Math.max(0, Number(fieldStrengthEl.value) || 0);
+    refreshHudReadouts();
+    refreshFieldDependent(false);
+  });
+
+  resistorREl.addEventListener('input', ()=>{
+    resistorOhm = Math.max(0.05, Number(resistorREl.value) || 0.05);
+    refreshHudReadouts();
+    refreshFieldDependent(false);
+  });
+
+  magnetYawEl.addEventListener('input', ()=>{
+    magnetYawDeg = Number(magnetYawEl.value) || 0;
+    refreshHudReadouts();
+    refreshFieldDependent(true);
+  });
+
+  magnetBackEl.addEventListener('input', ()=>{
+    magnetBack01 = clamp01(Number(magnetBackEl.value) || 0);
+    refreshHudReadouts();
+    refreshFieldDependent(false);
+  });
+
+  btnHudToggle.addEventListener('click', async (ev)=>{
+    await unlockAudioOnce();
+    sfxClick.play();
+    ev.preventDefault();
+    ev.stopPropagation();
+
+    if (!wrap.classList.contains('tiny')) return;
+    setHudCollapsed(!hudCollapsed);
+  });
+
+  // =========================
+  // Battery axis from plane
+  // =========================
+  function applyBatteryAxisFromCircuitPlane(){
+    if (!batteryBranchObj) return;
+    batteryBranchObj.updateMatrixWorld(true);
+    batteryBaseQuat.copy(batteryBranchObj.quaternion);
+
+    const okPlane = updateCircuitPlaneFromStops(circuitPlaneP, circuitPlaneN);
+    const axisWorld = okPlane ? circuitPlaneN.clone() : new THREE.Vector3(0,1,0);
+
+    batteryBranchObj.getWorldQuaternion(batteryBaseWorldQuat);
+    const invBaseWorld = batteryBaseWorldQuat.clone().invert();
+    batteryFlipAxisLocal.copy(axisWorld).applyQuaternion(invBaseWorld).normalize();
+  }
+
+  // =========================
+  // init()
+  // =========================
+  async function init(){
+    try{
+      const fbxLoader = new FBXLoader();
+      const { obj } = await loadFBXWithFallback(fbxLoader, MODEL_FILE);
+
+      modelRoot = obj;
+
+      obj.traverse((child)=>{
+        if (child.isMesh){
+          child.frustumCulled = true;
+          child.castShadow = false;
+          child.receiveShadow = false;
+          applySetToMesh(child);
+        }
+      });
+
+      scene.add(obj);
+      fitToObject(obj);
+
+      homeDistance = camera.position.distanceTo(controls.target);
+      controls.minDistance = homeDistance * 0.35;
+      controls.maxDistance = homeDistance * 0.91;
+      controls.maxPolarAngle = Math.PI * 0.5 - 0.02;
+
+      controls.update();
+      controls.saveState();
+
+      ARROW_LEN_ROD  = homeDistance * 0.030;
+      ARROW_LEN_WIRE = homeDistance * 0.022;
+      ARROW_LIFT     = homeDistance * 0.004;
+
+      switchRoot  = obj.getObjectByName(SWITCH_NAME);
+      stopRoot    = obj.getObjectByName(STOP_NAME);
+      rodObj      = obj.getObjectByName(ROD_NAME);
+
+      circuitObj = obj.getObjectByName(CIRCUIT_NAME);
+      batteryBranchObj  = obj.getObjectByName(BATTERY_NAME);
+      resistorBranchObj = obj.getObjectByName(RESISTOR_NAME);
+
+      poleNObj  = obj.getObjectByName(POLE_N_NAME);
+      poleSObj  = obj.getObjectByName(POLE_S_NAME);
+      magnetObj = findMagnetObject(obj);
+      fuseObj   = findFuseObject(obj);
+
+      linesObj = magnetObj ? magnetObj.getObjectByName(LINES_NAME) : obj.getObjectByName(LINES_NAME);
+
+      if (switchRoot){
+        buttonObj = switchRoot.getObjectByName(BUTTON_NAME);
+        if (buttonObj){
+          buttonKeepY = buttonObj.rotation.y;
+          buttonKeepZ = buttonObj.rotation.z;
+        }
+        ledObj = switchRoot.getObjectByName(LED_NAME);
+        if (ledObj){
+          ledObj.traverse(o=>{ if (o.isMesh) ensureCloneMaterials(o); });
+          applyLedGlow(false);
+        }
+      }
+
+      lampace1Obj = null; lampace2Obj = null; lampaceLegacyObj = null;
+      lap1BaseScale = null; lap2BaseScale = null; lapLegacyBaseScale = null;
+
+      if (rodObj){
+        lampace1Obj = rodObj.getObjectByName(LAPLACE1_NAME);
+        lampace2Obj = rodObj.getObjectByName(LAPLACE2_NAME);
+        lampaceLegacyObj = rodObj.getObjectByName(LAPLACE_LEGACY_NAME);
+
+        if (lampace1Obj){ lampace1Obj.visible = false; markSkipBoundsDeep(lampace1Obj); lap1BaseScale = lampace1Obj.scale.clone(); }
+        if (lampace2Obj){ lampace2Obj.visible = false; markSkipBoundsDeep(lampace2Obj); lap2BaseScale = lampace2Obj.scale.clone(); }
+        if (lampaceLegacyObj){ lampaceLegacyObj.visible = false; markSkipBoundsDeep(lampaceLegacyObj); lapLegacyBaseScale = lampaceLegacyObj.scale.clone(); }
+      }
+
+      paintObjectWhite(poleNObj);
+      paintObjectWhite(poleSObj);
+
+      setupRodRail();
+      computeBatteryTAlongRail();
+
+      applyBatteryAxisFromCircuitPlane();
+
+      setupMagnetRig(obj);
+      applyGlowToLines(linesObj);
+      captureMagnetB0Local();
+
+      computeMagnetBackAxisWorld();
+      calibrateMagnetBackMaxDistFromLines();
+      applyMagnetTransform();
+
+      setupArrows();
+      setupHeatWaves();
+
+      setLinesOpacity(Number(linesOpacityEl.value));
+
+      computeFloorY();
+      floorMargin = Math.max(homeDistance * 0.02, 0.01);
+      clampCameraAboveFloor();
+
+      fieldStrength = Math.max(0, Number(fieldStrengthEl.value) || 0);
+      resistorOhm = Math.max(0.05, Number(resistorREl.value) || 1.0);
+
+      magnetYawDeg = Number(magnetYawEl.value) || 0;
+      magnetBack01 = clamp01(Number(magnetBackEl.value) || 0);
+
+      applyMagnetTransform();
+
+      batteryLevel = 1.0;
+      batteryReversed = false;
+      applyBatteryRotation();
+
+      circuitOn = false;
+      setSwitchButton(false);
+
+      energizedPrev = null;
+      applyLaplaceVectorScale();
+      syncEnergizedState();
+      updateLaplaceVisibility();
+
+      if (railReady){
+        setRodT(tMin);
+        rodVel = 0;
+      }
+
+      overlayBtnLayer.innerHTML = '';
+      overlayPopLayer.innerHTML = '';
+      overlays.clear();
+      openOverlayKey = null;
+
+      const batExtra = `
+        <div class="bat-row">
+          <div class="bat-shell" aria-hidden="true">
+            <div class="bat-cap"></div>
+            <div class="bat-fill" id="batFill"></div>
+          </div>
+          <div class="bat-text" id="batPct">100%</div>
+        </div>
+      `;
+
+      makeOverlay(
+        'battery',
+        '🔋',
+        'Μπαταρία',
+        'Η μπαταρία έχει πεπερασμένη χωρητικότητα σε ενέργεια. Όταν ο διακόπτης είναι ενεργοποιημένος, παρέχει ηλεκτρική ενέργεια η οποία μετατρέπεται σε κινητική ενέργεια στη ράβδο και σε θερμότητα στο περιβάλλον (Φαινόμενο Joule).',
+        ()=>batteryBranchObj,
+        { extraHtml: batExtra, anchorMode: ANCHOR.CENTER }
+      );
+
+      makeOverlay(
+        'resistor',
+        'Ω',
+        'Αντιστάτης',
+        'Περιορίζει το ρεύμα και μετατρέπει μέρος της ηλεκτρικής ενέργειας σε θερμότητα (φαινόμενο Joule). Όταν υπάρχει ρεύμα, εμφανίζονται θερμικά “κύματα”.',
+        ()=>resistorBranchObj,
+        { anchorMode: ANCHOR.CENTER }
+      );
+
+      makeOverlay(
+        'fuse',
+        '🛡️',
+        'Ηλεκτρική Ασφάλεια',
+        'Προστατεύει το κύκλωμα: αν το ρεύμα γίνει υπερβολικά μεγάλο, “κόβει” το κύκλωμα για να μην καταστραφούν τα στοιχεία.',
+        ()=>fuseObj,
+        { anchorMode: ANCHOR.CENTER }
+      );
+
+      makeOverlay(
+        'switch',
+        '⏻',
+        'Διακόπτης',
+        'Ανοίγει ή κλείνει το κύκλωμα. Όταν είναι κλειστός (ON), επιτρέπει τη ροή ρεύματος (εφόσον η μπαταρία έχει ενέργεια).',
+        ()=>switchRoot,
+        { anchorMode: ANCHOR.CENTER }
+      );
+
+      makeOverlay(
+        'rod',
+        '↔️',
+        'Ράβδος (Αγωγός)',
+        'Αγωγός που μπορεί να κινηθεί πάνω σε ράγες. Όταν τη διαρρέει ρεύμα μέσα σε μαγνητικό πεδίο, δέχεται δύναμη Laplace και κινείται.',
+        ()=>rodObj,
+        { anchorMode: ANCHOR.CENTER }
+      );
+
+      makeOverlay(
+        'magnet',
+        '🧲',
+        'Μαγνήτης',
+        'Δημιουργεί μαγνητικό πεδίο. Ο slider “Γωνία” θέτει τη γωνία θ μεταξύ δυναμικών γραμμών (Β) και Ι. Με την “Επικάλυψη” μειώνεται το ενεργό τμήμα L της ράβδου μέσα στο πεδίο.',
+        ()=> poleNObj,
+        { anchorMode: ANCHOR.TOP }
+      );
+
+      batFillEl = document.getElementById('batFill');
+      batPctEl  = document.getElementById('batPct');
+      renderBatteryGauge();
+
+      loaderEl.style.display = 'none';
+      refreshHudReadouts();
+
+      requestAnimationFrame(applyHudSizing);
+    } catch (e){
+      progEl.style.width = '0%';
+      setStatusText(
+        'Σφάλμα φόρτωσης.\n' +
+        'Βεβαιώσου ότι το LaplaceCircuit.fbx υπάρχει στο ίδιο folder (ή στο resources/).'
+      );
+    }
+  }
+
+  // =========================
+  // Animation loop
+  // =========================
+  const clock = new THREE.Clock();
+  function animate(){
+    requestAnimationFrame(animate);
+    let dt = clock.getDelta();
+    if (!Number.isFinite(dt) || dt <= 0) dt = 0.016;
+    dt = Math.min(dt, 0.05);
+    const tNow = clock.elapsedTime;
+
+    updateBatteryDrain(dt);
+    syncEnergizedState();
+
+    updateRodPhysics(dt);
+    updateArrows();
+
+    updateHeatWaves(dt, tNow);
+
+    renderBatteryGauge();
+    updateOverlays();
+
+    controls.update();
+    clampCameraAboveFloor();
+    renderer.render(scene, camera);
+  }
+
+  animate();
+  init();
+</script>
+</body>
+</html>

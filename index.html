@@ -1534,6 +1534,89 @@ html{
       .timelinePanel{ padding: 16px; }
       .tlYearBtn{ padding: 6px 9px 18px; font-size: 12px; }
     }
+
+    /* ===== Play Store application catalog: expandable for future Android apps ===== */
+    .playCatalogIntro{
+      border-top:1px solid rgba(255,255,255,.12);
+      margin-top:34px;
+      padding-top:27px;
+    }
+    .playCatalogIntro h3{
+      margin:0 0 9px;
+      font-size:clamp(20px,2.15vw,29px);
+      letter-spacing:.1px;
+    }
+    .playCatalogIntro p{
+      color:rgba(255,255,255,.78);
+      margin:0;
+      line-height:1.6;
+    }
+    .playAppsGrid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:16px;
+      margin-top:18px;
+    }
+    .playAppCard{
+      padding:20px;
+      min-width:0;
+      display:flex;
+      flex-direction:column;
+      gap:17px;
+    }
+    .playAppInfo{
+      display:grid;
+      grid-template-columns:94px minmax(0,1fr);
+      align-items:start;
+      gap:15px;
+    }
+    .playAppIcon{
+      width:94px;height:94px;
+      display:block;
+      object-fit:cover;
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow:0 14px 35px rgba(0,0,0,.24);
+      background:rgba(255,255,255,.08);
+    }
+    .playAppType{
+      font-size:12px;
+      font-weight:850;
+      color:rgba(255,255,255,.70);
+      letter-spacing:.1px;
+    }
+    .playAppCard h4{
+      margin:6px 0 8px;
+      font-size:19px;
+      line-height:1.3;
+      color:rgba(255,255,255,.96);
+    }
+    .playAppCard p{
+      margin:0;
+      color:rgba(255,255,255,.78);
+      font-size:14px;
+      line-height:1.55;
+    }
+    .playAppTags{display:flex;gap:7px;flex-wrap:wrap;}
+    .playAppTags span{
+      font-size:12px;font-weight:750;
+      color:rgba(255,255,255,.82);
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:999px;
+      padding:6px 10px;
+    }
+    .playAppActions{display:flex;flex-wrap:wrap;gap:9px;margin-top:auto;}
+    .playAppActions .btn{font-size:14px;padding:11px 13px;}
+    .playAppActions a:focus-visible{outline:2px solid var(--accent);outline-offset:3px;}
+    @media (max-width:930px){.playAppsGrid{grid-template-columns:1fr;}}
+    @media (max-width:500px){
+      .playAppInfo{grid-template-columns:72px minmax(0,1fr);gap:12px;}
+      .playAppIcon{width:72px;height:72px;border-radius:16px;}
+      .playAppCard h4{font-size:17px;}
+    }
+    /* ===== End Play Store application catalog ===== */
+
 </style>
 
   <!-- =============================
@@ -1621,6 +1704,7 @@ html{
   <link rel="preconnect" href="https://i.ytimg.com" crossorigin />
   <link rel="preconnect" href="https://itunes.apple.com" crossorigin />
 
+  <script src="playstore/catalog.js" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">Πήγαινε στο περιεχόμενο</a>
@@ -1835,7 +1919,7 @@ html{
             <div class="nowStack" id="nowCarouselTrack">
               <div class="nowItem">
                             <b><span class="chip chip-has-ico"><img class="chip-ico" src="https://img.icons8.com/?size=100&id=Qn4GH3u6CYo5&format=png&color=000000" alt="Google Play" loading="lazy" decoding="async"></span> Android βιβλίο: Ηλεκτρομαγνητισμός Γυμνασίου</b>
-                            <span>Η ανάπτυξη έχει ολοκληρωθεί και σύντομα θα είναι διαθέσιμη. Εγγραφείτε στο <a class="u" href="#contact">newsletter</a> ή επισκεφθείτε ξανά την σελίδα μας για να προμηθευτείτε τον σύνδεσμο.</span>
+                            <span>Η ανάπτυξη έχει ολοκληρωθεί και σύντομα θα είναι διαθέσιμη. Δες την <a class="u" href="playstore/electromagnetism-gymnasium/">αναλυτική παρουσίαση της εφαρμογής</a> και δοκίμασε δύο διαδραστικά εργαστήρια. Εγγραφείτε στο <a class="u" href="#contact">newsletter</a> για ενημερώσεις σχετικά με τη διάθεσή της.</span>
                           </div>
               <div class="nowItem">
                             <b><span class="chip chip-has-ico"><img class="chip-ico" src="https://img.icons8.com/?size=100&id=Qn4GH3u6CYo5&format=png&color=000000" alt="Google Play" loading="lazy" decoding="async"></span> Android εφαρμογή: iCircuit</b>
@@ -1976,8 +2060,26 @@ html{
           <p>Δες το TOP 10 και τη θέση σου. Ένα επιπλέον κίνητρο για συνέπεια στη μελέτη.</p>
         </div>
 
-</div>
       </div>
+
+      <!-- Ανεξάρτητη υποκατηγορία Play Store: οι κάρτες δημιουργούνται από playstore/catalog.js -->
+      <div class="playCatalogIntro reveal" id="playstore-apps">
+        <h3>Εφαρμογές &amp; διαδραστικά βιβλία στο Google Play</h3>
+        <p>Γνώρισε τις εφαρμογές της iPedia για Android. Κάθε εφαρμογή διαθέτει τη δική της σελίδα παρουσίασης με πληροφορίες, δυνατότητες και, όπου παρέχονται, δοκιμαστικά διαδραστικά εργαστήρια.</p>
+      </div>
+      <div class="playAppsGrid" id="playAppsGrid" aria-label="Κατάλογος εφαρμογών iPedia στο Google Play">
+        <!-- Οι κάρτες εισάγονται αυτόματα από playstore/catalog.js. -->
+      </div>
+      <noscript>
+        <div class="card playAppCard" style="margin-top:16px">
+          <h4>Ηλεκτρομαγνητισμός Γ΄ Γυμνασίου</h4>
+          <p>Διαδραστικό βιβλίο Φυσικής με δύο δοκιμαστικά εργαστήρια.</p>
+          <div class="playAppActions">
+            <a class="btn primary" href="https://play.google.com/store/apps/details?id=com.ipedia.emappdemo" target="_blank" rel="noopener noreferrer">Κατέβασε την εφαρμογή</a>
+            <a class="btn" href="playstore/electromagnetism-gymnasium/">Ιστοσελίδα εφαρμογής</a>
+          </div>
+        </div>
+      </noscript>
     </div>
   </section>
 
